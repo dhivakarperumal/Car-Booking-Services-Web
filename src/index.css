@@ -176,3 +176,18 @@ body {
 .card-title {
   @apply text-lg font-semibold text-gray-800 border-b pb-2;
 }
+
+
+.hero-zoom {
+  animation: zoomEffect 10s ease-in-out infinite;
+}
+
+@keyframes zoomEffect {
+  0% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(1.15);
+  }
+}
+
