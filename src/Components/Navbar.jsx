@@ -15,7 +15,7 @@ const Navbar = () => {
   return (
     <header className="sticky top-0 z-50">
       {/* Glow line */}
-      <div className="h-[1px] bg-gradient-to-r from-transparent via-sky-400 to-transparent animate-pulse" />
+      {/* <div className="h-[1px] bg-gradient-to-r from-transparent via-sky-400 to-transparent animate-pulse" /> */}
 
       <div className="bg-black backdrop-blur-md border-b border-sky-400/20">
         <div className="max-w-7xl mx-auto px-6">
