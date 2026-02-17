@@ -8,8 +8,9 @@ import { AuthProvider } from "./PrivateRouter/AuthContext.jsx";
 import PrivateRoute from "./PrivateRouter/PrivateRouter.jsx";
 import { Toaster } from "react-hot-toast";
 import Home from "./Components/Home.jsx";
-
-
+import Pricing from "./Components/Pricing.jsx";
+import Products from "./Components/Products.jsx";
+import ContactUs from "./Components/ContactUs.jsx";
 
 // Auth
 import Login from "./Auth/Login.jsx";
@@ -48,6 +49,8 @@ import AddStock from "./Admin/Products/AddStock.jsx";
 import StockDetails from "./Admin/Products/StockDetails.jsx";
 import AddCarServices from "./Admin/ServicesList/AddSerivess.jsx";
 import ServicesListAll from "./Admin/ServicesList/ServicesListAll.jsx";
+import Services from "./Components/Services.jsx";
+import About from "./Components/About.jsx";
 
 
 const router = createBrowserRouter([
@@ -59,7 +62,11 @@ const router = createBrowserRouter([
   
       { path: "/login", element: <Login /> },
       { path: "/register", element: <Register /> },
-
+      { path: "/services", element: <Services /> },
+      { path: "/pricing", element: <Pricing /> },
+      { path: "/products", element: <Products /> },
+      { path: "/about", element: <About /> },
+      { path: "/contact", element: <ContactUs /> },
      
     ],
   },

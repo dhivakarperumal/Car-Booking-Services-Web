@@ -1,28 +1,31 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const navigate = useNavigate();
 
   const links = [
-    "HOME",
-    "SERVICES",
-    "PRICING",
-    "PRODUCTS",
-    "ABOUT",
-    "CONTACT US",
+    { label: "HOME", path: "/" },
+    { label: "SERVICES", path: "/services" },
+    { label: "PRICING", path: "/pricing" },
+    { label: "PRODUCTS", path: "/products" },
+    { label: "ABOUT", path: "/about" },
+    { label: "CONTACT US", path: "/contact" },
   ];
 
   return (
     <header className="sticky top-0 z-50">
-      {/* Glow line */}
-      {/* <div className="h-[1px] bg-gradient-to-r from-transparent via-sky-400 to-transparent animate-pulse" /> */}
 
       <div className="bg-black backdrop-blur-md border-b border-sky-400/20">
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex items-center justify-between h-16">
 
             {/* LOGO */}
-            <div className="flex items-center gap-3 group cursor-pointer">
+            <div
+              onClick={() => navigate("/")}
+              className="flex items-center gap-3 cursor-pointer group"
+            >
               <img
                 src="/logo.png"
                 alt="DucatiBox Logo"
@@ -35,10 +38,10 @@ const Navbar = () => {
             {/* DESKTOP MENU */}
             <nav className="hidden md:flex items-center gap-8">
               {links.map((item) => (
-                <a
-                  key={item}
-                  href="#"
-                  className="relative text-gray-300 text-[14px] font-bold tracking-[0.2em]
+                <button
+                  key={item.label}
+                  onClick={() => navigate(item.path)}
+                  className="relative cursor-pointer text-gray-300 text-[14px] font-bold tracking-[0.2em]
                              transition-all duration-300
                              hover:text-sky-400
                              hover:drop-shadow-[0_0_8px_rgba(56,189,248,0.6)]
@@ -48,22 +51,20 @@ const Navbar = () => {
                              after:transition-all after:duration-300
                              hover:after:w-full"
                 >
-                  {item}
-                </a>
+                  {item.label}
+                </button>
               ))}
             </nav>
 
-            {/* CTA BUTTON */}
+            {/* CTA */}
             <div className="hidden md:block">
               <button
-                className="relative cursor-pointer px-6 py-2.5 rounded-md font-bold text-xs tracking-[0.2em]
+                onClick={() => navigate("/services")}
+                className="relative px-6 py-2.5 cursor-pointer rounded-md font-bold text-xs tracking-[0.2em]
                            text-sky-400 border border-sky-400/60
                            transition-all duration-300
                            hover:text-black hover:bg-sky-400
-                           hover:shadow-[0_0_25px_rgba(56,189,248,0.6)]
-                           before:absolute before:inset-0 before:rounded-md
-                           before:border before:border-sky-400/40
-                           before:opacity-0 hover:before:opacity-100"
+                           hover:shadow-[0_0_25px_rgba(56,189,248,0.6)]"
               >
                 BOOK SERVICE
               </button>
@@ -82,6 +83,9 @@ const Navbar = () => {
         </div>
       </div>
 
+      <div className="h-[1px] bg-gradient-to-r from-transparent via-sky-400 to-transparent animate-pulse" />
+
+
       {/* MOBILE MENU */}
       <div
         className={`md:hidden bg-black/95 backdrop-blur transition-all duration-300 overflow-hidden
@@ -89,17 +93,24 @@ const Navbar = () => {
       >
         <nav className="flex flex-col px-6 py-6 gap-6">
           {links.map((item) => (
-            <a
-              key={item}
-              href="#"
+            <button
+              key={item.label}
+              onClick={() => {
+                navigate(item.path);
+                setIsOpen(false);
+              }}
               className="text-gray-300 text-xs font-bold tracking-[0.2em]
-                         hover:text-sky-400 transition"
+                         hover:text-sky-400 transition text-left"
             >
-              {item}
-            </a>
+              {item.label}
+            </button>
           ))}
 
           <button
+            onClick={() => {
+              navigate("/services");
+              setIsOpen(false);
+            }}
             className="mt-4 px-5 py-2.5 rounded-md font-bold text-xs tracking-[0.2em]
                        text-black bg-sky-400
                        shadow-[0_0_25px_rgba(56,189,248,0.6)]"
