@@ -4,6 +4,7 @@ import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/effect-fade";
 import About from "./About";
+import Footer from "./Footer";
 
 const slides = [
   {
@@ -88,6 +89,7 @@ export default function Hero() {
       </Swiper>
     </section>
     <About />
+    <Footer />
     </>
   );
 }
