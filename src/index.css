@@ -1,25 +1,26 @@
-
-@import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=Josefin+Sans:ital,wght@0,100..700;1,100..700&display=swap');
+/* @import url('https://fonts.googleapis.com/css2?family=Lobster+Two:ital,wght@0,400;0,700;1,400;1,700&display=swap'); */
 
 body {
-  font-family: 'Josefin Sans', sans-serif;
+  font-family: "Lobster Two", sans-serif;
+  font-weight: 500;
+  font-style: normal;
 }
 
 @import "tailwindcss";
 
-.archivo-black-regular {
+/* .archivo-black-regular {
   font-family: "Archivo Black", sans-serif;
   font-weight: 400;
   font-style: normal;
-}
+} */
 
 @theme {
   --color-orange100: #FFEDD5;
-  --color-orange500: #F97316;     
+  --color-orange500: #F97316;
   --color-orange400: #FB923C;
   --color-orange600: #EA580C;
-  --color-orange700: #C2410C; 
-  --color-red500: #EF4444; 
+  --color-orange700: #C2410C;
+  --color-red500: #EF4444;
   --color-gray500: #6B7280;
   --color-HalfWhite: #F9FAFB;
   --color-LightGray: #F3F4F6;
@@ -56,14 +57,14 @@ body {
 
 .swiper-button-next,
 .swiper-button-prev {
-   z-index: 50; 
+  z-index: 50;
   width: 25px !important;
   height: 25px !important;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 4px;
-  overflow: hidden;              
+  overflow: hidden;
   box-sizing: border-box;
 }
 
@@ -71,7 +72,8 @@ body {
 .swiper-button-next::after,
 .swiper-button-prev::after {
   font-size: 12px !important;
-  line-height: 1 !important;     /* ✅ prevent overflow */
+  line-height: 1 !important;
+  /* ✅ prevent overflow */
   margin: 0 !important;
 }
 
@@ -86,6 +88,7 @@ body {
 
 /* Optional: hide arrows on small screens */
 @media (max-width: 640px) {
+
   .swiper-button-next,
   .swiper-button-prev {
     display: none;
@@ -115,12 +118,15 @@ body {
 
 /* Hide scrollbar but allow scrolling */
 .hide-scrollbar {
-  scrollbar-width: none;        /* Firefox */
-  -ms-overflow-style: none;     /* IE 10+ */
+  scrollbar-width: none;
+  /* Firefox */
+  -ms-overflow-style: none;
+  /* IE 10+ */
 }
 
 .hide-scrollbar::-webkit-scrollbar {
-  display: none;                /* Chrome, Safari, Edge */
+  display: none;
+  /* Chrome, Safari, Edge */
 }
 
 .curtain {
@@ -149,7 +155,24 @@ body {
   from {
     transform: scaleX(1);
   }
+
   to {
     transform: scaleX(0);
   }
+}
+
+.input {
+  @apply border border-gray-300 rounded-lg px-3 py-2 w-full focus:ring-2 focus:ring-black outline-none text-sm;
+}
+
+.btn {
+  @apply bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 text-sm;
+}
+
+.card {
+  @apply bg-white shadow-md rounded-2xl p-6 space-y-4;
+}
+
+.card-title {
+  @apply text-lg font-semibold text-gray-800 border-b pb-2;
 }

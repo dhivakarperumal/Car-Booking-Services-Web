@@ -26,28 +26,16 @@ import Register from "./Auth/Register.jsx";
 // // Admin
 import AdminPanel from "./Admin/AdminPanel.jsx";
 import Dashboard from "./Admin/Dashboard/Dashboard.jsx";
-// import Patients from "./Admin/Bookingservice/Patients.js";
-// import PatientsDetails from "./Admin/Bookingservice/PatiientsDetails.jsx";
-
-import Appointments from "./Admin/ServicesProvider/Services.jsx";
-
 import Billings  from "./Admin/Billing/Billins.jsx";
 import Inventory from "./Admin/Inventory/Inventory.jsx";
 
 import Reports from "./Admin/Reports/Reports.jsx";
 import Settings from "./Admin/Settingss/Settings.jsx"
 import BookingService from "./Admin/Bookingservice/BookingService.jsx";
-
-import AddAppointment from "./Admin/ServicesProvider/AddServices.jsx";
-
-
 import AddBilling from "./Admin/Billing/AddBilling.jsx";
 import AddInventoryItem from "./Admin/Inventory/AddInventoryItem.jsx";
-
 import ProfileSettings from "./Admin/Settingss/ProfileSettings.jsx";
-// import BillingSettings from "./Admin/Settingss/BillingSettings.jsx";
 import UserManagement  from "./Admin/Settingss/UserManagement.jsx";
-
 import Staffs from "./Admin/Employees/Staffs.jsx";
 import AddEditStaff from "./Admin/Employees/AddStaff.jsx";
 import ViewStaff from "./Admin/Employees/ViewStaff.jsx";
@@ -61,6 +49,12 @@ import Servicestype from "./Admin/ServicesProvider/Services.jsx";
 import AddServicesType from "./Admin/ServicesProvider/AddServices.jsx";
 import ViewService from "./Admin/ServicesProvider/ViewCarservices.jsx";
 import AddServiceParts from "./Admin/ServicesProvider/Addpairparts.jsx";
+import AllProducts from "./Admin/Products/AllProducts.jsx";
+import AddProducts from "./Admin/Products/AddProducts.jsx";
+import AddStock from "./Admin/Products/AddStock.jsx";
+import StockDetails from "./Admin/Products/StockDetails.jsx";
+import AddCarServices from "./Admin/ServicesList/AddSerivess.jsx";
+import ServicesListAll from "./Admin/ServicesList/ServicesListAll.jsx";
 
 
 const router = createBrowserRouter([
@@ -74,9 +68,6 @@ const router = createBrowserRouter([
       { path: "pricing", element: <Pricing /> },
       { path: "product", element: <Product /> },
       { path: "service/:id", element: <ServiceDetails /> },
-      // { path: "services", element: <ServicePage /> },
-      // { path: "doctors", element: <DoctorPage /> },
-      // { path: "contact", element: <ContactPage /> },
       { path: "bookaservice", element: <BookAService /> },
       { path: "contact", element: <Contact /> },
      
@@ -101,14 +92,17 @@ const router = createBrowserRouter([
       { path: "addservicestype", element: <AddServicesType /> },
       { path: "addserviceparts", element: <AddServiceParts /> },
       { path: "bookings", element: <BookingService /> },
-      // { path: "addpatients/:id", element: <AddPatient /> },
-      // { path: "patients/:id", element: <PatientsDetails /> },
-      // { path: "doctorslots", element: <DoctorSlots /> },
 
+      { path: "allProducts", element: <AllProducts /> },
+      { path: "addproducts", element: <AddProducts /> },
+      { path: "addstock", element: <AddStock /> },
+      { path: "stockdetails", element: <StockDetails /> },
+
+
+      { path: "addservices", element: <AddCarServices /> },
+      { path: "serviceslist", element: <ServicesListAll /> },
      
-      // { path: "appointments", element: <Appointments /> },
-      // { path: "addappointments", element: <AddAppointment/> },
-      // { path: "addappointments/:id", element: <AddAppointment /> },
+      
 
       { path: "carservies", element: <CarServices /> },
       { path: "addcarservies", element: <AddServices /> },
