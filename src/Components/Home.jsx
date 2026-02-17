@@ -1,11 +1,15 @@
 import react from "react";
 import Hero from "./Hero";
+import Navbar from "./Navbar";
 
+export default function Home() {
 
-export default function HomeHeroSlider() {
   return (
     <>
-     <Hero />
+     <h1>
+      <Navbar/>
+      <Hero/>
+     </h1>
     </>
   );
 }
