@@ -6,8 +6,8 @@ export default function AboutStats() {
 
       {/* Background Image */}
       <div
-        className="absolute inset-0 bg-cover bg-center opacity-20"
-        style={{ backgroundImage: "url(https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ-nWdBIBLQ4Oy_71LqdzEMqu_FCf_PxEQ0ug&s)" }}
+        className="absolute inset-0 bg-cover bg-center "
+        style={{ backgroundImage: "url(https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQfAJ3Ai3tu58SWAJ2mK_EhozE-OIgQXcLXNg&s)" }}
       />
 
       {/* Overlay */}
@@ -49,9 +49,9 @@ export default function AboutStats() {
           {/* RIGHT STATS */}
           <div className="grid sm:grid-cols-2 gap-10">
 
-            <StatCard icon={<Settings size={22} />} title="Wheel Replacement" value="700+" />
-            <StatCard icon={<Wrench size={22} />} title="Interior Remodeling" value="200+" />
-            <StatCard icon={<Paintbrush size={22} />} title="Color Correction" value="500+" />
+            <StatCard icon={<Settings size={22} />} title="Wheel Replacement" value="1000+" />
+            <StatCard icon={<Wrench size={22} />} title="Interior Remodeling" value="400+" />
+            <StatCard icon={<Paintbrush size={22} />} title="Color Correction" value="700+" />
             <StatCard icon={<Users size={22} />} title="Years Experience" value="25+" />
 
           </div>
