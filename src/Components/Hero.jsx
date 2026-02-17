@@ -3,6 +3,8 @@ import { Autoplay, EffectFade } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/effect-fade";
+import About from "./About";
+import Footer from "./Footer";
 
 const slides = [
   {
@@ -29,6 +31,7 @@ const slides = [
 
 export default function Hero() {
   return (
+    <>
     <section className="relative h-screen overflow-hidden bg-black">
       <Swiper
         modules={[Autoplay,EffectFade]}
@@ -85,5 +88,8 @@ export default function Hero() {
         ))}
       </Swiper>
     </section>
+    <About />
+    <Footer />
+    </>
   );
 }
