@@ -1,5 +1,6 @@
 import react from "react";
 import Hero from "./Hero";
+import Services from "./Services";
 
 export default function Home() {
 
@@ -7,6 +8,7 @@ export default function Home() {
     <>
      <h1>
       <Hero/>
+      <Services/>
      </h1>
     </>
   );
