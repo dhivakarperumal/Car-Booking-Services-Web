@@ -1,10 +1,6 @@
 import react from "react";
 
-
-export default function HomeHeroSlider() {
-
-
-
+export default function Home() {
 
   return (
     <>
