@@ -51,6 +51,7 @@ import AddCarServices from "./Admin/ServicesList/AddSerivess.jsx";
 import ServicesListAll from "./Admin/ServicesList/ServicesListAll.jsx";
 import Services from "./Components/Services.jsx";
 import About from "./Components/About.jsx";
+import ServiceDetails from "./Components/ServiceDetails.jsx";
 
 
 const router = createBrowserRouter([
@@ -65,6 +66,7 @@ const router = createBrowserRouter([
       { path: "/services", element: <Services /> },
       { path: "/pricing", element: <Pricing /> },
       { path: "/products", element: <Products /> },
+      { path: "/services/:id", element: <ServiceDetails /> },
       { path: "/about", element: <About /> },
       { path: "/contact", element: <ContactUs /> },
      

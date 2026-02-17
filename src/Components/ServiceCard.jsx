@@ -1,62 +1,78 @@
-import React from 'react'
+import React from "react";
+import { useNavigate } from "react-router-dom";
 
 const ServiceCard = ({ service }) => {
-  return (
-    <div
-      className="group relative bg-[#0b0f14]
+    const navigate = useNavigate();
+
+    return (
+        <div
+            className="group relative bg-[#0b0f14]
                  border border-white/10
                  transition-all duration-500
-                 hover:scale-105
+                 hover:scale-[1.02]
                  hover:border-sky-400
                  hover:shadow-[0_25px_70px_rgba(56,189,248,0.35)]"
-    >
-      <div className="p-8 text-center">
+        >
+            <div className="p-6 text-center">
 
-        {/* Title */}
-        <h3 className="text-white text-xl font-bold mb-4">
-          {service.name}
-        </h3>
+                {/* TITLE */}
+                <h3 className="text-white text-2xl font-bold mb-4">
+                    {service.name}
+                </h3>
 
-        {/* Description */}
-        <p className="text-gray-400 text-sm leading-relaxed mb-8">
-          {service.description}
-        </p>
+                {/* DESCRIPTION (SLIGHTLY MORE GAP) */}
+                <p className="text-gray-400 text-sm leading-relaxed mb-10 line-clamp-3">
+                    {service.description}
+                </p>
 
-        {/* Image */}
-        <div className="relative mb-10">
-          <img
-            src={service.image}
-            alt={service.title}
-            className="mx-auto rounded-md"
-          />
+                {/* IMAGE */}
+                <div className="relative mb-8">
+                    <img
+                        src={service.image}
+                        alt={service.name}
+                        className="w-full h-[180px] object-cover rounded-md
+                       transition duration-500  group-hover:scale-110"
+                    />
 
-          {/* Floating Icon */}
-          <div
-            className="absolute -top-6 left-1/2 -translate-x-1/2
-                       w-14 h-14 bg-sky-400 rounded-full
-                       flex items-center justify-center
-                       border-4 border-black
-                       shadow-[0_0_25px_rgba(56,189,248,0.6)]"
-          >
-            <span className="text-black text-xl font-bold">⚙</span>
-          </div>
-        </div>
+                  {/* ICON (UNCHANGED POSITION) */}
+<div
+  className="absolute -top-6 left-1/2 -translate-x-1/2
+             w-14 h-14 rounded-full
+             flex items-center justify-center
+             bg-black
+             border-2 border-sky-400
+             transition-all duration-300
+             group-hover:bg-sky-400
+             group-hover:border-black"
+>
+  <span
+    className="text-sky-400 text-xl font-bold
+               transition-all duration-300
+               group-hover:text-black"
+  >
+    ⚙
+  </span>
+</div>
+                </div>
 
-        {/* Button */}
-        <button
-          className="w-full py-3 text-xs font-bold tracking-[0.25em]
-                     text-gray-300 border border-white/20
+                {/* READ MORE (VISIBLE, NO BG → BG ON HOVER) */}
+                <button
+                    onClick={() => navigate(`/services/${service.id}`)}
+                    className="w-full py-2 text-xs font-bold tracking-[0.25em]
+                     text-sky-400 border border-sky-400/40
+                     cursor-pointer
                      transition-all duration-300
                      group-hover:bg-sky-400
                      group-hover:text-black
                      group-hover:border-sky-400
-                     group-hover:shadow-[0_0_25px_rgba(56,189,248,0.6)]"
-        >
-          READ MORE
-        </button>
-      </div>
-    </div>
-  );
+                     hover:shadow-[0_0_25px_rgba(56,189,248,0.6)]"
+                >
+                    READ MORE
+                </button>
+
+            </div>
+        </div>
+    );
 };
 
 export default ServiceCard;
