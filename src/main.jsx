@@ -8,14 +8,7 @@ import { AuthProvider } from "./PrivateRouter/AuthContext.jsx";
 import PrivateRoute from "./PrivateRouter/PrivateRouter.jsx";
 import { Toaster } from "react-hot-toast";
 import Home from "./Components/Home.jsx";
-import BookAService from "./Components/BookAService.jsx";
-import AboutPage from "./Components/AboutPage.jsx";
-import VideoGallery from "./Components/VideoGallery.jsx";
-import Contact from "./Components/Contact.jsx";
-import ServiceDetails from "./Components/ServiceDetails.jsx";
-import NotFound from "./Components/NotFound.jsx";
-import Pricing from "./Components/Pricing.jsx";
-import Product from "./Components/Product.jsx";
+
 
 
 // Auth
@@ -63,14 +56,7 @@ const router = createBrowserRouter([
     element: <App />,
     children: [
       { index: true, element: <Home /> },
-      { path: "gallery", element: <VideoGallery /> },
-      { path: "about", element: <AboutPage /> },
-      { path: "pricing", element: <Pricing /> },
-      { path: "product", element: <Product /> },
-      { path: "service/:id", element: <ServiceDetails /> },
-      { path: "bookaservice", element: <BookAService /> },
-      { path: "contact", element: <Contact /> },
-     
+  
       { path: "/login", element: <Login /> },
       { path: "/register", element: <Register /> },
 

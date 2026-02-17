@@ -1,5 +1,12 @@
 import { useState } from "react";
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import {
+  collection,
+  addDoc,
+  serverTimestamp,
+  doc,
+  runTransaction,
+  updateDoc,
+} from "firebase/firestore";
 import { db } from "../../firebase";
 import toast from "react-hot-toast";
 
@@ -30,27 +37,65 @@ const AddCarService = () => {
     status: "active",
   });
 
-  const generateServiceId = () =>
-    "SRV" + Date.now().toString().slice(-6);
+  /* 🔢 Generate SE001 Counter */
+  const generateServiceCode = async () => {
+    const counterRef = doc(db, "counters", "serviceCounter");
 
+    return await runTransaction(db, async (tx) => {
+      const snap = await tx.get(counterRef);
+      const next = (snap.exists() ? snap.data().current : 0) + 1;
+      tx.set(counterRef, { current: next }, { merge: true });
+      return `SE${String(next).padStart(3, "0")}`;
+    });
+  };
+
+  /* 🔧 Handle Change */
   const handleChange = (e) => {
     const { name, value } = e.target;
     if (name === "price" && value < 0) return;
     setForm({ ...form, [name]: value });
   };
 
-  const handleImageUpload = (e) => {
+  /* 🖼️ Compress Image */
+  const compressImage = (file) =>
+    new Promise((resolve) => {
+      const img = new Image();
+      const reader = new FileReader();
+
+      reader.readAsDataURL(file);
+      reader.onload = (event) => {
+        img.src = event.target.result;
+      };
+
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+
+        const maxWidth = 600;
+        const scaleSize = maxWidth / img.width;
+
+        canvas.width = maxWidth;
+        canvas.height = img.height * scaleSize;
+
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+        const compressedBase64 = canvas.toDataURL("image/jpeg", 0.6); // 60% quality
+        resolve(compressedBase64);
+      };
+    });
+
+  /* 🖼️ Image Upload */
+  const handleImageUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setForm({ ...form, image: reader.result });
-      setImagePreview(reader.result);
-    };
-    reader.readAsDataURL(file);
+    const compressed = await compressImage(file);
+
+    setForm({ ...form, image: compressed });
+    setImagePreview(compressed);
   };
 
+  /* ➕ SUBMIT */
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -62,13 +107,18 @@ const AddCarService = () => {
     try {
       setLoading(true);
 
-      await addDoc(collection(db, "services"), {
-        id: generateServiceId(),
+      const serviceCode = await generateServiceCode();
+
+      const docRef = await addDoc(collection(db, "services"), {
+        code: serviceCode,
         ...form,
         price: Number(form.price),
         gst: Number(form.gst || 0),
         createdAt: serverTimestamp(),
       });
+
+      /* 🔹 Save docRefId inside document */
+      await updateDoc(docRef, { docRefId: docRef.id });
 
       toast.success("Service added");
 
@@ -85,7 +135,8 @@ const AddCarService = () => {
       });
 
       setImagePreview("");
-    } catch {
+    } catch (err) {
+      console.error(err);
       toast.error("Error adding service");
     } finally {
       setLoading(false);
@@ -156,7 +207,6 @@ const AddCarService = () => {
             className="border rounded-lg px-3 py-2"
           />
 
-          {/* IMAGE */}
           <div className="md:col-span-3">
             <label className="block text-sm mb-1">Service Image</label>
             <input type="file" accept="image/*" onChange={handleImageUpload} />
@@ -191,3 +241,5 @@ const AddCarService = () => {
 };
 
 export default AddCarService;
+
+
