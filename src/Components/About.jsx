@@ -8,7 +8,7 @@ export default function AboutStats() {
       {/* Background Image */}
       <div
         className="absolute inset-0 bg-cover bg-center "
-        style={{ backgroundImage: "url(https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQfAJ3Ai3tu58SWAJ2mK_EhozE-OIgQXcLXNg&s)" }}
+        style={{ backgroundImage: "url(./images/about-bg.jpg)" }}
       />
 
       {/* Overlay */}

@@ -2,6 +2,7 @@ import react from "react";
 import Hero from "./Hero";
 import Services from "./Services";
 import About from "./About";
+import Pricing from "./Pricing";
 
 export default function Home() {
 
@@ -11,6 +12,7 @@ export default function Home() {
       <Hero />
       <About />
       <Services/>
+      <Pricing/>
      </h1>
     </>
   );
