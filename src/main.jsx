@@ -57,6 +57,7 @@ import PricingList from "./Admin/PricingAll/AllPricesList.jsx";
 import PricingForm from "./Admin/PricingAll/AddPrice.jsx";
 import Contact from "./Components/ContactUs.jsx";
 import BookService from "./Components/BookService.jsx";
+import Account from "./Components/Account.jsx";
 
 
 const router = createBrowserRouter([
@@ -76,8 +77,7 @@ const router = createBrowserRouter([
       { path: "/about", element: <About /> },
       { path: "/contact", element: <ContactUs /> },
       { path: "/bookservice", element: <BookService /> },
-
-       
+      { path: "/account", element: <Account /> },       
     ],
   },
 
