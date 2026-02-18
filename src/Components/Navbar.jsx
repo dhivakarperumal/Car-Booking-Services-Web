@@ -63,19 +63,19 @@ const Navbar = () => {
     return () => unsubscribe();
   }, []);
 
-useEffect(() => {
-  const handleClickOutside = (e) => {
-    if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
-      setShowMenu(false);
-    }
-  };
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setShowMenu(false);
+      }
+    };
 
-  document.addEventListener("click", handleClickOutside);
+    document.addEventListener("click", handleClickOutside);
 
-  return () => {
-    document.removeEventListener("click", handleClickOutside);
-  };
-}, []);
+    return () => {
+      document.removeEventListener("click", handleClickOutside);
+    };
+  }, []);
 
 
   const links = [
@@ -139,109 +139,109 @@ useEffect(() => {
             <div className="flex items-center gap-4">
 
               {/* RIGHT SIDE (DESKTOP + MOBILE) */}
-<div className="flex items-center gap-3">
+              <div className="flex items-center gap-3">
 
-  {/* BOOK SERVICE (DESKTOP ONLY) */}
- <button
-  onClick={() => navigate("/bookservice")}
-  className="hidden md:flex relative px-6 py-2.5 rounded-md
+                {/* BOOK SERVICE (DESKTOP ONLY) */}
+                <button
+                  onClick={() => navigate("/bookservice")}
+                  className="hidden md:flex relative px-6 py-2.5 rounded-md
              font-bold text-xs tracking-[0.2em]
              text-sky-400 border border-sky-400/60
              transition-all duration-300
              hover:text-black hover:bg-sky-400
              hover:shadow-[0_0_25px_rgba(56,189,248,0.7)]
              active:scale-95 cursor-pointer"
->
-  BOOK SERVICE
-</button>
+                >
+                  BOOK SERVICE
+                </button>
 
-  {/* USER AVATAR (SINGLE INSTANCE) */}
-  {!loadingUser && (
-    userData ? (
-      <div className="relative" ref={dropdownRef}>
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            setShowMenu(prev => !prev);
-          }}
-          className="h-9 w-9 cursor-pointer rounded-full flex items-center justify-center
+                {/* USER AVATAR (SINGLE INSTANCE) */}
+                {!loadingUser && (
+                  userData ? (
+                    <div className="relative" ref={dropdownRef}>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setShowMenu(prev => !prev);
+                        }}
+                        className="h-9 w-9 cursor-pointer rounded-full flex items-center justify-center
                      bg-gradient-to-br from-sky-500 to-cyan-400
                      text-black font-bold shadow-[0_0_15px_rgba(56,189,248,0.6)]"
-        >
-          {(userData.username || userData.displayName || userData.email)
-            ?.charAt(0)
-            .toUpperCase()}
-        </button>
+                      >
+                        {(userData.username || userData.displayName || userData.email)
+                          ?.charAt(0)
+                          .toUpperCase()}
+                      </button>
 
-        {/* DROPDOWN */}
-        {showMenu && (
-          <div
-            onClick={(e) => e.stopPropagation()}
-            className="absolute right-0 top-12 w-52 rounded-xl
+                      {/* DROPDOWN */}
+                      {showMenu && (
+                        <div
+                          onClick={(e) => e.stopPropagation()}
+                          className="absolute right-0 top-12 w-52 rounded-xl
                        bg-black border border-sky-400/30
                        shadow-[0_0_30px_rgba(56,189,248,0.25)]
                        overflow-hidden z-50"
-          >
-            {/* USER INFO */}
-            <div className="px-4 py-3 border-b border-sky-400/20">
-              <p className="text-sm font-semibold text-sky-300 truncate">
-                {userData.username || userData.displayName}
-              </p>
-              <p className="text-xs text-sky-400 truncate">
-                {userData.email}
-              </p>
-            </div>
+                        >
+                          {/* USER INFO */}
+                          <div className="px-4 py-3 border-b border-sky-400/20">
+                            <p className="text-sm font-semibold text-sky-300 truncate">
+                              {userData.username || userData.displayName}
+                            </p>
+                            <p className="text-xs text-sky-400 truncate">
+                              {userData.email}
+                            </p>
+                          </div>
 
-            {/* ACCOUNT */}
-            <button
-              onClick={() => {
-                navigate("/account");
-                setShowMenu(false);
-              }}
-              className="w-full cursor-pointer px-4 py-3 text-left text-white
+                          {/* ACCOUNT */}
+                          <button
+                            onClick={() => {
+                              navigate("/account");
+                              setShowMenu(false);
+                            }}
+                            className="w-full cursor-pointer px-4 py-3 text-left text-white
                          hover:bg-sky-400/10 hover:text-sky-400 transition"
-            >
-              Account
-            </button>
+                          >
+                            Account
+                          </button>
 
-            {/* LOGOUT */}
-            <button
-              onClick={handleLogout}
-              className="w-full px-4 py-3 text-left
+                          {/* LOGOUT */}
+                          <button
+                            onClick={handleLogout}
+                            className="w-full px-4 py-3 text-left
                          text-white hover:text-red-400 cursor-pointer hover:bg-red-500/10 transition"
-            >
-              Logout
-            </button>
-          </div>
-        )}
-      </div>
-    ) : (
-      <button
-        onClick={() => navigate("/login")}
-        className="text-sky-400 cursor-pointer hover:text-white transition"
-      >
-        <User size={22} />
-      </button>
-    )
-  )}
+                          >
+                            Logout
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => navigate("/login")}
+                      className="text-sky-400 cursor-pointer hover:text-white transition"
+                    >
+                      <User size={22} />
+                    </button>
+                  )
+                )}
 
-  {/* HAMBURGER (MOBILE ONLY) */}
-  <button
-    onClick={() => setIsOpen(!isOpen)}
-    className="md:hidden flex flex-col gap-1"
-  >
-    <span className={`w-6 h-[2px] bg-white transition ${isOpen && "rotate-45 translate-y-2"}`} />
-    <span className={`w-6 h-[2px] bg-white transition ${isOpen && "opacity-0"}`} />
-    <span className={`w-6 h-[2px] bg-white transition ${isOpen && "-rotate-45 -translate-y-2"}`} />
-  </button>
+                {/* HAMBURGER (MOBILE ONLY) */}
+                <button
+                  onClick={() => setIsOpen(!isOpen)}
+                  className="md:hidden flex flex-col gap-1"
+                >
+                  <span className={`w-6 h-[2px] bg-white transition ${isOpen && "rotate-45 translate-y-2"}`} />
+                  <span className={`w-6 h-[2px] bg-white transition ${isOpen && "opacity-0"}`} />
+                  <span className={`w-6 h-[2px] bg-white transition ${isOpen && "-rotate-45 -translate-y-2"}`} />
+                </button>
 
-</div>
+              </div>
 
-             
+
             </div>
 
-   
-            
+
+
           </div>
         </PageContainer>
       </div>
@@ -255,7 +255,7 @@ useEffect(() => {
         ${isOpen ? "max-h-[420px] border-t border-sky-400/20" : "max-h-0"}`}
       >
         <nav className="flex flex-col px-6 py-6 gap-6">
-          
+
           {links.map((item) => (
             <button
               key={item.label}
