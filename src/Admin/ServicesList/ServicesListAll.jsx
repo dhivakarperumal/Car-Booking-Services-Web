@@ -188,7 +188,7 @@ const ServicesListAll = () => {
                 <div className="flex justify-end gap-3 mt-3">
                   <button
                     onClick={() =>
-                      navigate(`/admin/edit-car-service/${srv.docId}`)
+                      navigate(`/admin/addservices/${srv.docId}`)
                     }
                     className="border border-gray-300 p-2 rounded-full text-blue-600 hover:scale-110 transition"
                   >
@@ -241,7 +241,7 @@ const ServicesListAll = () => {
                       <div className="flex justify-end gap-3">
                         <button
                           onClick={() =>
-                            navigate(`/admin/edit-car-service/${srv.docId}`)
+                            navigate(`/admin/addservices/${srv.docId}`)
                           }
                           className="text-blue-600 hover:scale-110 transition"
                         >

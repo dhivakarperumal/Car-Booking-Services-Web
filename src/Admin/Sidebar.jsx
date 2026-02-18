@@ -31,8 +31,8 @@ const navItems = [
     icon: Package,
     children: [
       { path: "/admin/allProducts", label: "Products", icon: Dumbbell },
-      { path: "/admin/plansall", label: "Membership Plans", icon: ClipboardList },
-      { path: "/admin/fecilities", label: "Facilities", icon: Activity },
+      { path: "/admin/productbilling", label: "Product Billing", icon: ClipboardList },
+      // { path: "/admin/fecilities", label: "Facilities", icon: Activity },
       { path: "/admin/stockdetails", label: "Supplements Stock", icon: Boxes },
     ],
   },
@@ -44,7 +44,7 @@ const navItems = [
   /* ===== Services & Bookings ===== */
   { path: "/admin/services", label: "Services", icon: Wrench },
   { path: "/admin/bookings", label: "Booking Service", icon: CalendarCheck },
-  { path: "/admin/carservies", label: "Car Services", icon: CalendarCheck },
+  // { path: "/admin/carservies", label: "Car Services", icon: CalendarCheck },
 
   /* ===== Customers & Staff ===== */
   { path: "/admin/customers", label: "Customers", icon: Users },
@@ -118,7 +118,7 @@ const Sidebar = ({ isOpen, onClose, collapsed, onToggleCollapse }) => {
         className={`fixed top-0 left-0 z-50 h-full
         bg-gradient-to-b from-blue-950 via-blue-900 to-blue-950
         text-white border-r border-white/10
-        shadow-[0_25px_60px_rgba(0,0,0,0.5)]
+      
         flex flex-col transition-all duration-300
         backdrop-blur-xl
         ${isOpen ? "translate-x-0" : "-translate-x-full"}
@@ -249,7 +249,7 @@ const Sidebar = ({ isOpen, onClose, collapsed, onToggleCollapse }) => {
           onClick={onToggleCollapse}
           className="hidden lg:flex absolute -right-4 top-1/2 -translate-y-1/2
           w-9 h-9 rounded-full
-          bg-gradient-to-br from-orange-500 to-red-600
+          bg-gradient-to-br from-blue-500 to-red-600
           shadow-xl shadow-orange-500/40
           items-center justify-center
           text-white hover:scale-110 transition-all"

@@ -84,17 +84,18 @@ const GradientStatCard = ({
 
 const Dashboard = () => {
 
-  const [stats, setStats] = useState({
-    patients: 0,
-    appointmentsToday: 0,
-    treatments: 0,
-    pendingPayments: 0,
-    doctors: 0,
-    equipmentDue: 0,
+  const [topStats, setTopStats] = useState({
+    todayBookings: 0,
+    totalServices: 0,
+    totalCustomers: 0,
+    totalEmployees: 0,
+    totalOrders: 0,
+    totalProducts: 0,   // ✅ NEW
+    totalEarnings: 0,
   });
 
+
   useEffect(() => {
-    // ⏰ TODAY RANGE (IST safe)
     const start = Timestamp.fromDate(
       new Date(new Date().setHours(0, 0, 0, 0))
     );
@@ -102,50 +103,94 @@ const Dashboard = () => {
       new Date(new Date().setHours(23, 59, 59, 999))
     );
 
-    // 👤 Patients
-    onSnapshot(collection(db, "carServices"), (snap) =>
-      setStats((p) => ({ ...p, patients: snap.size }))
-    );
-
-    // 📅 Today's Appointments
-    onSnapshot(
+    // TODAY BOOKINGS
+    const unsubToday = onSnapshot(
       query(
-        collection(db, "appointments"),
+        collection(db, "bookings"),
         where("createdAt", ">=", start),
         where("createdAt", "<=", end)
       ),
       (snap) =>
-        setStats((p) => ({ ...p, appointmentsToday: snap.size }))
+        setTopStats((p) => ({ ...p, todayBookings: snap.size }))
     );
 
-    // 🦷 Active Treatments (status = active)
-    onSnapshot(
-      query(collection(db, "carServices"), where("status", "==", "In Progress")),
+    // TOTAL SERVICES
+    const unsubServices = onSnapshot(
+      collection(db, "services"),
       (snap) =>
-        setStats((p) => ({ ...p, treatments: snap.size }))
+        setTopStats((p) => ({ ...p, totalServices: snap.size }))
     );
 
-    // 💰 Pending Payments
-    onSnapshot(
-      query(collection(db, "billings"), where("paymentStatus", "==", "pending")),
-      (snap) =>
-        setStats((p) => ({ ...p, pendingPayments: snap.size }))
+    // TOTAL CUSTOMERS (unique mobile)
+    const unsubCustomers = onSnapshot(
+      collection(db, "users"),
+      (snap) => {
+        const unique = new Set();
+        snap.forEach((d) => {
+          const data = d.data();
+          if (data.mobileNumber) unique.add(data.mobileNumber);
+        });
+        setTopStats((p) => ({
+          ...p,
+          totalCustomers: unique.size,
+        }));
+      }
     );
 
-    // 👨‍⚕️ Available Doctors (status = active)
-    onSnapshot(
-      query(collection(db, "employees"), where("status", "==", "active")),
+    // TOTAL EMPLOYEES
+    const unsubEmp = onSnapshot(
+      collection(db, "employees"),
       (snap) =>
-        setStats((p) => ({ ...p, doctors: snap.size }))
+        setTopStats((p) => ({ ...p, totalEmployees: snap.size }))
     );
 
-    // 🧰 Equipment Due (status = active)
-    onSnapshot(
-      query(collection(db, "carInventory")),
+    // TOTAL ORDERS
+    const unsubOrders = onSnapshot(
+      collection(db, "orders"),
       (snap) =>
-        setStats((p) => ({ ...p, equipmentDue: snap.size }))
+        setTopStats((p) => ({ ...p, totalOrders: snap.size }))
     );
+
+    // TOTAL EARNINGS
+    const unsubEarnings = onSnapshot(
+      collection(db, "billings"),
+      (snap) => {
+        let total = 0;
+
+        snap.forEach((doc) => {
+          const data = doc.data();
+          const status = (data.paymentStatus || "").toLowerCase();
+
+          if (status === "paid") {
+            total += Number(data.grandTotal || 0);
+          }
+
+          if (status === "partial") {
+            total += Number(data.paidAmount || 0);
+          }
+        });
+
+        setTopStats((p) => ({ ...p, totalEarnings: total }));
+      }
+    );
+
+    const unsubProducts = onSnapshot(
+      collection(db, "products"),
+      (snap) =>
+        setTopStats((p) => ({ ...p, totalProducts: snap.size }))
+    );
+
+    return () => {
+      unsubToday();
+      unsubServices();
+      unsubCustomers();
+      unsubEmp();
+      unsubProducts();
+      unsubOrders();
+      unsubEarnings();
+    };
   }, []);
+
 
 
   const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
@@ -179,7 +224,7 @@ const Dashboard = () => {
     const lastWeek = getWeekRange(1);
 
     const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-    const q = query(collection(db, "appointments"));
+    const q = query(collection(db, "bookings"));
 
     const unsub = onSnapshot(q, (snap) => {
       const baseData = days.map((d) => ({
@@ -204,11 +249,17 @@ const Dashboard = () => {
         const data = doc.data();
         if (!data.status) return;
 
-        const status = String(data.status).toLowerCase().trim();
+        const rawStatus = String(data.status).toLowerCase().trim();
 
-        // ✅ SAFELY PICK DATE
+        /* 🔹 MAP TO DASHBOARD STATUS */
+        let status = "pending";
+
+        if (rawStatus === "service completed") status = "completed";
+        if (rawStatus === "cancelled") status = "cancelled";
+
+        /* ✅ SAFE DATE PICK */
         const baseDate =
-          (status === "completed" || status === "cancelled")
+          status === "completed" || status === "cancelled"
             ? data.updatedAt?.toDate() || data.createdAt?.toDate()
             : data.createdAt?.toDate();
 
@@ -220,7 +271,7 @@ const Dashboard = () => {
         const dayIndex = date.getDay() === 0 ? 6 : date.getDay() - 1;
 
         /* =====================
-           TODAY COUNTS (ONLY TODAY)
+           TODAY COUNTS
         ===================== */
         if (date.getTime() === today.getTime()) {
           if (status === "pending") tempCounts.pending++;
@@ -252,6 +303,7 @@ const Dashboard = () => {
           baseData[dayIndex].lastWeek++;
         }
       });
+
 
       setAppointmentData(baseData);
       setCounts(tempCounts);
@@ -293,25 +345,37 @@ const Dashboard = () => {
 
       snap.forEach((doc) => {
         const data = doc.data();
+
         if (!data.createdAt) return;
 
         const status = (data.paymentStatus || "").toLowerCase();
 
-        // ✅ allow paid + partial
-        if (!["paid", "partial"].includes(status)) return;
+        let paidAmount = 0;
+
+        /* ✅ PAID → FULL GRAND TOTAL */
+        if (status === "paid") {
+          paidAmount = Number(data.grandTotal || 0);
+        }
+
+        /* ✅ PARTIAL → USE paidAmount FIELD */
+        else if (status === "partial") {
+          paidAmount = Number(data.paidAmount || 0);
+        }
+
+        /* ❌ PENDING → IGNORE */
+        else {
+          return;
+        }
+
+        if (paidAmount <= 0) return;
 
         const date = data.createdAt.toDate();
         const monthIndex = date.getMonth();
 
-        const paid =
-          status === "paid"
-            ? Number(data.grandTotal || 0)
-            : Number(data.paidAmount || 0);
-
-        monthly[monthIndex].revenue += paid;
+        monthly[monthIndex].revenue += paidAmount;
 
         if (monthIndex === currentMonth) {
-          thisMonthTotal += paid;
+          thisMonthTotal += paidAmount;
         }
       });
 
@@ -322,14 +386,12 @@ const Dashboard = () => {
     return () => unsub();
   }, []);
 
-
-
   const [patients, setPatients] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
     const q = query(
-      collection(db, "carServices"),
+      collection(db, "services"),
       orderBy("createdAt", "desc"),
       limit(5)
     );
@@ -374,13 +436,18 @@ const Dashboard = () => {
     "Engine Check": "#dc2626",
   };
 
+  const getColor = (name, index) => {
+    if (SERVICE_COLORS[name]) return SERVICE_COLORS[name];
+    return colors[index % colors.length];
+  };
+
   const [stats1, setStats1] = useState({});
   const [total, setTotal] = useState(0);
 
   useEffect(() => {
     const q = query(
-      collection(db, "carServices"),
-      where("status", "in", ["Pending", "In Progress"])
+      collection(db, "allServices"),
+      where("serviceStatus", "in", ["Pending", "In Progress"])
     );
 
     const unsub = onSnapshot(q, (snap) => {
@@ -389,10 +456,12 @@ const Dashboard = () => {
 
       snap.forEach((doc) => {
         const data = doc.data();
-        if (!data.serviceType) return;
 
-        const serviceType = data.serviceType.trim();
-        counts[serviceType] = (counts[serviceType] || 0) + 1;
+        /* 🔧 SERVICE NAME FIELD */
+        const serviceName =
+          data.serviceName || data.packageName || "General Service";
+
+        counts[serviceName] = (counts[serviceName] || 0) + 1;
         sum++;
       });
 
@@ -402,6 +471,7 @@ const Dashboard = () => {
 
     return () => unsub();
   }, []);
+
 
 
 
@@ -426,49 +496,21 @@ const Dashboard = () => {
       return "conic-gradient(#e5e7eb 0% 100%)";
     }
 
-    const gap = 0.6; // small gap between segments
+    const gap = 0.4;
 
-    const parts = entries.map(([_, count], i) => {
+    const parts = entries.map(([name, count], i) => {
       const percent = (count / total) * 100;
       const start = current + gap;
       current += percent;
       const end = current - gap;
 
-      return `${colors[i % colors.length]} ${start}% ${end}%`;
+      return `${getColor(name, i)} ${start}% ${end}%`;
     });
 
     return `conic-gradient(${parts.join(", ")})`;
   })();
 
-  const [followUps, setFollowUps] = useState([]);
 
-
-  useEffect(() => {
-    // ⏰ Today range (IST safe)
-    const start = Timestamp.fromDate(
-      new Date(new Date().setHours(0, 0, 0, 0))
-    );
-    const end = Timestamp.fromDate(
-      new Date(new Date().setHours(23, 59, 59, 999))
-    );
-
-    const q = query(
-      collection(db, "appointments"),
-      where("type", "==", "follow-up"),   // ✅ FIX
-      where("createdAt", ">=", start),
-      where("createdAt", "<=", end)
-    );
-
-    const unsub = onSnapshot(q, (snap) => {
-      const list = snap.docs.map((d) => ({
-        id: d.id,
-        ...d.data(),
-      }));
-      setFollowUps(list);
-    });
-
-    return () => unsub();
-  }, []);
 
   const [rows, setRows] = useState([]);
 
@@ -496,235 +538,269 @@ const Dashboard = () => {
     <div className="min-h-screen  p-2">
       {/* STATS */}
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-6">
+
         <GradientStatCard
-          title="TODAY ORDERS"
-          value="$5,74.12"
-          change="+427"
+          title="TODAY BOOKINGS"
+          value={topStats.todayBookings}
+          change="+"
           isUp={true}
           gradient="bg-gradient-to-r from-blue-500 to-blue-300"
         />
 
         <GradientStatCard
-          title="TODAY EARNINGS"
-          value="$1,230.17"
-          change="-23.09%"
-          isUp={false}
+          title="TOTAL SERVICES"
+          value={topStats.totalServices}
+          change="+"
+          isUp={true}
+          gradient="bg-gradient-to-r from-indigo-500 to-indigo-300"
+        />
+
+        <GradientStatCard
+          title="TOTAL CUSTOMERS"
+          value={topStats.totalCustomers}
+          change="+"
+          isUp={true}
+          gradient="bg-gradient-to-r from-purple-500 to-violet-400"
+        />
+
+        <GradientStatCard
+          title="TOTAL EMPLOYEES"
+          value={topStats.totalEmployees}
+          change="+"
+          isUp={true}
+          gradient="bg-gradient-to-r from-cyan-500 to-sky-400"
+        />
+
+        <GradientStatCard
+          title="TOTAL PRODUCTS"
+          value={topStats.totalProducts}
+          change="+"
+          isUp={true}
           gradient="bg-gradient-to-r from-pink-500 to-rose-400"
         />
 
         <GradientStatCard
+          title="TOTAL ORDERS"
+          value={topStats.totalOrders}
+          change="+"
+          isUp={true}
+          gradient="bg-gradient-to-r from-orange-500 to-amber-400"
+        />
+
+        <GradientStatCard
           title="TOTAL EARNINGS"
-          value="$7,125.70"
-          change="52.09%"
+          value={`₹ ${topStats.totalEarnings.toLocaleString("en-IN")}`}
+          change="+"
           isUp={true}
           gradient="bg-gradient-to-r from-green-500 to-emerald-400"
         />
 
-        <GradientStatCard
-          title="PRODUCT SOLD"
-          value="$4,820.50"
-          change="-152.3"
-          isUp={false}
-          gradient="bg-gradient-to-r from-orange-500 to-amber-400"
-        />
       </div>
-
-
-
-      {/* APPOINTMENTS */}
       <div >
 
 
         {/* TWO COLUMNS INSIDE */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* APPOINTMENTS */}
-<div className="bg-white rounded-2xl mb-9 shadow-sm border border-gray-100 p-5">
-  {/* HEADER */}
-  <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 mb-4">
-    <h4 className="font-semibold text-gray-800 text-lg">
-      Booking Services
-    </h4>
+          <div className="bg-white rounded-2xl mb-9 shadow-sm border border-gray-100 p-5">
+            {/* HEADER */}
+            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 mb-4">
+              <h4 className="font-semibold text-gray-800 text-lg">
+                Booking Services
+              </h4>
 
-    {/* LEGEND */}
-    <div className="flex flex-wrap gap-3 text-xs">
-      {[
-        { color: "bg-blue-500", label: "This Week" },
-        { color: "bg-green-500", label: "Last Week" },
-        { color: "bg-yellow-500", label: "Pending" },
-        { color: "bg-emerald-600", label: "Completed" },
-        { color: "bg-red-600", label: "Cancelled" },
-      ].map((item) => (
-        <span key={item.label} className="flex items-center gap-1">
-          <span className={`w-3 h-3 rounded-full ${item.color}`} />
-          {item.label}
-        </span>
-      ))}
-    </div>
-  </div>
+              {/* LEGEND */}
+              <div className="flex flex-wrap gap-3 text-xs">
+                {[
+                  { color: "bg-blue-500", label: "This Week" },
+                  { color: "bg-green-500", label: "Last Week" },
+                  { color: "bg-yellow-500", label: "Pending" },
+                  { color: "bg-emerald-600", label: "Completed" },
+                  { color: "bg-red-600", label: "Cancelled" },
+                ].map((item) => (
+                  <span key={item.label} className="flex items-center gap-1">
+                    <span className={`w-3 h-3 rounded-full ${item.color}`} />
+                    {item.label}
+                  </span>
+                ))}
+              </div>
+            </div>
 
-  {/* BAR CHART */}
-  <div className="h-64">
-    <ResponsiveContainer width="100%" height="100%">
-      <BarChart data={appointmentData || []} barGap={4}>
-        <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+            {/* BAR CHART */}
+            <div className="h-64">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={appointmentData || []} barGap={4}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
 
-        <XAxis
-          dataKey="day"
-          tick={{ fontSize: 12 }}
-          stroke="#94a3b8"
-        />
+                  <XAxis
+                    dataKey="day"
+                    tick={{ fontSize: 12 }}
+                    stroke="#94a3b8"
+                  />
 
-        <YAxis
-          allowDecimals={false}
-          tick={{ fontSize: 12 }}
-          stroke="#94a3b8"
-          domain={[0, "dataMax + 2"]}
-        />
+                  <YAxis
+                    allowDecimals={false}
+                    tick={{ fontSize: 12 }}
+                    stroke="#94a3b8"
+                    domain={[0, "dataMax + 2"]}
+                  />
 
-        <Tooltip
-          contentStyle={{
-            borderRadius: "10px",
-            border: "none",
-            boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
-          }}
-        />
+                  <Tooltip
+                    contentStyle={{
+                      borderRadius: "10px",
+                      border: "none",
+                      boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
+                    }}
+                  />
 
-        {/* THIS WEEK */}
-        <Bar
-          dataKey="thisWeek"
-          fill="#3b82f6"
-          radius={[4, 4, 0, 0]}
-          barSize={14}
-        />
+                  {/* THIS WEEK */}
+                  <Bar
+                    dataKey="thisWeek"
+                    fill="#3b82f6"
+                    radius={[4, 4, 0, 0]}
+                    barSize={24}
+                  />
 
-        {/* LAST WEEK */}
-        <Bar
-          dataKey="lastWeek"
-          fill="#22c55e"
-          radius={[4, 4, 0, 0]}
-          barSize={14}
-        />
+                  {/* LAST WEEK */}
+                  <Bar
+                    dataKey="lastWeek"
+                    fill="#22c55e"
+                    radius={[4, 4, 0, 0]}
+                    barSize={24}
+                  />
 
-        {/* PENDING */}
-        <Bar
-          dataKey="pending"
-          fill="#eab308"
-          radius={[4, 4, 0, 0]}
-          barSize={14}
-        />
+                  {/* PENDING */}
+                  <Bar
+                    dataKey="pending"
+                    fill="#eab308"
+                    radius={[4, 4, 0, 0]}
+                    barSize={24}
+                  />
 
-        {/* COMPLETED */}
-        <Bar
-          dataKey="completed"
-          fill="#16a34a"
-          radius={[4, 4, 0, 0]}
-          barSize={14}
-        />
+                  {/* COMPLETED */}
+                  <Bar
+                    dataKey="completed"
+                    fill="#16a34a"
+                    radius={[4, 4, 0, 0]}
+                    barSize={24}
+                  />
 
-        {/* CANCELLED */}
-        <Bar
-          dataKey="cancelled"
-          fill="#dc2626"
-          radius={[4, 4, 0, 0]}
-          barSize={14}
-        />
-      </BarChart>
-    </ResponsiveContainer>
-  </div>
+                  {/* CANCELLED */}
+                  <Bar
+                    dataKey="cancelled"
+                    fill="#dc2626"
+                    radius={[4, 4, 0, 0]}
+                    barSize={14}
+                  />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
 
-  {/* STATUS CARDS */}
-  <div className="grid grid-cols-1 sm:grid-cols-3 mt-5 gap-3 text-center">
-    <div className="bg-yellow-50 text-yellow-600 rounded-xl py-3 font-semibold shadow-sm">
-      Pending: {counts?.pending ?? 0}
-    </div>
+            {/* STATUS CARDS */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 mt-5 gap-3 text-center">
+              <div className="bg-yellow-50 text-yellow-600 rounded-xl py-3 font-semibold shadow-sm">
+                Pending: {counts?.pending ?? 0}
+              </div>
 
-    <div className="bg-green-50 text-green-600 rounded-xl py-3 font-semibold shadow-sm">
-      Completed: {counts?.completed ?? 0}
-    </div>
+              <div className="bg-green-50 text-green-600 rounded-xl py-3 font-semibold shadow-sm">
+                Completed: {counts?.completed ?? 0}
+              </div>
 
-    <div className="bg-red-50 text-red-600 rounded-xl py-3 font-semibold shadow-sm">
-      Cancelled: {counts?.cancelled ?? 0}
-    </div>
-  </div>
-</div>
+              <div className="bg-red-50 text-red-600 rounded-xl py-3 font-semibold shadow-sm">
+                Cancelled: {counts?.cancelled ?? 0}
+              </div>
+            </div>
+          </div>
 
 
 
-         <div className="bg-white rounded-2xl mb-9 shadow-sm border border-gray-100 p-5">
-  <h4 className="font-semibold text-gray-800 mb-1">
-    Financial Overview
-  </h4>
+          <div className="bg-white rounded-2xl mb-9 shadow-sm border border-gray-100 p-6">
+            {/* HEADER */}
+            <div className="flex items-center justify-between mb-4">
+              <h4 className="font-semibold text-gray-800">
+                Financial Overview
+              </h4>
 
-  {/* TOTAL */}
-  <h2 className="text-3xl font-bold mb-4">
-    ₹ {(monthlyTotal || 0).toLocaleString("en-IN")}
-  </h2>
+              <span className="text-xs bg-blue-50 text-blue-600 px-3 py-1 rounded-full">
+                This Year
+              </span>
+            </div>
 
-  <div className="h-64">
-    <ResponsiveContainer width="100%" height="100%">
-      <BarChart data={revenueData} barGap={6}>
-        <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+            {/* TOTAL */}
+            <h2 className="text-3xl font-bold text-gray-900 mb-6">
+              ₹ {(monthlyTotal || 0).toLocaleString("en-IN")}
+            </h2>
 
-        <XAxis
-          dataKey="month"
-          tick={{ fontSize: 12 }}
-          stroke="#94a3b8"
-        />
+            {/* CHART */}
+            <div className="h-64">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={revenueData}>
+                  {/* GRID */}
+                  <CartesianGrid
+                    strokeDasharray="3 3"
+                    stroke="#f1f5f9"
+                    vertical={false}
+                  />
 
-        <YAxis
-          tickFormatter={(v) => `₹${v / 1000}k`}
-          tick={{ fontSize: 12 }}
-          stroke="#94a3b8"
-        />
+                  {/* X AXIS */}
+                  <XAxis
+                    dataKey="month"
+                    tick={{ fontSize: 12, fill: "#64748b" }}
+                    axisLine={false}
+                    tickLine={false}
+                  />
 
-        <Tooltip
-          formatter={(v) =>
-            `₹ ${Number(v).toLocaleString("en-IN")}`
-          }
-          contentStyle={{
-            borderRadius: "10px",
-            border: "none",
-            boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
-          }}
-        />
+                  {/* Y AXIS */}
+                  <YAxis
+                    tickFormatter={(v) =>
+                      `₹${Number(v).toLocaleString("en-IN")}`
+                    }
+                    tick={{ fontSize: 12, fill: "#64748b" }}
+                    axisLine={false}
+                    tickLine={false}
+                    width={80}
+                  />
 
-        <Legend
-          verticalAlign="bottom"
-          iconType="circle"
-          wrapperStyle={{ fontSize: "12px" }}
-        />
+                  {/* TOOLTIP */}
+                  <Tooltip
+                    formatter={(v) =>
+                      `₹ ${Number(v).toLocaleString("en-IN")}`
+                    }
+                    cursor={{ fill: "rgba(14,165,233,0.08)" }}
+                    contentStyle={{
+                      borderRadius: "12px",
+                      border: "none",
+                      boxShadow: "0 10px 25px rgba(0,0,0,0.08)",
+                    }}
+                  />
 
-        {/* NET PROFIT */}
-        <Bar
-          dataKey="profit"
-          name="Net Profit"
-          fill="#1d4ed8"
-          radius={[4, 4, 0, 0]}
-          barSize={18}
-        />
+                  {/* GRADIENT */}
+                  <defs>
+                    <linearGradient
+                      id="revenueGradient"
+                      x1="0"
+                      y1="0"
+                      x2="0"
+                      y2="1"
+                    >
+                      <stop offset="0%" stopColor="#0ea5e9" stopOpacity={0.9} />
+                      <stop offset="100%" stopColor="#0ea5e9" stopOpacity={0.3} />
+                    </linearGradient>
+                  </defs>
 
-        {/* REVENUE */}
-        <Bar
-          dataKey="revenue"
-          name="Revenue"
-          fill="#0ea5e9"
-          radius={[4, 4, 0, 0]}
-          barSize={18}
-        />
+                  {/* BAR */}
+                  <Bar
+                    dataKey="revenue"
+                    fill="url(#revenueGradient)"
+                    radius={[8, 8, 0, 0]}
+                    barSize={52}
+                  />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
 
-        {/* FREE CASH FLOW */}
-        <Bar
-          dataKey="cash"
-          name="Free Cash Flow"
-          fill="#fbbf24"
-          radius={[4, 4, 0, 0]}
-          barSize={18}
-        />
-      </BarChart>
-    </ResponsiveContainer>
-  </div>
-</div>
 
         </div>
       </div>
@@ -744,85 +820,108 @@ const Dashboard = () => {
             </span>
           </div>
 
-          <div className="bg-white rounded-2xl shadow border border-gray-200 overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="min-w-full text-sm text-gray-700 border-collapse">
+         <div className="bg-white rounded-2xl shadow border border-gray-200 overflow-hidden">
+  <div className="overflow-x-auto">
+    <table className="min-w-full text-sm text-gray-700 border-collapse">
 
-                {/* TABLE HEAD */}
-                <thead className="bg-black text-white border-b border-gray-200">
-                  <tr>
-                    <th className="px-3 py-4 text-left font-bold">S No</th>
-                    <th className="px-3 py-4 text-left font-bold">Name</th>
-                    <th className="px-3 py-4 text-left font-bold">Contact</th>
-                    <th className="px-3 py-4 text-left font-bold">Last Visit</th>
-                  </tr>
-                </thead>
+      {/* TABLE HEAD */}
+      <thead className="bg-black text-white border-b border-gray-200">
+        <tr>
+          <th className="px-3 py-4 text-left font-bold">S No</th>
+          <th className="px-3 py-4 text-left font-bold">Customer</th>
+          <th className="px-3 py-4 text-left font-bold">Contact</th>
+          <th className="px-3 py-4 text-left font-bold">Car</th>
+          <th className="px-3 py-4 text-left font-bold">Last Visit</th>
+        </tr>
+      </thead>
 
-                {/* TABLE BODY */}
-                <tbody>
-                  {patients.map((item, index) => (
-                    <tr
-                      key={item.id}
-                      className="border-b border-gray-300 hover:bg-gray-50 cursor-pointer"
-                      onClick={() => navigate(`/services/view/${item.id}`)}
-                    >
-                      {/* S No */}
-                      <td className="px-3 py-3 font-semibold">
-                        {index + 1}
-                      </td>
+      {/* TABLE BODY */}
+      <tbody>
+        {patients.map((item, index) => (
+          <tr
+            key={item.id}
+            className="border-b border-gray-300 hover:bg-gray-50 cursor-pointer"
+            onClick={() => navigate(`/services/view/${item.id}`)}
+          >
+            {/* S No */}
+            <td className="px-3 py-3 font-semibold">
+              {index + 1}
+            </td>
 
-                      {/* Name (Customer + Car No) */}
-                      <td className="px-3 py-3">
-                        <div className="font-medium">{item.customerName}</div>
-                        <div className="text-xs text-gray-500">
-                          {item.carNumber}
-                        </div>
-                      </td>
+            {/* CUSTOMER NAME + BOOKING ID */}
+            <td className="px-3 py-3">
+              <div className="font-medium">{item.name || "-"}</div>
+              <div className="text-xs text-gray-500">
+                {item.bookingId || "-"}
+              </div>
+            </td>
 
-                      {/* Contact */}
-                      <td className="px-3 py-3">
-                        {item.mobileNumber || "-"}
-                      </td>
+            {/* CONTACT */}
+            <td className="px-3 py-3">
+              {item.phone || "-"}
+              {item.altPhone && (
+                <div className="text-xs text-gray-400">
+                  Alt: {item.altPhone}
+                </div>
+              )}
+            </td>
 
-                      {/* Last Visit */}
-                      <td className="px-3 py-3">
-                        {formatDate(item.createdAt)}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
+            {/* CAR */}
+            <td className="px-3 py-3">
+              {item.brand || "-"} {item.model || ""}
+            </td>
 
-              </table>
-            </div>
-          </div>
+            {/* LAST VISIT */}
+            <td className="px-3 py-3">
+              {item.createdAt
+                ? formatDate(item.createdAt)
+                : "-"}
+            </td>
+          </tr>
+        ))}
+
+        {patients.length === 0 && (
+          <tr>
+            <td
+              colSpan="5"
+              className="text-center py-6 text-gray-400"
+            >
+              No services found
+            </td>
+          </tr>
+        )}
+      </tbody>
+    </table>
+  </div>
+</div>
+
         </div>
 
 
         {/* TREATMENT STATS */}
         <div className="bg-white rounded-xl shadow p-6">
           <h3 className="font-semibold text-gray-800 mb-5">
-            Treatment Stats
+            Active Services
           </h3>
 
           <div className="flex flex-col sm:flex-row items-center gap-6">
             {/* DONUT */}
             <div className="relative">
               <div
-                className="w-32 h-32 rounded-full shadow-inner"
+                className="w-36 h-36 rounded-full shadow-inner"
                 style={{
                   background: gradient,
-                  boxShadow: "0 0 0 6px #f8fafc inset",
+                  boxShadow: "0 0 0 8px #f8fafc inset",
                 }}
               />
 
-
               {/* CENTER */}
               <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <p className="text-2xl font-bold text-gray-800">
+                <p className="text-3xl font-bold text-gray-800">
                   {total}
                 </p>
                 <p className="text-xs text-gray-500">
-                  Active Treatments
+                  Active Services
                 </p>
               </div>
             </div>
@@ -843,8 +942,7 @@ const Dashboard = () => {
                       <span
                         className="w-3 h-3 rounded-full"
                         style={{
-                          backgroundColor:
-                            colors[index % colors.length],
+                          backgroundColor: getColor(cat, index),
                         }}
                       />
                       <span className="font-medium text-gray-700">
@@ -861,12 +959,13 @@ const Dashboard = () => {
 
               {total === 0 && (
                 <div className="text-center text-gray-400 py-6">
-                  No active treatments found
+                  No active services found
                 </div>
               )}
             </div>
           </div>
         </div>
+
       </div>
 
       {/* FOLLOW UPS + EQUIPMENT */}

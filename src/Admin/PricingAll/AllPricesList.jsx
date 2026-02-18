@@ -391,7 +391,7 @@ const PricingList = () => {
                 <div className="flex justify-end gap-3 mt-3">
                   <button
                     onClick={() =>
-                      navigate(`/admin/pricing/edit/${pkg.id}`, { state: pkg })
+                      navigate(`/admin/addprice/${pkg.id}`, { state: pkg })
                     }
                     className="text-blue-600 hover:scale-110 transition"
                   >
@@ -446,7 +446,7 @@ const PricingList = () => {
                       <div className="flex justify-end gap-3">
                         <button
                           onClick={() =>
-                            navigate(`/admin/pricing/edit/${pkg.id}`, {
+                            navigate(`/admin/addprice/${pkg.id}`, {
                               state: pkg,
                             })
                           }

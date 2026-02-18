@@ -17,30 +17,45 @@ const AddServiceParts = () => {
 
   const [services, setServices] = useState([]);
   const [selectedService, setSelectedService] = useState(null);
-
   const [search, setSearch] = useState("");
 
   const [parts, setParts] = useState([
     { partName: "", qty: 1, price: 0 },
   ]);
 
+  const [loading, setLoading] = useState(false);
+
   /* =======================
      FETCH SERVICES
   ======================= */
   useEffect(() => {
     const fetchServices = async () => {
-      const snap = await getDocs(collection(db, "carServices"));
-      setServices(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+      try {
+        const snap = await getDocs(collection(db, "allServices"));
+        setServices(
+          snap.docs.map((d) => ({ id: d.id, ...d.data() }))
+        );
+      } catch (err) {
+        console.error(err);
+        toast.error("Failed to load services");
+      }
     };
+
     fetchServices();
   }, []);
 
   /* =======================
      FILTER SERVICES
   ======================= */
-  const filteredServices = services.filter(s => {
-    const text = `${s.carServiceId} ${s.customerName} ${s.mobileNumber} ${s.mechanic}`
-      .toLowerCase();
+  const filteredServices = services.filter((s) => {
+    const text = `
+      ${s.bookingId || ""}
+      ${s.name || ""}
+      ${s.phone || ""}
+      ${s.brand || ""}
+      ${s.model || ""}
+    `.toLowerCase();
+
     return text.includes(search.toLowerCase());
   });
 
@@ -75,34 +90,49 @@ const AddServiceParts = () => {
       return;
     }
 
+    const validParts = parts.filter((p) => p.partName);
+
+    if (validParts.length === 0) {
+      toast.error("Add at least one part");
+      return;
+    }
+
     try {
+      setLoading(true);
+
       const partsRef = collection(
         db,
-        "carServices",
+        "allServices",
         selectedService.id,
         "parts"
       );
 
-      for (let p of parts) {
-        if (!p.partName) continue;
-
+      /* 🔹 SAVE PARTS */
+      for (let p of validParts) {
         await addDoc(partsRef, {
-          ...p,
+          partName: p.partName,
+          qty: Number(p.qty),
+          price: Number(p.price),
           total: Number(p.qty) * Number(p.price),
           createdAt: serverTimestamp(),
         });
       }
 
-      await updateDoc(doc(db, "carServices", selectedService.id), {
+      /* 🔹 UPDATE ESTIMATED COST */
+      await updateDoc(doc(db, "allServices", selectedService.id), {
         estimatedCost:
-          Number(selectedService.estimatedCost || 0) + totalPartsCost,
+          Number(selectedService.estimatedCost || 0) +
+          totalPartsCost,
         updatedAt: serverTimestamp(),
       });
 
       toast.success("Parts added successfully");
       navigate(-1);
     } catch (err) {
+      console.error(err);
       toast.error("Failed to save parts");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -110,88 +140,67 @@ const AddServiceParts = () => {
     <div className="p-6 max-w-6xl bg-white shadow rounded-lg mx-auto space-y-6">
       <h2 className="text-xl font-semibold">Add Service Parts</h2>
 
-      {/* SEARCH SERVICE */}
-      <div className="bg-white p-4 rounded-xl  space-y-3">
-        <input
-          placeholder="Search Service ID customer mobile mechanic"
-          className="w-full
-    rounded-lg
-    border border-gray-200
-    pl-10 px-4 py-4
-    text-sm
-    shadow-sm
-    focus:outline-none
-    focus:ring-2
-    focus:ring-gray-900/40
-    focus:border-gray-500
-    transition
-    bg-white"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
+      {/* 🔍 SEARCH SERVICE */}
+      <input
+        placeholder="Search Booking ID / Name / Phone / Car"
+        className="w-full border border-gray-200 px-4 py-3 rounded-lg shadow-sm focus:ring-2 focus:ring-gray-900/40"
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+      />
 
-        {search && (
-          <div className="border rounded max-h-52 overflow-auto">
-            {filteredServices.map(s => (
-              <div
-                key={s.id}
-                onClick={() => {
-                  setSelectedService(s);
-                  setSearch("");
-                }}
-                className="p-3 hover:bg-gray-100 cursor-pointer border-b border-gray-300"
-              >
-                <div className="font-semibold">{s.carServiceId}</div>
-                <div className="text-sm text-gray-500">
-                  {s.customerName} • {s.mobileNumber} • {s.mechanic}
-                </div>
+      {search && (
+        <div className="border rounded max-h-52 overflow-auto">
+          {filteredServices.map((s) => (
+            <div
+              key={s.id}
+              onClick={() => {
+                setSelectedService(s);
+                setSearch("");
+              }}
+              className="p-3 hover:bg-gray-100 cursor-pointer border-b"
+            >
+              <div className="font-semibold">
+                {s.bookingId || "-"}
               </div>
-            ))}
-          </div>
-        )}
-      </div>
-
-      {/* SELECTED SERVICE */}
-      {selectedService && (
-        <div className="bg-white shadow  text-black p-4 rounded-lg text-sm grid grid-cols-2 gap-2">
-          <div><b>Customer:</b> {selectedService.customerName}</div>
-          <div><b>Mobile:</b> {selectedService.mobileNumber}</div>
-          <div><b>Mechanic:</b> {selectedService.mechanic}</div>
-          <div><b>Car No:</b> {selectedService.carNumber}</div>
+              <div className="text-sm text-gray-500">
+                {s.name} • {s.phone} • {s.brand} {s.model}
+              </div>
+            </div>
+          ))}
         </div>
       )}
 
-      {/* PARTS TABLE */}
-      <div className="bg-white rounded-2xl shadow  overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="min-w-full text-sm border-collapse">
-            <thead className="bg-black text-white">
+      {/* 📋 SELECTED SERVICE */}
+      {selectedService && (
+        <div className="bg-gray-50 p-4 rounded-lg text-sm grid grid-cols-2 gap-2">
+          <div><b>Booking ID:</b> {selectedService.bookingId}</div>
+          <div><b>Customer:</b> {selectedService.name}</div>
+          <div><b>Mobile:</b> {selectedService.phone}</div>
+          <div><b>Car:</b> {selectedService.brand} {selectedService.model}</div>
+          <div><b>Issue:</b> {selectedService.issue || selectedService.otherIssue}</div>
+        </div>
+      )}
+
+      {/* 🧾 PARTS TABLE */}
+      <div className="overflow-x-auto">
+        <table className="min-w-full text-sm border">
+          <thead className="bg-black text-white">
             <tr>
-              <th className="px-4 py-4 text-left">Part Name</th>
-              <th className="px-4 py-4 text-left">Qty</th>
-              <th className="px-4 py-4 text-left">Price</th>
-              <th className="px-4 py-4 text-left">Total</th>
+              <th className="px-4 py-3 text-left">Part Name</th>
+              <th className="px-4 py-3 text-left">Qty</th>
+              <th className="px-4 py-3 text-left">Price</th>
+              <th className="px-4 py-3 text-left">Total</th>
               <th></th>
             </tr>
           </thead>
 
           <tbody>
             {parts.map((p, i) => (
-              <tr key={i} className="border-b border-gray-300 ">
-                <td className="px-4 py-4">
+              <tr key={i} className="border-b">
+                <td className="px-4 py-3">
                   <input
-                    className="rounded-lg
-    border border-gray-200
-    pl-10 px-4 py-3
-    text-sm
-    shadow-sm
-    focus:outline-none
-    focus:ring-2
-    focus:ring-gray-900/40
-    focus:border-gray-500
-    transition
-    bg-white"
-                    placeholder="Enter part names"
+                    className="border px-3 py-2 rounded w-full"
+                    placeholder="Part name"
                     value={p.partName}
                     onChange={(e) =>
                       handlePartChange(i, "partName", e.target.value)
@@ -199,21 +208,10 @@ const AddServiceParts = () => {
                   />
                 </td>
 
-                <td className="px-4 py-4">
+                <td className="px-4 py-3">
                   <input
                     type="number"
-                    className="rounded-lg
-    border border-gray-200
-    pl-10 px-4 py-3
-    text-sm
-    shadow-sm
-    focus:outline-none
-    focus:ring-2
-    focus:ring-gray-900/40
-    focus:border-gray-500
-    transition
-    bg-white"
-                    
+                    className="border px-3 py-2 rounded w-20"
                     value={p.qty}
                     onChange={(e) =>
                       handlePartChange(i, "qty", e.target.value)
@@ -221,20 +219,10 @@ const AddServiceParts = () => {
                   />
                 </td>
 
-                <td className="px-4 py-4">
+                <td className="px-4 py-3">
                   <input
                     type="number"
-                    className="rounded-lg
-    border border-gray-200
-    pl-10 px-4 py-3
-    text-sm
-    shadow-sm
-    focus:outline-none
-    focus:ring-2
-    focus:ring-gray-900/40
-    focus:border-gray-500
-    transition
-    bg-white"
+                    className="border px-3 py-2 rounded w-24"
                     value={p.price}
                     onChange={(e) =>
                       handlePartChange(i, "price", e.target.value)
@@ -242,11 +230,11 @@ const AddServiceParts = () => {
                   />
                 </td>
 
-                <td className="px-4 py-4 font-semibold">
+                <td className="px-4 py-3 font-semibold">
                   ₹{p.qty * p.price}
                 </td>
 
-                <td>
+                <td className="px-4 py-3">
                   {parts.length > 1 && (
                     <button
                       onClick={() => removePartRow(i)}
@@ -261,20 +249,15 @@ const AddServiceParts = () => {
           </tbody>
         </table>
 
-        </div>
-        
-
-       <div className="flex items-center justify-end">
-         <button
+        <button
           onClick={addPartRow}
-          className="bg-black text-white mt-3 flex items-center gap-2 px-4 py-3 rounded-lg font-bold"
+          className="bg-black text-white mt-3 flex items-center gap-2 px-4 py-2 rounded-lg"
         >
           <FaPlus /> Add Part
         </button>
-       </div>
       </div>
 
-      {/* FOOTER */}
+      {/* 💰 FOOTER */}
       <div className="flex justify-between items-center">
         <h3 className="text-lg font-semibold">
           Total Parts Cost: ₹{totalPartsCost}
@@ -282,9 +265,10 @@ const AddServiceParts = () => {
 
         <button
           onClick={handleSave}
-          className="bg-black text-white mt-3 flex items-center gap-2 px-4 py-3 rounded-lg font-bold hover:bg-orange-500"
+          disabled={loading}
+          className="bg-black text-white px-6 py-3 rounded-lg font-bold hover:bg-orange-500"
         >
-          Save Parts
+          {loading ? "Saving..." : "Save Parts"}
         </button>
       </div>
     </div>
@@ -292,3 +276,4 @@ const AddServiceParts = () => {
 };
 
 export default AddServiceParts;
+
