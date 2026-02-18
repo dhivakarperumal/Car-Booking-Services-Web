@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import PageContainer from "./PageContainer";
 import { useRef } from "react";
 import { onAuthStateChanged } from "firebase/auth";
-import { auth } from "../firebase";
+import { auth,db } from "../firebase";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -14,7 +14,6 @@ import {
     runTransaction,
     serverTimestamp
 } from "firebase/firestore";
-import { db } from "../firebase";
 
 import { forwardRef } from "react";
 
