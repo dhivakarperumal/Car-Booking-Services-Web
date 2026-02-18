@@ -54,7 +54,7 @@ const Register = () => {
       });
 
       toast.success(`Account created successfully as ${userRole}`);
-      navigate("/login");
+      onSuccess?.();
     } catch (err) {
       toast.error(err.message);
     } finally {
