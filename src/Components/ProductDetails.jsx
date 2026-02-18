@@ -1,12 +1,23 @@
 import { useParams } from "react-router-dom";
-import { collection, getDocs, query, where } from "firebase/firestore";
-import { db } from "../firebase";
+import { useNavigate } from "react-router-dom";
+import {
+  doc,
+  setDoc,
+  getDoc,
+  updateDoc,
+  collection,
+  getDocs,
+  query,
+  where,
+} from "firebase/firestore";
+import { auth, db } from "../firebase";
 import { useEffect, useState } from "react";
 
 export default function ProductDetails() {
   const { slug } = useParams();
   const [product, setProduct] = useState(null);
   const [activeImage, setActiveImage] = useState(0);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -21,6 +32,35 @@ export default function ProductDetails() {
 
     fetchProduct();
   }, [slug]);
+
+  const handleAddToCart = async () => {
+    const user = auth.currentUser;
+
+    if (!user) {
+      alert("Please login first");
+      return;
+    }
+
+    const cartRef = doc(db, "users", user.uid, "cart", product.docId);
+    const existing = await getDoc(cartRef);
+
+    if (existing.exists()) {
+      await updateDoc(cartRef, {
+        quantity: existing.data().quantity + 1,
+      });
+    } else {
+      await setDoc(cartRef, {
+        productId: product.docId,
+        name: product.name,
+        price: product.offerPrice,
+        image: product.images?.[0],
+        quantity: 1,
+        addedAt: new Date(),
+      });
+    }
+
+    navigate("/cart");
+  };
 
   if (!product)
     return <div className="text-white text-center py-40">Loading...</div>;
@@ -155,10 +195,11 @@ export default function ProductDetails() {
             {/* CTA BUTTONS */}
             <div className="mt-15 flex flex-col sm:flex-row gap-4">
               <button
+                onClick={handleAddToCart}
                 className="flex-1 px-10 py-4 rounded-full font-semibold
-    bg-gradient-to-r from-blue-600 to-cyan-400 text-black
-    hover:scale-105 transition-all duration-300
-    shadow-xl shadow-blue-500/40 cursor-pointer"
+bg-gradient-to-r from-blue-600 to-cyan-400 text-black
+hover:scale-105 transition-all duration-300
+shadow-xl shadow-blue-500/40 cursor-pointer"
               >
                 Add To Cart
               </button>
