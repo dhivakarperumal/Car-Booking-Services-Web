@@ -5,6 +5,7 @@ import PageContainer from "./PageContainer";
 import { useNavigate } from "react-router-dom";
 import { FaStar, FaRegStar } from "react-icons/fa";
 import { FiShoppingCart } from "react-icons/fi";
+import PageHeader from "./PageHeader";
 
 export default function Products() {
   const [products, setProducts] = useState([]);
@@ -31,6 +32,8 @@ export default function Products() {
   }, []);
 
   return (
+    <>
+    <PageHeader title="Our Products" />
     <section className="bg-black py-24">
       <PageContainer>
         <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-3">
@@ -200,5 +203,6 @@ flex flex-col"
         </div>
       </PageContainer>
     </section>
+    </>
   );
 }

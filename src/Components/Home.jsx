@@ -1,8 +1,8 @@
 import react from "react";
 import Hero from "./Hero";
-import AboutHome from "./AboutHome"
-import Pricing from "./Pricing";
+import AboutHome from "./AboutHome";
 import ServiceSwiper from "./SeviceSwiper";
+import PricingSwiper from "./PricingSwiper";
 
 export default function Home() {
 
@@ -12,7 +12,7 @@ export default function Home() {
       <Hero />
       <AboutHome />
       <ServiceSwiper />
-      <Pricing/>
+      <PricingSwiper />
      </h1>
     </>
   );
