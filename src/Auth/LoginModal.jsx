@@ -8,8 +8,7 @@ const LoginModal = ({ open, onClose, onOpenRegister }) => {
       
       {/* MODAL CONTAINER */}
       <div
-        className="relative bg-black rounded-2xl
-                   max-h-[90vh] min-w-100 overflow-y-auto"
+       className="relative bg-black rounded-2xl max-h-[90vh] w-full max-w-sm overflow-y-auto"
       >
         {/* CLOSE BUTTON */}
         <button

@@ -5,22 +5,27 @@ const RegisterModal = ({ open, onClose, onSwitchToLogin }) => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
-      <div className="relative bg-black rounded-2xl p-6">
-
+      
+      {/* MODAL CONTAINER */}
+      <div
+        className="relative bg-black rounded-2xl
+                   max-h-[90vh] overflow-y-auto max-w-sm"
+      >
         {/* CLOSE BUTTON */}
         <button
           onClick={onClose}
-          className="absolute top-3 right-3 text-slate-400 hover:text-white"
+          className="absolute top-3 right-3 text-slate-400 hover:text-white z-10"
         >
           ✕
         </button>
 
+        {/* REGISTER FORM */}
         <RegisterForm
           onSuccess={onClose}
           onSwitchToLogin={onSwitchToLogin}
         />
-
       </div>
+
     </div>
   );
 };
