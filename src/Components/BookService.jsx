@@ -1,45 +1,65 @@
 import React, { useState } from "react";
 import PageContainer from "./PageContainer";
+import { useRef } from "react";
 
-const Input = ({ label, ...props }) => (
+import { forwardRef } from "react";
+
+const Input = forwardRef(({ label, required, error, ...props }, ref) => (
     <div>
-        <label className="block mb-2 text-sm text-gray-400">{label}</label>
+        <label className="block mb-2 text-sm text-gray-400">
+            {label} {required && <span className="text-red-400">*</span>}
+        </label>
+
         <input
+            ref={ref}
             {...props}
-            className="w-full rounded-xl bg-black/60 border border-white/10
-      px-4 py-3 text-white focus:outline-none
-      focus:border-sky-400 focus:ring-1 focus:ring-sky-400"
+            className={`w-full rounded-xl bg-black/60 border px-4 py-3 text-white
+      focus:outline-none
+      ${error ? "border-red-400" : "border-white/10 focus:border-sky-400 focus:ring-1 focus:ring-sky-400"}`}
         />
-    </div>
-);
 
-const Textarea = ({ label, ...props }) => (
+        <p className="mt-1 h-4 text-xs text-red-400">{error || ""}</p>
+    </div>
+));
+
+const Textarea = forwardRef(({ label, required, error, ...props }, ref) => (
     <div>
-        <label className="block mb-2 text-sm text-gray-400">{label}</label>
+        <label className="block mb-2 text-sm text-gray-400">
+            {label} {required && <span className="text-red-400">*</span>}
+        </label>
+
         <textarea
+            ref={ref}
             {...props}
-            rows="4"
-            className="w-full rounded-xl bg-black/60 border border-white/10
-      px-4 py-3 text-white focus:outline-none
-      focus:border-sky-400 focus:ring-1 focus:ring-sky-400"
+            className={`w-full rounded-xl bg-black/60 border px-4 py-3 text-white
+      focus:outline-none
+      ${error ? "border-red-400" : "border-white/10 focus:border-sky-400 focus:ring-1 focus:ring-sky-400"}`}
         />
-    </div>
-);
 
-const Select = ({ label, children, ...props }) => (
+        <p className="mt-1 h-4 text-xs text-red-400">{error || ""}</p>
+    </div>
+));
+
+
+const Select = forwardRef(({ label, required, error, children, ...props }, ref) => (
     <div>
-        <label className="block mb-2 text-sm text-gray-400">{label}</label>
+        <label className="block mb-2 text-sm text-gray-400">
+            {label} {required && <span className="text-red-400">*</span>}
+        </label>
+
         <select
+            ref={ref}
             {...props}
-            className="w-full rounded-xl bg-black/60 border border-white/10
-      px-4 py-3 text-white focus:outline-none
-      focus:border-sky-400 focus:ring-1 focus:ring-sky-400"
+            className={`w-full rounded-xl bg-black/60 border px-4 py-3 text-white
+      focus:outline-none
+      ${error ? "border-red-400" : "border-white/10 focus:border-sky-400 focus:ring-1 focus:ring-sky-400"}`}
         >
             {children}
         </select>
-    </div>
-);
 
+        <p className="mt-1 h-4 text-xs text-red-400">{error || ""}</p>
+    </div>
+));
 const BookService = () => {
     const [formData, setFormData] = useState({
         name: "",
@@ -54,11 +74,25 @@ const BookService = () => {
         location: "",
     });
 
+    const refs = {
+        name: useRef(),
+        phone: useRef(),
+        email: useRef(),
+        brand: useRef(),
+        model: useRef(),
+        issue: useRef(),
+        location: useRef(),
+        address: useRef(),
+    };
+
+
     const [locationLoading, setLocationLoading] = useState(false);
     const [locationError, setLocationError] = useState("");
 
     const [isChennai, setIsChennai] = useState(true);
     const [submitError, setSubmitError] = useState("");
+
+    const [errors, setErrors] = useState({});
 
     const handleUseCurrentLocation = async () => {
         setLocationLoading(true);
@@ -112,20 +146,35 @@ const BookService = () => {
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        if (!formData.email) {
-            setSubmitError("Please enter your email address");
-            return;
-        }
+        const newErrors = {};
 
-        // ❌ Chennai validation ONLY on submit
+        if (!formData.name) newErrors.name = "Name is required";
+        if (!formData.phone) newErrors.phone = "Phone number is required";
+        if (!formData.email) newErrors.email = "Email is required";
+        if (!formData.brand) newErrors.brand = "Brand is required";
+        if (!formData.model) newErrors.model = "Model is required";
+        if (!formData.issue) newErrors.issue = "Issue is required";
+        if (!formData.location) newErrors.location = "Location is required";
+        if (!formData.address) newErrors.address = "Service address is required";
+
         if (!isChennai) {
-            setSubmitError("Sorry, currently our service is available only in Chennai.");
+            newErrors.location = "Service available only in Chennai";
+        }
+
+        setErrors(newErrors);
+
+        // 🚀 Scroll to first error
+        const firstErrorKey = Object.keys(newErrors)[0];
+        if (firstErrorKey && refs[firstErrorKey]?.current) {
+            refs[firstErrorKey].current.scrollIntoView({
+                behavior: "smooth",
+                block: "center",
+            });
+            refs[firstErrorKey].current.focus();
             return;
         }
 
-        setSubmitError("");
-
-        // ✅ Proceed with booking (Firebase / API)
+        // ✅ All good
         console.log("Booking Data:", formData);
     };
 
@@ -156,21 +205,38 @@ const BookService = () => {
                     </div>
 
                     {/* Form Card */}
-                    <form className="rounded-3xl border border-white/10 bg-white/5 backdrop-blur-xl p-10 space-y-8 shadow-2xl">
-
-                        {/* Name */}
-                        <Input label="Full Name" name="name" onChange={handleChange} />
+                    <form className="rounded-3xl border border-white/10 bg-white/5 backdrop-blur-xl p-10 space-y-2 shadow-2xl">
 
                         <Input
-                            label="Email Address"
-                            name="email"
-                            type="email"
+                            ref={refs.name}
+                            label="Full Name"
+                            name="name"
+                            required
+                            error={errors.name}
                             onChange={handleChange}
                         />
 
+                        <Input
+                            ref={refs.email}
+                            label="Email Address"
+                            name="email"
+                            required
+                            error={errors.email}
+                            onChange={handleChange}
+                        />
+
+
+
                         {/* Phone Numbers */}
                         <div className="grid md:grid-cols-2 gap-6">
-                            <Input label="Phone Number" name="phone" onChange={handleChange} />
+                            <Input
+                                ref={refs.phone}
+                                label="Phone Number"
+                                name="phone"
+                                required
+                                error={errors.phone}
+                                onChange={handleChange}
+                            />
                             <Input
                                 label="Alternative Phone (Optional)"
                                 name="altPhone"
@@ -180,7 +246,14 @@ const BookService = () => {
 
                         {/* Brand & Model */}
                         <div className="grid md:grid-cols-2 gap-6">
-                            <Select label="Car Brand" name="brand" onChange={handleChange}>
+                            <Select
+                                ref={refs.brand}
+                                label="Car Brand"
+                                name="brand"
+                                required
+                                error={errors.brand}
+                                onChange={handleChange}
+                            >
                                 <option value="">Select Brand</option>
                                 <option>Honda</option>
                                 <option>Hyundai</option>
@@ -188,11 +261,25 @@ const BookService = () => {
                                 <option>Audi</option>
                             </Select>
 
-                            <Input label="Car Model" name="model" onChange={handleChange} />
+                            <Input
+                                ref={refs.model}
+                                label="Car Model"
+                                name="model"
+                                required
+                                error={errors.model}
+                                onChange={handleChange}
+                            />
                         </div>
 
                         {/* Issues */}
-                        <Select label="Issue" name="issue" onChange={handleChange}>
+                        <Select
+                            ref={refs.issue}
+                            label="Issue"
+                            name="issue"
+                            required
+                            error={errors.issue}
+                            onChange={handleChange}
+                        >
                             <option value="">Select Issue</option>
                             <option>Engine Problem</option>
                             <option>Brake Issue</option>
@@ -209,41 +296,48 @@ const BookService = () => {
                         )}
 
                         <div>
-                            <label className="block mb-2 text-sm text-gray-400">
-                                Current Location
-                            </label>
+                            <div>
+                                <label className="block mb-2 text-sm text-gray-400">
+                                    Current Location <span className="text-red-400">*</span>
+                                </label>
 
-                            <div className="flex gap-4">
-                                <input
-                                    type="text"
-                                    value={formData.location}
-                                    readOnly
-                                    placeholder="Click to fetch your current address"
-                                    className="flex-1 rounded-xl bg-black/60 border border-white/10
-      px-4 py-3 text-white"
-                                />
+                                <div className="flex gap-4">
+                                    <input
+                                        ref={refs.location}
+                                        type="text"
+                                        value={formData.location}
+                                        readOnly
+                                        className="flex-1 rounded-xl bg-black/60 border px-4 py-3 text-white
+      border-white/10"
+                                    />
 
-                                <button
-                                    type="button"
-                                    onClick={handleUseCurrentLocation}
-                                    disabled={locationLoading}
-                                    className="px-6 rounded-xl font-semibold text-black
-      bg-gradient-to-r from-sky-500 to-cyan-400
-      hover:scale-105 transition-all duration-300
-      disabled:opacity-50"
-                                >
-                                    {locationLoading ? "Fetching..." : "Use Current Location"}
-                                </button>
+                                    <button
+                                        type="button"
+                                        onClick={handleUseCurrentLocation}
+                                        disabled={locationLoading}
+                                        className="px-6 rounded-xl font-semibold text-black
+      bg-gradient-to-r from-sky-500 to-cyan-400"
+                                    >
+                                        {locationLoading ? "Fetching..." : "Use Current Location"}
+                                    </button>
+                                </div>
+
+                                <p className="mt-1 h-4 text-xs text-red-400">
+                                    {errors.location || ""}
+                                </p>
                             </div>
+
                         </div>
 
                         {/* Address */}
                         <Textarea
+                            ref={refs.address}
                             label="Service Address"
                             name="address"
+                            required
+                            error={errors.address}
                             onChange={handleChange}
                         />
-
                         {submitError && (
                             <p className="text-red-400 text-sm text-center">{submitError}</p>
                         )}
