@@ -115,6 +115,52 @@ const BookService = () => {
     const navigate = useNavigate();
     const [submitting, setSubmitting] = useState(false);
 
+    const [locationQuery, setLocationQuery] = useState("");
+    const [locationResults, setLocationResults] = useState([]);
+    const [coords, setCoords] = useState({ lat: null, lng: null });
+
+    const searchLocation = async (query) => {
+        if (!query || query.length < 3) {
+            setLocationResults([]);
+            return;
+        }
+
+        try {
+            const res = await fetch(
+                `https://nominatim.openstreetmap.org/search?format=json&q=${query}&addressdetails=1&limit=5`
+            );
+            const data = await res.json();
+            setLocationResults(data);
+        } catch (error) {
+            console.error("Search failed");
+        }
+    };
+
+    const handleSelectLocation = (place) => {
+        setFormData((prev) => ({
+            ...prev,
+            location: place.display_name,
+        }));
+
+        setLocationQuery(place.display_name);
+
+        setCoords({
+            lat: place.lat,
+            lng: place.lon,
+        });
+
+        const city =
+            place.address?.city ||
+            place.address?.town ||
+            place.address?.village ||
+            "";
+
+        setIsChennai(
+            ["chennai", "tirupattur"].includes(city.toLowerCase())
+        );
+
+        setLocationResults([]);
+    };
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (user) => {
             setCurrentUser(user);
@@ -131,51 +177,125 @@ const BookService = () => {
 
     const [errors, setErrors] = useState({});
 
+    // const handleUseCurrentLocation = async () => {
+    //     setLocationLoading(true);
+    //     setSubmitError("");
+
+    //     if (!navigator.geolocation) {
+    //         setLocationLoading(false);
+    //         return;
+    //     }
+
+    //     navigator.geolocation.getCurrentPosition(
+    //         async (position) => {
+    //             const { latitude, longitude } = position.coords;
+
+    //             try {
+    //                 const res = await fetch(
+    //                     `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`
+    //                 );
+    //                 const data = await res.json();
+
+    //                 const city =
+    //                     data.address.city ||
+    //                     data.address.town ||
+    //                     data.address.village ||
+    //                     "";
+
+    //                 setFormData((prev) => ({
+    //                     ...prev,
+    //                     location: data.display_name,
+    //                 }));
+
+    //                 setCoords({
+    //                     lat: latitude,
+    //                     lng: longitude,
+    //                 });
+
+    //                 setIsChennai(
+    //                     ["chennai", "tirupattur"].includes(city.toLowerCase())
+    //                 );
+    //             } catch (err) {
+    //                 console.error("Location fetch failed");
+    //             } finally {
+    //                 setLocationLoading(false);
+    //             }
+    //         },
+    //         () => {
+    //             setLocationLoading(false);
+    //         }
+    //     );
+    // };
+
+
     const handleUseCurrentLocation = async () => {
-        setLocationLoading(true);
-        setSubmitError("");
+  setLocationLoading(true);
+  setSubmitError("");
 
-        if (!navigator.geolocation) {
-            setLocationLoading(false);
-            return;
-        }
+  if (!navigator.geolocation) {
+    setSubmitError("Geolocation is not supported by your browser");
+    setLocationLoading(false);
+    return;
+  }
 
-        navigator.geolocation.getCurrentPosition(
-            async (position) => {
-                const { latitude, longitude } = position.coords;
+  navigator.geolocation.getCurrentPosition(
+    async (position) => {
+      const { latitude, longitude } = position.coords;
 
-                try {
-                    const res = await fetch(
-                        `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`
-                    );
-                    const data = await res.json();
-
-                    const city =
-                        data.address.city ||
-                        data.address.town ||
-                        data.address.village ||
-                        "";
-
-                    setFormData((prev) => ({
-                        ...prev,
-                        location: data.display_name,
-                    }));
-
-                    setIsChennai(
-                        ["chennai", "tirupattur"].includes(city.toLowerCase())
-                    );
-                } catch (err) {
-                    console.error("Location fetch failed");
-                } finally {
-                    setLocationLoading(false);
-                }
-            },
-            () => {
-                setLocationLoading(false);
-            }
+      try {
+        const res = await fetch(
+          `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${latitude}&lon=${longitude}`
         );
-    };
+        const data = await res.json();
 
+        const city =
+          data.address?.city ||
+          data.address?.town ||
+          data.address?.village ||
+          "";
+
+        setFormData((prev) => ({
+          ...prev,
+          location: data.display_name,
+        }));
+
+        setLocationQuery(data.display_name);
+
+        setCoords({
+          lat: latitude,
+          lng: longitude,
+        });
+
+        setIsChennai(
+          ["chennai", "tirupattur"].includes(city.toLowerCase())
+        );
+      } catch (err) {
+        console.error(err);
+        setSubmitError("Unable to fetch address from location");
+      } finally {
+        setLocationLoading(false);
+      }
+    },
+    (error) => {
+      console.error("Geolocation error:", error);
+
+      if (error.code === 1) {
+        setSubmitError("Location permission denied");
+      } else if (error.code === 2) {
+        setSubmitError("Location unavailable");
+      } else if (error.code === 3) {
+        setSubmitError("Location request timed out");
+      }
+
+      setLocationLoading(false);
+    },
+    {
+      enableHighAccuracy: true,
+      timeout: 15000,
+      maximumAge: 0,
+    }
+  );
+};
     const generateBookingId = async () => {
         const counterRef = doc(db, "counters", "bookingCounter");
 
@@ -230,7 +350,9 @@ const BookService = () => {
         if (!formData.location) newErrors.location = "Location is required";
         if (!formData.address) newErrors.address = "Service address is required";
 
-        if (!isChennai) {
+        if (!coords.lat || !coords.lng) {
+            newErrors.location = "Please select location or use current location";
+        } else if (!isChennai) {
             newErrors.location = "Service available only in Chennai & Tirupattur";
         }
 
@@ -275,6 +397,8 @@ const BookService = () => {
                 otherIssue: formData.otherIssue || "",
                 address: formData.address,
                 location: formData.location,
+                latitude: coords.lat,
+                longitude: coords.lng,
 
                 // Status tracking
                 status: BOOKING_STATUS.BOOKED,
@@ -449,29 +573,48 @@ const BookService = () => {
                         <div>
                             <div>
                                 <label className="block mb-2 text-sm text-gray-400">
-                                    Current Location <span className="text-red-400">*</span>
+                                    Location <span className="text-red-400">*</span>
                                 </label>
 
-                                <div className="flex gap-4">
-                                    <input
-                                        ref={refs.location}
-                                        type="text"
-                                        value={formData.location}
-                                        readOnly
-                                        className="flex-1 rounded-xl bg-black/60 border px-4 py-3 text-white
-      border-white/10"
-                                    />
+                                {/* SEARCH INPUT */}
+                                <input
+                                    ref={refs.location}
+                                    type="text"
+                                    value={locationQuery}
+                                    placeholder="Search your area..."
+                                    onChange={(e) => {
+                                        setLocationQuery(e.target.value);
+                                        setCoords({ lat: null, lng: null });
+                                        searchLocation(e.target.value);
+                                    }}
+                                    className="w-full rounded-xl bg-black/60 border px-4 py-3 text-white border-white/10"
+                                />
 
-                                    <button
-                                        type="button"
-                                        onClick={handleUseCurrentLocation}
-                                        disabled={locationLoading}
-                                        className="px-6 rounded-xl font-semibold text-black
-      bg-gradient-to-r from-sky-500 to-cyan-400"
-                                    >
-                                        {locationLoading ? "Fetching..." : "Use Current Location"}
-                                    </button>
-                                </div>
+                                {/* SEARCH RESULTS */}
+                                {locationResults.length > 0 && (
+                                    <div className="mt-2 rounded-xl border border-white/10 bg-black max-h-56 overflow-y-auto relative z-50">
+                                        {locationResults.map((place) => (
+                                            <div
+                                                key={place.place_id}
+                                                onClick={() => handleSelectLocation(place)}
+                                                className="px-4 py-3 cursor-pointer text-sm hover:bg-white/10"
+                                            >
+                                                {place.display_name}
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+
+                                {/* CURRENT LOCATION BUTTON (UNCHANGED) */}
+                                <button
+                                    type="button"
+                                    onClick={handleUseCurrentLocation}
+                                    disabled={locationLoading}
+                                    className="mt-4 px-6 py-3 rounded-xl font-semibold text-black
+    bg-gradient-to-r from-sky-500 to-cyan-400"
+                                >
+                                    {locationLoading ? "Fetching..." : "Use Current Location"}
+                                </button>
 
                                 <p className="mt-1 h-4 text-xs text-red-400">
                                     {errors.location || ""}
