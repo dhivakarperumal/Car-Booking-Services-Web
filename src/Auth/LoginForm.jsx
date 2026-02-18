@@ -1,17 +1,17 @@
 import { useState } from "react";
 import {
-  signInWithEmailAndPassword,
-  signInWithPopup,
+    signInWithEmailAndPassword,
+    signInWithPopup,
 } from "firebase/auth";
 import {
-  doc,
-  getDoc,
-  setDoc,
-  serverTimestamp,
-  collection,
-  query,
-  where,
-  getDocs,
+    doc,
+    getDoc,
+    setDoc,
+    serverTimestamp,
+    collection,
+    query,
+    where,
+    getDocs,
 } from "firebase/firestore";
 import { auth, db, googleProvider } from "../firebase";
 import toast from "react-hot-toast";
@@ -20,198 +20,196 @@ import { FaCar, FaGoogle } from "react-icons/fa";
 import { MdEmail, MdLock } from "react-icons/md";
 
 const LoginForm = ({ onSuccess, onOpenRegister }) => {
-  const [identifier, setIdentifier] = useState("");
-  const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
+    const [identifier, setIdentifier] = useState("");
+    const [password, setPassword] = useState("");
+    const [loading, setLoading] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
 
-  // 🔹 Resolve email from username
-  const getEmailFromUsername = async (username) => {
-    const q = query(
-      collection(db, "users"),
-      where("username", "==", username)
-    );
+    // 🔹 Resolve email from username
+    const getEmailFromUsername = async (username) => {
+        const q = query(
+            collection(db, "users"),
+            where("username", "==", username)
+        );
 
-    const snapshot = await getDocs(q);
-    if (snapshot.empty) {
-      throw new Error("Username not found");
-    }
+        const snapshot = await getDocs(q);
+        if (snapshot.empty) {
+            throw new Error("Username not found");
+        }
 
-    return snapshot.docs[0].data().email;
-  };
+        return snapshot.docs[0].data().email;
+    };
 
-  // 🔹 Email / Username Login
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    if (loading) return;
+    // 🔹 Email / Username Login
+    const handleLogin = async (e) => {
+        e.preventDefault();
+        if (loading) return;
 
-    setLoading(true);
+        setLoading(true);
 
-    try {
-      let emailToLogin = identifier;
+        try {
+            let emailToLogin = identifier;
 
-      if (!identifier.includes("@")) {
-        emailToLogin = await getEmailFromUsername(identifier);
-      }
+            if (!identifier.includes("@")) {
+                emailToLogin = await getEmailFromUsername(identifier);
+            }
 
-      const res = await signInWithEmailAndPassword(
-        auth,
-        emailToLogin,
-        password
-      );
+            const res = await signInWithEmailAndPassword(
+                auth,
+                emailToLogin,
+                password
+            );
 
-      const snap = await getDoc(doc(db, "users", res.user.uid));
-      onSuccess?.(snap.exists() ? snap.data().role : "user");
-    } catch (err) {
-      toast.error(err.message || "Login failed");
-    } finally {
-      setLoading(false);
-    }
-  };
+            const snap = await getDoc(doc(db, "users", res.user.uid));
+            onSuccess?.(snap.exists() ? snap.data().role : "user");
+        } catch (err) {
+            toast.error(err.message || "Login failed");
+        } finally {
+            setLoading(false);
+        }
+    };
 
-  // 🔹 Google Login
-  const handleGoogleLogin = async () => {
-    try {
-      const res = await signInWithPopup(auth, googleProvider);
-      const userRef = doc(db, "users", res.user.uid);
-      const snap = await getDoc(userRef);
+    // 🔹 Google Login
+    const handleGoogleLogin = async () => {
+        try {
+            const res = await signInWithPopup(auth, googleProvider);
+            const userRef = doc(db, "users", res.user.uid);
+            const snap = await getDoc(userRef);
 
-      let role = "user";
+            let role = "user";
 
-      if (!snap.exists()) {
-        await setDoc(userRef, {
-          uid: res.user.uid,
-          email: res.user.email || "",
-          username: res.user.displayName || "",
-          role: "user",
-          photoURL: res.user.photoURL || "",
-          createdAt: serverTimestamp(),
-        });
-      } else {
-        role = snap.data().role;
-      }
+            if (!snap.exists()) {
+                await setDoc(userRef, {
+                    uid: res.user.uid,
+                    email: res.user.email || "",
+                    username: res.user.displayName || "",
+                    role: "user",
+                    photoURL: res.user.photoURL || "",
+                    createdAt: serverTimestamp(),
+                });
+            } else {
+                role = snap.data().role;
+            }
 
-      onSuccess?.(role);
-    } catch (err) {
-      toast.error(err.message);
-    }
-  };
+            onSuccess?.(role);
+        } catch (err) {
+            toast.error(err.message);
+        }
+    };
 
-return (
-  <div
-    className="w-full max-w-md mx-auto text-white
+    return (
+        <div
+            className="w-full max-w-md mx-auto text-white
                bg-black rounded-2xl
                max-h-[85vh] overflow-y-auto
                px-6 py-6 border border-sky-400"
-  >
-    {/* ICON */}
-    <div className="flex justify-center mb-4">
-      <div
-        className="w-14 h-14 rounded-full
-                   bg-gradient-to-br from-sky-500 to-blue-100
-                   flex items-center justify-center
-                   shadow-[0_0_15px_rgba(249,115,22,0.6)]"
-      >
-        <FaCar className="text-2xl text-white" />
-      </div>
-    </div>
-
-    <h2 className="text-2xl font-bold text-center">
-      Car Service Login
-    </h2>
-
-    <p className="text-center text-slate-400 text-sm mt-1 mb-5">
-      Sign in to manage services & bookings
-    </p>
-
-    {/* FORM */}
-    <form onSubmit={handleLogin} className="space-y-3">
-
-      {/* EMAIL / USERNAME */}
-      <div className="relative">
-        <MdEmail className="absolute left-3 top-1/2 -translate-y-1/2
-                           text-slate-400" />
-        <input
-          type="text"
-          placeholder="Email or Username"
-          value={identifier}
-          onChange={(e) => setIdentifier(e.target.value)}
-          required
-          className="w-full pl-10 p-2.5 rounded-lg
-                     bg-slate-900 border border-slate-700
-                     focus:ring-2 focus:ring-sky-500 outline-none"
-        />
-      </div>
-
-      {/* PASSWORD */}
-      <div className="relative">
-        <MdLock className="absolute left-3 top-1/2 -translate-y-1/2
-                          text-slate-400" />
-        <input
-          type={showPassword ? "text" : "password"}
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-          className="w-full pl-10 pr-11 p-2.5 rounded-lg
-                     bg-slate-900 border border-slate-700
-                     focus:ring-2 focus:ring-sky-500 outline-none"
-        />
-        <button
-          type="button"
-          onClick={() => setShowPassword(!showPassword)}
-          className="absolute right-3 top-1/2 -translate-y-1/2
-                     text-slate-400 hover:text-sky-400"
         >
-          {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-        </button>
-      </div>
+            {/* LOGO */}
+            <div className="flex justify-center mb-4">
+                <img
+                    src="/logo.png"   // 🔁 change path if needed
+                    alt="Logo"
+                    className="h-14 w-auto object-contain
+               drop-shadow-[0_0_15px_rgba(56,189,248,0.7)]"
+                />
+            </div>
 
-      {/* LOGIN BUTTON */}
-      <button
-        disabled={loading}
-        className="w-full py-2.5 mt-2 rounded-lg font-semibold
+            <h2 className="text-2xl font-bold text-center">
+                Car Service Login
+            </h2>
+
+            <p className="text-center text-slate-400 text-sm mt-1 mb-5">
+                Sign in to manage services & bookings
+            </p>
+
+            {/* FORM */}
+            <form onSubmit={handleLogin} className="space-y-3">
+
+                {/* EMAIL / USERNAME */}
+                <div className="relative">
+                    <MdEmail className="absolute left-3 top-1/2 -translate-y-1/2
+                           text-slate-400" />
+                    <input
+                        type="text"
+                        placeholder="Email or Username"
+                        value={identifier}
+                        onChange={(e) => setIdentifier(e.target.value)}
+                        required
+                        className="w-full pl-10 p-2.5 rounded-lg
+                     bg-slate-900 border border-slate-700
+                     focus:ring-2 focus:ring-sky-500 outline-none"
+                    />
+                </div>
+
+                {/* PASSWORD */}
+                <div className="relative">
+                    <MdLock className="absolute left-3 top-1/2 -translate-y-1/2
+                          text-slate-400" />
+                    <input
+                        type={showPassword ? "text" : "password"}
+                        placeholder="Password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                        className="w-full pl-10 pr-11 p-2.5 rounded-lg
+                     bg-slate-900 border border-slate-700
+                     focus:ring-2 focus:ring-sky-500 outline-none"
+                    />
+                    <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2
+                     text-slate-400 hover:text-sky-400 cursor-pointer"
+                    >
+                        {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                    </button>
+                </div>
+
+                {/* LOGIN BUTTON */}
+                <button
+                    disabled={loading}
+                    className="w-full py-2.5 mt-2 rounded-lg font-semibold
                    bg-gradient-to-r from-sky-500 to-sky-500
                    cursor-pointer
                    transition disabled:opacity-50"
-      >
-        {loading ? "Signing in..." : "Sign In"}
-      </button>
-    </form>
+                >
+                    {loading ? "Signing in..." : "Sign In"}
+                </button>
+            </form>
 
-    {/* OR */}
-    <div className="my-5 flex items-center gap-3">
-      <div className="flex-1 h-px bg-slate-700" />
-      <span className="text-xs text-slate-400">OR</span>
-      <div className="flex-1 h-px bg-slate-700" />
-    </div>
+            {/* OR */}
+            <div className="my-5 flex items-center gap-3">
+                <div className="flex-1 h-px bg-slate-700" />
+                <span className="text-xs text-slate-400">OR</span>
+                <div className="flex-1 h-px bg-slate-700" />
+            </div>
 
-    {/* GOOGLE */}
-    <button
-      onClick={handleGoogleLogin}
-      className="w-full py-2.5 rounded-lg border border-slate-700
+            {/* GOOGLE */}
+            <button
+                onClick={handleGoogleLogin}
+                className="w-full py-2.5 rounded-lg border border-slate-700
                  flex items-center justify-center gap-3
-                 hover:bg-slate-800 transition"
-    >
-      <FaGoogle className="text-blue-500 text-base" />
-      <span className="font-medium text-slate-300 text-sm">
-        Continue with Google
-      </span>
-    </button>
+                 hover:bg-slate-800 transition cursor-pointer"
+            >
+                <FaGoogle className="text-blue-500 text-base" />
+                <span className="font-medium text-slate-300 text-sm">
+                    Continue with Google
+                </span>
+            </button>
 
-    {/* REGISTER LINK */}
-    <p className="text-xs mt-4 text-center text-slate-400">
-      Don’t have an account?{" "}
-      <button
-        type="button"
-        onClick={onOpenRegister}
-        className="text-sky-400 font-semibold hover:underline"
-      >
-        Register
-      </button>
-    </p>
-  </div>
-);
+            {/* REGISTER LINK */}
+            <p className="text-xs mt-4 text-center text-slate-400">
+                Don’t have an account?{" "}
+                <button
+                    type="button"
+                    onClick={onOpenRegister}
+                    className="text-sky-400 font-semibold hover:underline cursor-pointer"
+                >
+                    Register
+                </button>
+            </p>
+        </div>
+    );
 };
 
 export default LoginForm;

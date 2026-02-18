@@ -8,14 +8,14 @@ const RegisterModal = ({ open, onClose, onSwitchToLogin }) => {
       
       {/* MODAL CONTAINER */}
       <div
-        className="relative bg-black rounded-2xl
-                   max-h-[90vh] overflow-y-auto max-w-sm"
-      >
+  className="relative bg-black rounded-2xl
+             max-h-[90vh] w-full max-w-sm overflow-y-auto"
+>
         {/* CLOSE BUTTON */}
         <button
-          onClick={onClose}
-          className="absolute top-3 right-3 text-slate-400 hover:text-white z-10"
-        >
+  onClick={onClose}
+  className="absolute top-3 right-3 text-slate-400 hover:text-white z-50 cursor-pointer"
+>
           ✕
         </button>
 

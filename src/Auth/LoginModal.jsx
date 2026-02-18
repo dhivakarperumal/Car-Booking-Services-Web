@@ -13,7 +13,7 @@ const LoginModal = ({ open, onClose, onOpenRegister }) => {
         {/* CLOSE BUTTON */}
         <button
           onClick={onClose}
-          className="absolute top-3 right-3 text-slate-400 hover:text-white z-10"
+          className="absolute top-3 right-3 text-slate-400 hover:text-white z-10 cursor-pointer"
         >
           ✕
         </button>
