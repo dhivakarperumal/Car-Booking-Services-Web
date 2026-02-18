@@ -37,7 +37,7 @@ export default function Products() {
           {products.map((product) => (
             <div
               key={product.docId}
-              onClick={() => navigate(`/product/${product.slug}`)}
+              onClick={() => navigate(`/products/${product.slug}`)}
               className="group relative bg-[#050b14]
 border border-white/20
 rounded-2xl overflow-hidden cursor-pointer
