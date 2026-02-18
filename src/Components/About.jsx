@@ -7,16 +7,15 @@ export default function AboutStats() {
 
       {/* Background Image */}
       <div
-        className="absolute inset-0 bg-cover bg-center "
-        style={{ backgroundImage: "url(./images/about-bg.jpg)" }}
+        className="absolute inset-0 bg-cover bg-center"
+        style={{ backgroundImage: "url('/images/about-bg.jpg')" }}
       />
 
       {/* Overlay */}
       <div className="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-black/60" />
 
-      <PageContainer>
-      <div className="relative">
-
+      <div className="relative container mx-auto px-6">
+        <PageContainer>
         <div className="grid lg:grid-cols-2 gap-20 items-center">
 
           {/* LEFT CONTENT */}
@@ -40,9 +39,11 @@ export default function AboutStats() {
               preserve your vehicle’s performance and appearance.
             </p>
 
-            <button className="mt-6 px-10 py-4 rounded-full font-semibold
+            <button
+              className="mt-6 px-10 py-4 rounded-full font-semibold
               bg-gradient-to-r from-blue-600 to-cyan-400
-              hover:scale-105 transition-all duration-300 shadow-lg shadow-blue-500/40">
+              hover:scale-105 transition-all duration-300 shadow-lg shadow-blue-500/40"
+            >
               Contact Us →
             </button>
 
@@ -51,44 +52,40 @@ export default function AboutStats() {
           {/* RIGHT STATS */}
           <div className="grid sm:grid-cols-2 gap-10">
 
-            <StatCard icon={<Settings size={22} />} title="Wheel Replacement" value="1000+" />
-            <StatCard icon={<Wrench size={22} />} title="Interior Remodeling" value="400+" />
-            <StatCard icon={<Paintbrush size={22} />} title="Color Correction" value="700+" />
-            <StatCard icon={<Users size={22} />} title="Years Experience" value="25+" />
+            {[
+              { icon: <Settings size={22} />, title: "Wheel Replacement", value: "1000+" },
+              { icon: <Wrench size={22} />, title: "Interior Remodeling", value: "400+" },
+              { icon: <Paintbrush size={22} />, title: "Color Correction", value: "700+" },
+              { icon: <Users size={22} />, title: "Years Experience", value: "25+" },
+            ].map((item, i) => (
+              <div
+                key={i}
+                className="relative p-8 rounded-2xl border border-white/10
+                backdrop-blur-xl bg-white/5 shadow-2xl
+                hover:-translate-y-2 transition-all duration-300 group"
+              >
+
+                {/* Glow */}
+                <div className="absolute inset-0 rounded-2xl bg-blue-500/10 opacity-0 group-hover:opacity-100 transition" />
+
+                {/* Icon */}
+                <div className="absolute -top-6 left-6 bg-gradient-to-r from-blue-600 to-cyan-400
+                  p-3 rounded-xl shadow-lg shadow-blue-500/40">
+                  {item.icon}
+                </div>
+
+                <p className="text-gray-400 mt-8">{item.title}</p>
+                <h3 className="text-4xl font-bold mt-3">{item.value}</h3>
+
+              </div>
+            ))}
 
           </div>
 
         </div>
+        </PageContainer>
+
       </div>
-      </PageContainer>
     </section>
-  );
-}
-
-/* PREMIUM GLASS CARD */
-
-function StatCard({ icon, title, value }) {
-  return (
-    <div
-      className="relative p-8 rounded-2xl border border-white/10
-      backdrop-blur-xl bg-white/5 shadow-2xl
-      hover:-translate-y-2 transition-all duration-300 group"
-    >
-
-      {/* Glow */}
-      <div className="absolute inset-0 rounded-2xl bg-blue-500/10 opacity-0 group-hover:opacity-100 transition" />
-
-      {/* Icon */}
-      <div className="absolute -top-6 left-6 bg-gradient-to-r from-blue-600 to-cyan-400
-        p-3 rounded-xl shadow-lg shadow-blue-500/40">
-
-        {icon}
-      </div>
-
-      <p className="text-gray-400 mt-8">{title}</p>
-
-      <h3 className="text-4xl font-bold mt-3">{value}</h3>
-
-    </div>
   );
 }

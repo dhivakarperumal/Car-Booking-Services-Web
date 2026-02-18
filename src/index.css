@@ -191,3 +191,17 @@ body {
   }
 }
 
+.header-zoom {
+  animation: headerZoom 12s ease-in-out infinite alternate;
+}
+
+@keyframes headerZoom {
+  from {
+    transform: scale(1.2);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+
