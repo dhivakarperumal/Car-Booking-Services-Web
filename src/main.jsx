@@ -14,7 +14,6 @@ import Products from "./Components/Products.jsx";
 import ContactUs from "./Components/ContactUs.jsx";
 
 // Auth
-import Login from "./Auth/Login.jsx";
 import Register from "./Auth/Register.jsx";
 
 
@@ -66,8 +65,6 @@ const router = createBrowserRouter([
     element: <App />,
     children: [
       { index: true, element: <Home /> },
-  
-      { path: "/login", element: <Login /> },
       { path: "/register", element: <Register /> },
       { path: "/services", element: <Services /> },
       { path: "/pricing", element: <Pricing /> },

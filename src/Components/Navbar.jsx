@@ -9,6 +9,8 @@ import { useEffect } from "react";
 import { signOut } from "firebase/auth";
 import { setDoc } from "firebase/firestore";
 import { useRef } from "react";
+import LoginModal from "../Auth/LoginModal";
+import RegisterModal from "../Auth/RegisterModal";
 
 const Navbar = () => {
   const location = useLocation();
@@ -18,12 +20,14 @@ const Navbar = () => {
   const [userData, setUserData] = useState(null);
   const [loadingUser, setLoadingUser] = useState(true);
   const [showMenu, setShowMenu] = useState(false);
+  const [showLogin, setShowLogin] = useState(false);
+const [showRegister, setShowRegister] = useState(false);
 
   const handleLogout = async () => {
     await signOut(auth);
     setUserData(null);
     setShowMenu(false);
-    navigate("/login");
+    setShowLogin(true);
   };
 
   useEffect(() => {
@@ -217,7 +221,7 @@ const Navbar = () => {
                     </div>
                   ) : (
                     <button
-                      onClick={() => navigate("/login")}
+                      onClick={() => setShowLogin(true)} 
                       className="text-sky-400 cursor-pointer hover:text-white transition"
                     >
                       <User size={22} />
@@ -287,6 +291,23 @@ const Navbar = () => {
           </button>
         </nav>
       </div>
+     <LoginModal
+  open={showLogin}
+  onClose={() => setShowLogin(false)}
+  onOpenRegister={() => {
+    setShowLogin(false);
+    setShowRegister(true);
+  }}
+/>
+
+<RegisterModal
+  open={showRegister}
+  onClose={() => setShowRegister(false)}
+  onSwitchToLogin={() => {
+    setShowRegister(false);
+    setShowLogin(true);
+  }}
+/>
     </header>
   );
 };
