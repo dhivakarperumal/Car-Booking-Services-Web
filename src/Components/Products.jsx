@@ -39,15 +39,25 @@ export default function Products() {
               key={product.docId}
               onClick={() => navigate(`/products/${product.slug}`)}
               className="group relative bg-[#050b14]
-border border-white/20
+
+/* Default (Mobile) — Always glowing */
+border border-sky-400
+shadow-[0_30px_90px_rgba(56,189,248,0.45)]
+before:absolute before:inset-0 before:rounded-2xl
+before:bg-gradient-to-tr before:from-sky-500/10 before:to-cyan-400/5
+before:opacity-100
+
+md:border-2 md:border-white/30
+md:shadow-none
+md:before:opacity-0
+md:hover:border-sky-400
+md:hover:shadow-[0_30px_90px_rgba(56,189,248,0.45)]
+md:hover:before:opacity-100
+
 rounded-2xl overflow-hidden cursor-pointer
 transition-all duration-500
-hover:-translate-y-2
-hover:border-sky-400
-hover:shadow-[0_30px_90px_rgba(56,189,248,0.45)]
-flex flex-col before:absolute before:inset-0 before:rounded-2xl
-before:bg-gradient-to-tr before:from-sky-500/10 before:to-cyan-400/5
-before:opacity-0 hover:before:opacity-100 before:transition"
+md:hover:-translate-y-2
+flex flex-col"
             >
               {/* OFFER RIBBON */}
               {product.offer && (
@@ -61,13 +71,21 @@ before:opacity-0 hover:before:opacity-100 before:transition"
 
               {/* CART ICON (TOP RIGHT ON HOVER) */}
               <div
-                className="absolute top-5 right-5 z-20
-  translate-x-10 opacity-0
-  group-hover:translate-x-0 group-hover:opacity-100
+                className="
+  absolute top-5 right-5 z-20
+
+  opacity-100 translate-x-0
+
+  md:translate-x-10 md:opacity-0
+  md:group-hover:translate-x-0
+  md:group-hover:opacity-100
+
   transition-all duration-500 ease-out
   bg-black backdrop-blur p-3 rounded-full
   border border-sky-400 text-sky-400
-  shadow-lg shadow-sky-400/40"
+  shadow-lg shadow-sky-400/40
+  hover:shadow-sky-400/70
+  "
               >
                 <FiShoppingCart size={18} />
               </div>
@@ -109,7 +127,7 @@ before:opacity-0 hover:before:opacity-100 before:transition"
                 </div>
 
                 {/* PRICE */}
-                <div className="flex items-center gap-3 ">
+                <div className="flex items-center gap-3">
                   <span className="text-white text-2xl font-extrabold">
                     ₹{product.offerPrice}
                   </span>
@@ -119,14 +137,62 @@ before:opacity-0 hover:before:opacity-100 before:transition"
                   </span>
                 </div>
 
-                <div className="flex items-center gap-1 mt-2">
-                  {[1, 2, 3, 4, 5].map((star) =>
-                    star <= Number(product.rating || 0) ? (
-                      <FaStar key={star} className="text-sky-400 text-sm" />
-                    ) : (
-                      <FaRegStar key={star} className="text-gray-500 text-sm" />
-                    ),
-                  )}
+                {/* RATING + VIEW DETAILS */}
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mt-4">
+                  {/* RATING */}
+                  <div className="flex items-center gap-1">
+                    {[1, 2, 3, 4, 5].map((star) =>
+                      star <= Number(product.rating || 0) ? (
+                        <FaStar key={star} className="text-sky-400 text-sm" />
+                      ) : (
+                        <FaRegStar
+                          key={star}
+                          className="text-gray-500 text-sm"
+                        />
+                      ),
+                    )}
+                  </div>
+
+                  {/* VIEW DETAILS BUTTON */}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigate(`/products/${product.slug}`);
+                    }}
+                    className="relative overflow-hidden group
+  text-xs font-semibold uppercase tracking-wider
+  px-5 py-2.5 rounded-full mt-2 md:mt-0 self-start md:self-auto
+
+  bg-gradient-to-r from-sky-500 to-cyan-400
+  text-black
+  shadow-lg shadow-sky-400/40
+
+  md:bg-gradient-to-r md:from-sky-500/10 md:to-cyan-400/10
+  md:text-sky-400
+  md:border md:border-sky-400/40
+  md:shadow-none
+
+  backdrop-blur transition-all duration-300 cursor-pointer
+
+  md:hover:text-black
+  md:hover:from-sky-500 md:hover:to-cyan-400
+  md:hover:shadow-lg md:hover:shadow-sky-400/40
+  "
+                  >
+                    <span className="relative z-10 flex items-center gap-2">
+                      View Details
+                      <span className="transition-transform duration-300 md:group-hover:translate-x-1">
+                        →
+                      </span>
+                    </span>
+
+                    {/* Shine effect (desktop only animation) */}
+                    <span
+                      className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent
+    translate-x-[-120%] md:group-hover:translate-x-[120%]
+    transition duration-700 ease-out"
+                    />
+                  </button>
                 </div>
               </div>
             </div>
