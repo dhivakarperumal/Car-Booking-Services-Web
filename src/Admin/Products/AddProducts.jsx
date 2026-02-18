@@ -234,8 +234,8 @@ const AddProduct = () => {
         tags: Array.isArray(product.tags)
           ? product.tags
           : product.tags
-          ? product.tags.split(",").map((t) => t.trim())
-          : [],
+            ? product.tags.split(",").map((t) => t.trim())
+            : [],
 
         totalStock,
         updatedAt: serverTimestamp(),
@@ -266,115 +266,225 @@ const AddProduct = () => {
 
 
   return (
-    <form onSubmit={handleSubmit} className="p-6 max-w-6xl mx-auto space-y-6">
-      <h2 className="text-2xl font-bold">
-        {editData ? "Update Product" : "Add Car Spare Product"}
-      </h2>
+    <div className="max-w-6xl mx-auto bg-white p-2 rounded-2xl shadow space-y-6">
+      <form onSubmit={handleSubmit} className="p-6 max-w-6xl mx-auto space-y-6">
+        <h2 className="text-2xl font-bold">
+          {editData ? "Update Product" : "Add Car Spare Product"}
+        </h2>
 
-      {/* BASIC */}
-      <div className="grid grid-cols-2 gap-4">
-        <input name="name" placeholder="Product Name" onChange={handleChange} value={product.name} className="input" />
-        {/* <input name="slug" value={product.slug} readOnly className="input bg-gray-100" /> */}
-        <input name="brand" placeholder="Brand" onChange={handleChange} value={product.brand} className="input" />
-      </div>
-
-      <textarea name="description" placeholder="Description" onChange={handleChange} value={product.description} className="input" />
-
-      {/* PRICE */}
-      <div className="grid grid-cols-3 gap-4">
-        <input name="mrp" placeholder="MRP" onChange={handleChange} value={product.mrp} className="input" />
-        <input name="offer" placeholder="Offer %" onChange={handleChange} value={product.offer} className="input" />
-        <input name="offerPrice" placeholder="Offer Price" value={product.offerPrice} readOnly className="input bg-gray-100" />
-      </div>
-
-   
-
-     {/* RATING */}
-<div className="grid grid-cols-2 gap-4">
-  <input
-    type="number"
-    min="1"
-    max="5"
-    step="0.1"
-    placeholder="Rating (1–5)"
-    value={product.rating}
-    onChange={(e) =>
-      setProduct({ ...product, rating: e.target.value })
-    }
-    className="input"
-  />
-</div>
-
-<div className="text-sm text-gray-600">
-  ⭐ {product.rating || 0} / 5
-</div>
-
-
-      {/* VARIANTS */}
-      <div>
-        <h3 className="font-semibold">Variants</h3>
-        {variants.map((v, i) => (
-          <div key={i} className="grid grid-cols-4 gap-2 mb-2">
-            <input name="sku" placeholder="SKU" value={v.sku} onChange={(e) => handleVariantChange(i, e)} className="input" />
-            <input name="position" placeholder="Position" value={v.position} onChange={(e) => handleVariantChange(i, e)} className="input" />
-            <input name="material" placeholder="Material" value={v.material} onChange={(e) => handleVariantChange(i, e)} className="input" />
-            <input name="stock" placeholder="Stock" value={v.stock} onChange={(e) => handleVariantChange(i, e)} className="input" />
+        {/* BASIC */}
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium mb-1">Product Name</label>
+            <input
+              name="name"
+              value={product.name}
+              onChange={handleChange}
+              placeholder="E.g. Brake Pad Set"
+              className="w-full bg-white rounded-lg border border-gray-300 px-5 py-3 text-gray-900 shadow-sm  focus:ring-2 focus:ring-black outline-none transition transition"
+            />
           </div>
-        ))}
-        <button type="button" onClick={addVariant} className="btn">
-          + Add Variant
-        </button>
-      </div>
 
-      {/* IMAGES */}
-      <input type="file" multiple accept="image/*" onChange={(e) => handleMultipleImages(e.target.files)} />
-
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {images.map((img, i) => (
-          <div key={i} className="relative">
-            <img src={img} className="w-full h-32 object-cover rounded border" />
-            <button type="button" onClick={() => removeImage(i)} className="absolute top-1 right-1 bg-black text-white w-6 h-6 text-xs rounded-full">✕</button>
+          <div>
+            <label className="block text-sm font-medium mb-1">Brand</label>
+            <input
+              name="brand"
+              value={product.brand}
+              placeholder="E.g. Bosch"
+              onChange={handleChange}
+              className="w-full bg-white rounded-lg border border-gray-300 px-5 py-3 text-gray-900 shadow-sm  focus:ring-2 focus:ring-black outline-none transition transition"
+            />
           </div>
-        ))}
-      </div>
+        </div>
 
-      {/* WARRANTY */}
-      <div className="grid grid-cols-2 gap-4 items-center">
-        <label className="flex items-center gap-2">
-          <input type="checkbox" name="warrantyAvailable" checked={product.warrantyAvailable} onChange={handleChange} />
-          Warranty Available
-        </label>
+        {/* DESCRIPTION */}
+        <div>
+          <label className="block text-sm font-medium mb-1">Description</label>
+          <textarea
+            name="description"
+            placeholder="Enter product description"
+            value={product.description}
+            onChange={handleChange}
+            className="w-full bg-white rounded-lg border border-gray-300 px-5 py-3 text-gray-900 shadow-sm  focus:ring-2 focus:ring-black outline-none transition transition"
+          />
+        </div>
 
-        {product.warrantyAvailable && (
-          <input type="number" name="warrantyMonths" placeholder="Warranty Months" value={product.warrantyMonths} onChange={handleChange} className="input" />
-        )}
-      </div>
+        {/* PRICE */}
+        <div className="grid grid-cols-4 gap-4">
+          <div>
+            <label className="block text-sm font-medium mb-1">MRP</label>
+            <input name="mrp" value={product.mrp} onChange={handleChange} placeholder="Enter Mrp" className="w-full bg-white rounded-lg border border-gray-300 px-5 py-3 text-gray-900 shadow-sm  focus:ring-2 focus:ring-black outline-none transition transition" />
+          </div>
 
-      {/* RETURN */}
-      <div className="grid grid-cols-2 gap-4 items-center">
-        <label className="flex items-center gap-2">
-          <input type="checkbox" name="returnAvailable" checked={product.returnAvailable} onChange={handleChange} />
-          Return Available
-        </label>
+          <div>
+            <label className="block text-sm font-medium mb-1">Offer %</label>
+            <input name="offer" value={product.offer} onChange={handleChange} placeholder="Enter Offer" className="w-full bg-white rounded-lg border border-gray-300 px-5 py-3 text-gray-900 shadow-sm  focus:ring-2 focus:ring-black outline-none transition transition" />
+          </div>
 
-        {product.returnAvailable && (
-          <input type="number" name="returnDays" placeholder="Return Days" value={product.returnDays} onChange={handleChange} className="input" />
-        )}
-      </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">Offer Price</label>
+            <input name="offerPrice" value={product.offerPrice} readOnly className="w-full bg-white rounded-lg border border-gray-300 px-5 py-3 text-gray-900 shadow-sm  focus:ring-2 focus:ring-black outline-none transition transition" />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">Rating (1–5)</label>
+            <input
+              type="number"
+              min="1"
+              max="5"
+              step="0.1"
+              placeholder="Enter Rating "
+              value={product.rating}
+              onChange={(e) => setProduct({ ...product, rating: e.target.value })}
+              className="w-full bg-white rounded-lg border border-gray-300 px-5 py-3 text-gray-900 shadow-sm  focus:ring-2 focus:ring-black outline-none transition transition"
+            />
 
-      {/* TAGS */}
-      <input name="tags" placeholder="Tags (comma separated)" onChange={handleChange} value={product.tags} className="input" />
+          </div>
+        </div>
 
-      {/* FLAGS */}
-      <div className="flex gap-6">
-        <label><input type="checkbox" name="isFeatured" checked={product.isFeatured} onChange={handleChange} /> Featured</label>
-        <label><input type="checkbox" name="isActive" checked={product.isActive} onChange={handleChange} /> Active</label>
-      </div>
 
-      <button disabled={loading} className="bg-black text-white px-6 py-3 rounded-lg">
-        {loading ? "Saving..." : editData ? "Update Product" : "Save Product"}
-      </button>
-    </form>
+
+        {/* VARIANTS */}
+        <div>
+          <h3 className="font-semibold mb-2">Variants</h3>
+
+          {variants.map((v, i) => (
+            <div key={i} className="grid grid-cols-4 gap-2 mb-2">
+              <div>
+                <label className="block text-xs mb-1">SKU</label>
+                <input name="sku" value={v.sku} onChange={(e) => handleVariantChange(i, e)} placeholder="" className="w-full bg-white rounded-lg border border-gray-300 px-5 py-3 text-gray-900 shadow-sm  focus:ring-2 focus:ring-black outline-none transition transition" />
+              </div>
+
+              <div>
+                <label className="block text-xs mb-1">Position</label>
+                <input name="position" value={v.position} onChange={(e) => handleVariantChange(i, e)} className="w-full bg-white rounded-lg border border-gray-300 px-5 py-3 text-gray-900 shadow-sm  focus:ring-2 focus:ring-black outline-none transition transition" />
+              </div>
+
+              <div>
+                <label className="block text-xs mb-1">Material</label>
+                <input name="material" value={v.material} onChange={(e) => handleVariantChange(i, e)} className="w-full bg-white rounded-lg border border-gray-300 px-5 py-3 text-gray-900 shadow-sm  focus:ring-2 focus:ring-black outline-none transition transition" />
+              </div>
+
+              <div>
+                <label className="block text-xs mb-1">Stock</label>
+                <input name="stock" value={v.stock} onChange={(e) => handleVariantChange(i, e)} className="w-full bg-white rounded-lg border border-gray-300 px-5 py-3 text-gray-900 shadow-sm  focus:ring-2 focus:ring-black outline-none transition transition" />
+              </div>
+            </div>
+          ))}
+
+          <button type="button" onClick={addVariant} className="btn">
+            + Add Variant
+          </button>
+        </div>
+
+        {/* IMAGES */}
+        <div>
+          <label className="block text-sm font-medium mb-1">Product Images</label>
+          <input type="file" className="w-full bg-white rounded-lg border border-gray-300 px-5 py-3 text-gray-900 shadow-sm  focus:ring-2 focus:ring-black outline-none transition transition" multiple accept="image/*" onChange={(e) => handleMultipleImages(e.target.files)} />
+        </div>
+
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {images.map((img, i) => (
+            <div key={i} className="relative">
+              <img src={img} className="w-full h-32 object-cover rounded border" />
+              <button
+                type="button"
+                onClick={() => removeImage(i)}
+                className="absolute top-1 right-1 bg-black text-white w-6 h-6 text-xs rounded-full"
+              >
+                ✕
+              </button>
+            </div>
+          ))}
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-6">
+
+          {/* 🔹 WARRANTY */}
+          <div className="space-y-3">
+            <label className="flex items-center gap-2 font-medium">
+              <input
+                type="checkbox"
+                name="warrantyAvailable"
+                checked={product.warrantyAvailable}
+                onChange={handleChange}
+              />
+              Warranty Available
+            </label>
+
+            {product.warrantyAvailable && (
+              <div>
+                <label className="block text-sm font-medium mb-1">
+                  Warranty Months
+                </label>
+                <input
+                  name="warrantyMonths"
+                  placeholder="Enter Warranty Months"
+                  value={product.warrantyMonths}
+                  onChange={handleChange}
+                  className="w-full bg-white rounded-lg border border-gray-300 px-5 py-3 text-gray-900 shadow-sm  focus:ring-2 focus:ring-black outline-none transition transition"
+                />
+              </div>
+            )}
+          </div>
+
+          {/* 🔹 RETURN */}
+          <div className="space-y-3">
+            <label className="flex items-center gap-2 font-medium">
+              <input
+                type="checkbox"
+                name="returnAvailable"
+                checked={product.returnAvailable}
+                onChange={handleChange}
+              />
+              Return Available
+            </label>
+
+            {product.returnAvailable && (
+              <div>
+                <label className="block text-sm font-medium mb-1">
+                  Return Days
+                </label>
+                <input
+                  name="returnDays"
+                  value={product.returnDays}
+                  placeholder="Enter Return Days"
+                  onChange={handleChange}
+                  className="w-full bg-white rounded-lg border border-gray-300 px-5 py-3 text-gray-900 shadow-sm  focus:ring-2 focus:ring-black outline-none transition transition"
+                />
+              </div>
+            )}
+          </div>
+
+        </div>
+
+
+        {/* TAGS */}
+        <div>
+          <label className="block text-sm font-medium mb-1">Tags</label>
+          <input name="tags" value={product.tags} onChange={handleChange} placeholder="Enter Your Tags" className="w-full bg-white rounded-lg border border-gray-300 px-5 py-3 text-gray-900 shadow-sm  focus:ring-2 focus:ring-black outline-none transition transition" />
+        </div>
+
+        {/* FLAGS */}
+        <div className="flex gap-6">
+          <label className="flex items-center gap-2">
+            <input type="checkbox" name="isFeatured" checked={product.isFeatured} onChange={handleChange} />
+            Featured
+          </label>
+
+          <label className="flex items-center gap-2">
+            <input type="checkbox" name="isActive" checked={product.isActive} onChange={handleChange} />
+            Active
+          </label>
+        </div>
+
+        <div className="flex justify-end">
+          <button disabled={loading} className="bg-black text-white px-6 py-3 rounded-lg">
+            {loading ? "Saving..." : editData ? "Update Product" : "Save Product"}
+          </button>
+        </div>
+      </form>
+
+    </div>
   );
 };
 

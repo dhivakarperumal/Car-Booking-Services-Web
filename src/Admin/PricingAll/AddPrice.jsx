@@ -126,8 +126,8 @@ const PricingForm = () => {
   };
 
   return (
-    <div className="p-6 max-w-3xl mx-auto">
-      <div className="bg-gradient-to-br from-white to-gray-50 p-8 rounded-2xl shadow-xl border">
+    <div className="p-6 max-w-6xl mx-auto">
+      <div className="bg-gradient-to-br from-white to-gray-50 p-8 rounded-2xl shadow-xl border border-gray-300">
 
         <h2 className="text-2xl font-bold mb-6 text-gray-800">
           {editId ? "Update Package" : "Add Package"}
@@ -142,7 +142,7 @@ const PricingForm = () => {
               placeholder="Package Title"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="p-3 border rounded-lg"
+              className="w-full bg-white rounded-lg border border-gray-300 px-5 py-3 text-gray-900 shadow-sm  focus:ring-2 focus:ring-black outline-none transition"
             />
 
             <input
@@ -150,7 +150,7 @@ const PricingForm = () => {
               placeholder="Price ₹"
               value={price}
               onChange={(e) => setPrice(e.target.value)}
-              className="p-3 border rounded-lg"
+              className="w-full bg-white rounded-lg border border-gray-300 px-5 py-3 text-gray-900 shadow-sm  focus:ring-2 focus:ring-black outline-none transition"
             />
           </div>
 
@@ -162,7 +162,7 @@ const PricingForm = () => {
               <button
                 type="button"
                 onClick={addFeatureField}
-                className="text-sm bg-black text-white px-4 py-1.5 rounded-lg"
+                className="text-sm bg-black text-white px-4 py-2.5 rounded-md font-bold"
               >
                 + Add Feature
               </button>
@@ -177,13 +177,13 @@ const PricingForm = () => {
                   onChange={(e) =>
                     handleFeatureChange(i, e.target.value)
                   }
-                  className="flex-1 p-3 border rounded-lg"
+                  className="flex-1 w-full bg-white rounded-lg border border-gray-300 px-5 py-3 text-gray-900 shadow-sm  focus:ring-2 focus:ring-black outline-none transition"
                 />
 
                 <button
                   type="button"
                   onClick={() => removeFeatureField(i)}
-                  className="bg-red-600 text-white px-4 rounded-lg"
+                  className="bg-red-600 text-white px-4 py-0.5 rounded-full"
                 >
                   ✕
                 </button>
@@ -196,14 +196,14 @@ const PricingForm = () => {
             <button
               type="button"
               onClick={() => navigate("/admin/pricing")}
-              className="px-6 py-3 border rounded-lg"
+              className="px-6 py-2 border border-gray-300 rounded-md"
             >
               Back
             </button>
 
             <button
               disabled={loading}
-              className="bg-black text-white px-8 py-3 rounded-xl"
+              className="bg-black text-white px-8 py-2 rounded-md"
             >
               {loading
                 ? editId

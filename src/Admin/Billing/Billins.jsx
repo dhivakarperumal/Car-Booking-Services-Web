@@ -30,9 +30,8 @@ const StatusBadge = ({ status }) => {
 
   return (
     <span
-      className={`px-3 py-1 rounded-full text-white text-xs capitalize ${
-        map[status] || "bg-gray-400"
-      }`}
+      className={`px-3 py-1 rounded-full text-white text-xs capitalize ${map[status] || "bg-gray-400"
+        }`}
     >
       {status}
     </span>
@@ -43,7 +42,7 @@ const StatusBadge = ({ status }) => {
    STAT CARD
 ========================= */
 const StatCard = ({ title, value }) => (
-  <div className="bg-white rounded-xl shadow p-5">
+  <div className="bg-white rounded-md border border-gray-300 shadow p-5">
     <p className="text-sm text-gray-500">{title}</p>
     <p className="text-2xl font-bold mt-1">{value}</p>
   </div>
@@ -182,16 +181,16 @@ const Billings = () => {
             <th>Total</th>
           </tr>
           ${(bill.parts || [])
-            .map(
-              (p) => `
+        .map(
+          (p) => `
             <tr>
               <td>${p.partName}</td>
               <td>${p.qty}</td>
               <td class="right">₹${p.price}</td>
               <td class="right">₹${p.total}</td>
             </tr>`
-            )
-            .join("")}
+        )
+        .join("")}
         </table>
 
         <h3 class="right">Sub Total: ₹${bill.subTotal}</h3>
@@ -213,40 +212,42 @@ const Billings = () => {
      UI
   ========================= */
   return (
-    <div className="p-6 space-y-6 bg-gray-50 min-h-screen">
+    <div className="p-6 space-y-6  min-h-screen">
       {/* HEADER */}
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-semibold"></h1>
+      <div className="flex justify-end items-center">
+
         <button
           onClick={() => navigate("/admin/addbillings")}
-          className="bg-black hover:bg-orange-400 flex items-center justify-center py-3 text-white px-4 py-2 rounded  gap-2"
+          className="h-[42px] w-full sm:w-auto bg-black text-white px-5 rounded-md font-bold shadow
+             hover:bg-gray-900 transition flex items-center justify-center gap-2"
         >
-          <Plus size={16} /> Create Invoice
+          <Plus size={16} />
+          Create Invoice
         </button>
       </div>
 
       {/* STATS */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <StatCard title="Total Revenue" value={`₹${totalRevenue}`} />
         <StatCard title="Pending Invoices" value={pendingCount} />
       </div>
 
       {/* FILTER BAR */}
-      <div className="bg-white rounded-xl shadow p-4">
-  <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+      <div className="p-4">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
 
-    {/* LEFT : SEARCH */}
-    <div className="relative w-full md:max-w-md">
-      <Search
-        size={18}
-        className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-      />
-      <input
-        type="text"
-        placeholder="Search invoice customer car"
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-        className="
+          {/* LEFT : SEARCH */}
+          <div className="relative w-full md:max-w-md">
+            <Search
+              size={18}
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+            />
+            <input
+              type="text"
+              placeholder="Search invoice customer car"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="
           w-full
           rounded-lg
           border border-gray-200
@@ -260,16 +261,16 @@ const Billings = () => {
           transition
           bg-white
         "
-      />
-    </div>
+            />
+          </div>
 
-    {/* RIGHT : FILTERS */}
-    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+          {/* RIGHT : FILTERS */}
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
 
-      <select
-        value={statusFilter}
-        onChange={(e) => setStatusFilter(e.target.value)}
-        className="
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="
           rounded-lg
           border border-gray-200
           px-4 py-3
@@ -282,17 +283,17 @@ const Billings = () => {
           transition
           bg-white
         "
-      >
-        <option value="all">All Status</option>
-        <option value="paid">Paid</option>
-        <option value="partial">Partial</option>
-        <option value="pending">Pending</option>
-      </select>
+            >
+              <option value="all">All Status</option>
+              <option value="paid">Paid</option>
+              <option value="partial">Partial</option>
+              <option value="pending">Pending</option>
+            </select>
 
-      <select
-        value={amountSort}
-        onChange={(e) => setAmountSort(e.target.value)}
-        className="
+            <select
+              value={amountSort}
+              onChange={(e) => setAmountSort(e.target.value)}
+              className="
           rounded-lg
           border border-gray-200
           px-4 py-3
@@ -305,22 +306,22 @@ const Billings = () => {
           transition
           bg-white
         "
-      >
-        <option value="none">Amount Sort</option>
-        <option value="low">Low → High</option>
-        <option value="high">High → Low</option>
-      </select>
+            >
+              <option value="none">Amount Sort</option>
+              <option value="low">Low → High</option>
+              <option value="high">High → Low</option>
+            </select>
 
-    </div>
+          </div>
 
-  </div>
-</div>
+        </div>
+      </div>
 
 
       {/* TABLE */}
       <div className="bg-white rounded-2xl shadow overflow-hidden">
         <table className="min-w-full text-sm">
-          <thead className="bg-black text-white">
+          <thead className="bg-gradient-to-r from-black to-cyan-400 text-white">
             <tr>
               <th className="px-4 py-4">S No</th>
               <th className="px-4 py-4">Invoice</th>

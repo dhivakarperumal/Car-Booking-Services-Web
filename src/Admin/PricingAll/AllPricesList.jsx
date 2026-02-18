@@ -244,12 +244,12 @@ import { db } from "../../firebase";
 import toast from "react-hot-toast";
 import {
   LayoutGrid,
-  List,
   Plus,
   Search,
   Trash2,
   Pencil,
 } from "lucide-react";
+import { FaTable, } from "react-icons/fa";
 
 const PricingList = () => {
   const navigate = useNavigate();
@@ -313,59 +313,84 @@ const PricingList = () => {
 
   return (
     <div className="p-6 max-w-7xl mx-auto pb-5">
-      <div className="bg-gradient-to-br from-white to-gray-50 p-8 rounded-2xl shadow-xl border border-gray-100">
+      <div>
 
         {/* 🔹 HEADER */}
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-          <h2 className="text-xl font-bold">Pricing Packages</h2>
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
 
-          <div className="flex flex-wrap items-center gap-2 justify-end">
+          {/* 🔹 SEARCH */}
+          <div className="relative w-full lg:w-92">
+            <Search
+              size={16}
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+            />
+            <input
+              type="text"
+              placeholder="Search package..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="h-[45px] w-full pl-9 pr-3 py-3 border border-gray-300 bg-white
+               rounded-md text-sm shadow-sm
+               focus:ring-2 focus:ring-black outline-none transition"
+            />
+          </div>
 
-            {/* 🔹 SEARCH */}
-            <div className="relative">
-              <Search size={16} className="absolute left-2 top-2.5 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Search package..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="pl-8 pr-3 py-2 border rounded-lg text-sm w-44 sm:w-56"
-              />
-            </div>
+          {/* 🔹 ACTION BUTTONS */}
+          <div className="flex flex-wrap items-center gap-2 justify-start lg:justify-end">
 
             {/* 🔹 VIEW TOGGLE */}
-            <button
-              onClick={() => setView("card")}
-              className={`p-2 rounded-lg border ${
-                view === "card" ? "bg-black text-white" : "bg-white"
-              }`}
-            >
-              <LayoutGrid size={18} />
-            </button>
+            <div className="flex  border border-gray-300 rounded-md overflow-hidden">
+              <button
+                onClick={() => setView("card")}
+                className={`flex items-center gap-1 px-3 py-2.5 text-sm transition
+        ${view === "card"
+                    ? "bg-black text-white"
+                    : "bg-white text-gray-700 hover:bg-gray-100"
+                  }`}
+              >
+                <LayoutGrid size={16} />
+                <span className="hidden sm:inline">Card</span>
+              </button>
 
-            <button
-              onClick={() => setView("table")}
-              className={`p-2 rounded-lg border ${
-                view === "table" ? "bg-black text-white" : "bg-white"
-              }`}
-            >
-              <List size={18} />
-            </button>
+              <button
+                onClick={() => setView("table")}
+                className={`flex items-center gap-1 px-3 py-2.5 text-sm transition border-l
+        ${view === "table"
+                    ? "bg-black text-white"
+                    : "bg-white text-gray-700 hover:bg-gray-100"
+                  }`}
+              >
+                <FaTable size={16} />
+                <span className="hidden sm:inline">Table</span>
+              </button>
+            </div>
 
             {/* 🔹 ADD BUTTON */}
             <button
               onClick={() => navigate("/admin/addprice")}
-              className="flex items-center gap-2 bg-black text-white px-4 py-2 rounded-lg text-sm"
+              className="inline-flex items-center gap-2
+  bg-black text-white
+  px-4 h-10
+  rounded-md text-sm font-medium
+  hover:bg-gray-900
+  active:scale-95
+  focus:outline-none focus:ring-2 focus:ring-black/40
+  transition"
             >
-              <Plus size={16} />
-              <span className="hidden sm:inline">Add</span>
+              <span className="flex items-center justify-center w-5 h-5">
+                <Plus size={16} />
+              </span>
+
+              <span className="hidden sm:inline">Add New Pricing</span>
             </button>
+
           </div>
         </div>
 
+
         {/* 🔹 CARD VIEW */}
         {view === "card" && (
-         <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mt-10">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mt-10">
             {filteredPackages.map((pkg) => (
               <div
                 key={pkg.id}
@@ -418,51 +443,60 @@ const PricingList = () => {
 
         {/* 🔹 TABLE VIEW */}
         {view === "table" && (
-           <div className="overflow-x-auto border border-gray-300 rounded-xl mt-10">
-            <table className="min-w-full text-sm">
-              <thead className="bg-gray-100 text-left">
+          <div className="overflow-x-auto mt-10 bg-white rounded-2xl shadow-sm border border-gray-200">
+            <table className="w-full text-md">
+              <thead className="bg-gradient-to-r from-black to-cyan-400 text-white text-left">
                 <tr>
-                  <th className="p-3">S No</th>
-                  <th className="p-3">Title</th>
-                  <th className="p-3">Price</th>
-                  <th className="p-3">Features</th>
-                  <th className="p-3 text-right">Actions</th>
+                  <th className="px-4 py-4 text-left font-bold ">S No</th>
+                  <th className="px-4 py-4 text-left font-bold ">Title</th>
+                  <th className="px-4 py-4 text-left font-bold ">Price</th>
+                  <th className="px-4 py-4 text-left font-bold ">Features</th>
+                  <th className="px-4 py-4 text-left font-bold ">Actions</th>
                 </tr>
               </thead>
 
               <tbody>
-                {filteredPackages.map((pkg,i) => (
-                   <tr key={pkg.id} className="border-t border-gray-300 hover:bg-gray-50">
-                    <td className="p-3 font-medium">{i+1}</td>
-                    <td className="p-3 font-medium">{pkg.title}</td>
-                    <td className="p-3">
+                {filteredPackages.map((pkg, i) => (
+                  <tr key={pkg.id} className="border-t border-gray-300 hover:bg-gray-50">
+                    <td className="px-4 py-4">{i + 1}</td>
+                    <td className="px-4 py-4">{pkg.title}</td>
+                    <td className="px-4 py-4">
                       ₹{Number(pkg.price || 0).toLocaleString()}
                     </td>
-                    <td className="p-3">
+                    <td className="px-4 py-4">
                       {pkg.features?.length || 0}
                     </td>
 
-                    <td className="p-3">
-                      <div className="flex justify-end gap-3">
+                    <td className="px-4 py-4">
+                      <div className="flex items-center gap-2">
+
+                        {/* ✏️ EDIT */}
                         <button
                           onClick={() =>
-                            navigate(`/admin/addprice/${pkg.id}`, {
-                              state: pkg,
-                            })
+                            navigate(`/admin/addprice/${pkg.id}`, { state: pkg })
                           }
-                          className="text-blue-600 hover:scale-110 transition"
+                          className="flex items-center gap-1 px-3 py-1.5 rounded-lg
+      text-blue-600 hover:bg-blue-50 hover:text-blue-700
+      transition active:scale-95"
                         >
-                          <Pencil size={16} />
+                          <Pencil size={14} />
+                          <span className="hidden sm:inline">Edit</span>
                         </button>
 
+                        {/* 🗑 DELETE */}
                         <button
                           onClick={() => handleDelete(pkg.id)}
-                          className="text-red-500 hover:scale-110 transition"
+                          className="flex items-center gap-1 px-3 py-1.5 rounded-lg
+      text-red-500 hover:bg-red-50 hover:text-red-600
+      transition active:scale-95"
                         >
-                          <Trash2 size={16} />
+                          <Trash2 size={14} />
+                          <span className="hidden sm:inline">Delete</span>
                         </button>
+
                       </div>
                     </td>
+
                   </tr>
                 ))}
 

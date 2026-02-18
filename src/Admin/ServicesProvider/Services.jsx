@@ -134,18 +134,13 @@ const Services = () => {
     <div className="p-4 min-h-screen space-y-6">
       {/* HEADER */}
       <div className="flex justify-between items-center">
-        <h2 className="text-xl font-semibold">Car Services</h2>
+        
 
-        <button
-          onClick={() => navigate("/admin/addserviceparts")}
-          className="bg-black text-white px-5 py-3 hover:bg-orange-500 font-bold rounded-lg"
-        >
-          + Add Service Parts
-        </button>
+       
       </div>
 
       {/* SEARCH & FILTER */}
-      <div className="bg-white rounded-xl shadow p-4 flex flex-wrap gap-3 justify-between items-center">
+      <div className=" p-4 flex flex-wrap gap-3 justify-between items-center">
         <div className="relative w-full md:w-1/3">
           <FaSearch className="absolute left-3 top-4 text-gray-400" />
           <input
@@ -155,17 +150,20 @@ const Services = () => {
               setCurrentPage(1);
             }}
             placeholder="Search booking, name, phone, car"
-            className="w-full rounded-lg border border-gray-200 pl-10 px-4 py-3 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-900/40"
+            className="h-[45px] w-full pl-9 pr-3 py-3 border border-gray-300 bg-white
+               rounded-md text-sm shadow-sm
+               focus:ring-2 focus:ring-black outline-none transition"
           />
         </div>
 
-        <select
+       <div className="flex gap-2">
+         <select
           value={statusFilter}
           onChange={(e) => {
             setStatusFilter(e.target.value);
             setCurrentPage(1);
           }}
-          className="rounded-lg border border-gray-200 px-4 py-3 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-900/40"
+          className="rounded-lg border border-gray-200 px-4 py-2.5 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-900/40"
         >
           <option value="all">All Status</option>
           <option value="Pending">Pending</option>
@@ -173,6 +171,14 @@ const Services = () => {
           <option value="Waiting for Parts">Waiting for Parts</option>
           <option value="Completed">Completed</option>
         </select>
+         <button
+          onClick={() => navigate("/admin/addserviceparts")}
+          className="h-[42px] w-full sm:w-auto bg-black text-white px-5 rounded-md font-bold shadow
+             hover:bg-gray-900 transition"
+        >
+          + Add Service Parts
+        </button>
+       </div>
       </div>
 
       {/* TABLE */}

@@ -143,7 +143,7 @@ const ServicesListAll = () => {
             placeholder="Search service..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="h-[42px] w-full pl-9 pr-3 py-3 border border-gray-300 bg-white
+            className="h-[45px] w-full pl-9 pr-3 py-3 border border-gray-300 bg-white
                rounded-md text-sm shadow-sm
                focus:ring-2 focus:ring-black outline-none transition"
           />
@@ -275,16 +275,16 @@ const ServicesListAll = () => {
                     {(currentPage - 1) * itemsPerPage + i + 1}
                   </td>
                   <td className="px-4 py-4">
-  {srv.image ? (
-    <img
-      src={srv.image}
-      alt={srv.name}
-      className="w-12 h-12 object-cover rounded-md border"
-    />
-  ) : (
-    <span className="text-gray-400 text-xs">No image</span>
-  )}
-</td>
+                    {srv.image ? (
+                      <img
+                        src={srv.image}
+                        alt={srv.name}
+                        className="w-12 h-12 object-cover rounded-md border"
+                      />
+                    ) : (
+                      <span className="text-gray-400 text-xs">No image</span>
+                    )}
+                  </td>
 
                   <td className="px-4 py-4 font-medium">{srv.name}</td>
 

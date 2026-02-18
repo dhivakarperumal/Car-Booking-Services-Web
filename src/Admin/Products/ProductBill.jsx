@@ -267,7 +267,7 @@ const ProductBilling = () => {
   };
 
   return (
-    <div className="p-6 max-w-7xl mx-auto space-y-6">
+    <div className="max-w-6xl mx-auto bg-white p-4 rounded-2xl  shadow space-y-6">
       <h2 className="text-2xl font-bold">Billing</h2>
 
       {/* CUSTOMER (SHOP) */}
@@ -279,7 +279,7 @@ const ProductBilling = () => {
             onChange={(e) =>
               setCustomer({ ...customer, name: e.target.value })
             }
-            className="border px-3 py-2 rounded"
+            className="w-full bg-white rounded-lg border border-gray-300 px-5 py-3 text-gray-900 shadow-sm  focus:ring-2 focus:ring-black outline-none transition"
           />
 
           <input
@@ -288,13 +288,13 @@ const ProductBilling = () => {
             onChange={(e) =>
               setCustomer({ ...customer, phone: e.target.value })
             }
-            className="border px-3 py-2 rounded"
+            className="w-full bg-white rounded-lg border border-gray-300 px-5 py-3 text-gray-900 shadow-sm  focus:ring-2 focus:ring-black outline-none transition"
           />
 
           <select
             value={orderType}
             onChange={(e) => setOrderType(e.target.value)}
-            className="border px-3 py-2 rounded"
+            className="w-full bg-white rounded-lg border border-gray-300 px-5 py-3 text-gray-900 shadow-sm  focus:ring-2 focus:ring-black outline-none transition"
           >
             <option value="shop">Shop</option>
             <option value="online">Online</option>
@@ -311,7 +311,7 @@ const ProductBilling = () => {
             onChange={(e) =>
               setShipping({ ...shipping, name: e.target.value })
             }
-            className="border px-3 py-2 rounded"
+            className="w-full bg-white rounded-lg border border-gray-300 px-5 py-3 text-gray-900 shadow-sm  focus:ring-2 focus:ring-black outline-none transition"
           />
 
           <input
@@ -320,7 +320,7 @@ const ProductBilling = () => {
             onChange={(e) =>
               setShipping({ ...shipping, phone: e.target.value })
             }
-            className="border px-3 py-2 rounded"
+            className="w-full bg-white rounded-lg border border-gray-300 px-5 py-3 text-gray-900 shadow-sm  focus:ring-2 focus:ring-black outline-none transition"
           />
 
           <input
@@ -329,7 +329,7 @@ const ProductBilling = () => {
             onChange={(e) =>
               setShipping({ ...shipping, address: e.target.value })
             }
-            className="border px-3 py-2 rounded md:col-span-2"
+            className="w-full bg-white rounded-lg border border-gray-300 px-5 py-3 text-gray-900 shadow-sm  focus:ring-2 focus:ring-black outline-none transition md:col-span-2"
           />
 
           <input
@@ -338,7 +338,7 @@ const ProductBilling = () => {
             onChange={(e) =>
               setShipping({ ...shipping, city: e.target.value })
             }
-            className="border px-3 py-2 rounded"
+            className="w-full bg-white rounded-lg border border-gray-300 px-5 py-3 text-gray-900 shadow-sm  focus:ring-2 focus:ring-black outline-none transition"
           />
 
           <input
@@ -347,13 +347,13 @@ const ProductBilling = () => {
             onChange={(e) =>
               setShipping({ ...shipping, pincode: e.target.value })
             }
-            className="border px-3 py-2 rounded"
+            className="w-full bg-white rounded-lg border border-gray-300 px-5 py-3 text-gray-900 shadow-sm  focus:ring-2 focus:ring-black outline-none transition"
           />
 
           <select
             value={orderType}
             onChange={(e) => setOrderType(e.target.value)}
-            className="border px-3 py-2 rounded"
+            className="w-full bg-white rounded-lg border border-gray-300 px-5 py-3 text-gray-900 shadow-sm  focus:ring-2 focus:ring-black outline-none transition"
           >
             <option value="online">Online</option>
             <option value="shop">Shop</option>
@@ -369,7 +369,7 @@ const ProductBilling = () => {
             setSelectedProductId(e.target.value);
             setSelectedVariantIndex("");
           }}
-          className="border px-3 py-2 rounded"
+          className="w-full bg-white rounded-lg border border-gray-300 px-5 py-3 text-gray-900 shadow-sm  focus:ring-2 focus:ring-black outline-none transition"
         >
           <option value="">Select Product</option>
           {products.map((p) => (
@@ -382,7 +382,7 @@ const ProductBilling = () => {
         <select
           value={selectedVariantIndex}
           onChange={(e) => setSelectedVariantIndex(e.target.value)}
-          className="border px-3 py-2 rounded"
+          className="w-full bg-white rounded-lg border border-gray-300 px-5 py-3 text-gray-900 shadow-sm  focus:ring-2 focus:ring-black outline-none transition"
         >
           <option value="">Select Variant</option>
           {selectedProduct?.variants?.map((v, i) => (
@@ -396,40 +396,42 @@ const ProductBilling = () => {
           type="number"
           value={qty}
           onChange={(e) => setQty(e.target.value)}
-          className="border px-3 py-2 rounded"
+          className="w-full bg-white rounded-lg border border-gray-300 px-5 py-3 text-gray-900 shadow-sm  focus:ring-2 focus:ring-black outline-none transition"
           placeholder="Qty"
         />
 
         <button
           onClick={addToCart}
-          className="bg-black text-white px-4 py-2 rounded"
+          className="bg-gradient-to-r from-black to-cyan-400 text-white px-4 py-2 rounded"
         >
           Add
         </button>
       </div>
 
       {/* CART */}
-      <div className="overflow-x-auto bg-white rounded-xl shadow">
+      <div className="overflow-x-auto bg-white rounded-xl mt-10 shadow">
         <table className="w-full text-sm">
-          <thead className="bg-gray-100 text-left">
+          <thead className="bg-gradient-to-r from-black to-cyan-400 text-white text-left">
             <tr>
-              <th className="p-3">Product</th>
-              <th className="p-3">Variant</th>
-              <th className="p-3">Price</th>
-              <th className="p-3">Qty</th>
-              <th className="p-3">Total</th>
-              <th className="p-3">Action</th>
+              <th className="px-4 py-4 text-left">S No</th>
+              <th className="px-4 py-4 text-left">Product</th>
+              <th className="px-4 py-4 text-left">Variant</th>
+              <th className="px-4 py-4 text-left">Price</th>
+              <th className="px-4 py-4 text-left">Qty</th>
+              <th className="px-4 py-4 text-left">Total</th>
+              <th className="px-4 py-4 text-left">Action</th>
             </tr>
           </thead>
           <tbody>
             {cart.map((item, i) => (
-              <tr key={i} className="border-t">
-                <td className="p-3">{item.name}</td>
-                <td className="p-3">{item.variant}</td>
-                <td className="p-3">₹ {item.price}</td>
-                <td className="p-3">{item.qty}</td>
-                <td className="p-3 font-semibold">₹ {item.total}</td>
-                <td className="p-3">
+              <tr key={i} className="border-t border-gray-300">
+                <td className="px-4 py-4 text-left">{i + 1}</td>
+                <td className="px-4 py-4 text-left">{item.name}</td>
+                <td className="px-4 py-4 text-left">{item.variant}</td>
+                <td className="px-4 py-4 text-left">₹ {item.price}</td>
+                <td className="px-4 py-4 text-left">{item.qty}</td>
+                <td className="px-4 py-4 text-left font-semibold">₹ {item.total}</td>
+                <td className="px-4 py-4 text-left">
                   <button
                     onClick={() => removeItem(i)}
                     className="bg-red-500 text-white px-2 py-1 rounded text-xs"
@@ -447,12 +449,14 @@ const ProductBilling = () => {
         Grand Total: ₹ {grandTotal}
       </div>
 
-      <button
+   <div className="flex justify-end">
+       <button
         onClick={handleSaveBill}
-        className="bg-green-600 text-white px-6 py-3 rounded"
+        className="bg-gradient-to-r from-black to-cyan-400 text-white px-6 py-3 rounded"
       >
         Save Order & Print
       </button>
+   </div>
     </div>
   );
 };

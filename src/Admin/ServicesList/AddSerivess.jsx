@@ -155,7 +155,7 @@
 //   return (
 //     <div className="p-6 max-w-6xl mx-auto">
 //   <div className="bg-gradient-to-br from-white to-gray-50 p-8 rounded-2xl shadow-xl border border-gray-100">
-    
+
 //     {/* Header */}
 //     <div className="mb-6">
 //       <h2 className="text-2xl font-bold text-gray-800">Add Car Service</h2>
@@ -196,7 +196,7 @@
 //         />
 //       </div>
 
-     
+
 //       {/* Supported Brands */}
 //       <div className="md:col-span-3 bg-white p-4 rounded-xl border border-gray-300">
 //         <h3 className="font-semibold text-gray-700 mb-2">Supported Brands</h3>
@@ -573,7 +573,7 @@ const AddCarService = () => {
 
   return (
     <div className="p-6 max-w-6xl mx-auto">
-      <div className="bg-gradient-to-br from-white to-gray-50 p-8 rounded-2xl shadow-xl border">
+      <div className="bg-gradient-to-br from-white to-gray-50 p-8 rounded-2xl shadow-xl border border-gray-300">
 
         <h2 className="text-2xl font-bold mb-6">
           {editId ? "Update Car Service" : "Add Car Service"}
@@ -581,83 +581,115 @@ const AddCarService = () => {
 
         <form onSubmit={handleSubmit} className="grid md:grid-cols-2 gap-5">
 
-          {/* Name */}
-          <input
-            type="text"
-            name="name"
-            placeholder="Service Name"
-            value={form.name}
-            onChange={handleChange}
-            className="border p-3 rounded-lg"
-          />
 
-          {/* Price */}
-          <input
-            type="number"
-            name="price"
-            placeholder="Price ₹"
-            value={form.price}
-            onChange={handleChange}
-            className="border p-3 rounded-lg"
-          />
 
-          {/* Icon */}
+          {/* 🔹 SERVICE NAME */}
           <div>
-            <label className="text-sm font-semibold">Select Icon</label>
+            <label className="block text-sm font-medium mb-1">
+              Service Name
+            </label>
+            <input
+              type="text"
+              name="name"
+              placeholder="e.g. Full Car Wash"
+              value={form.name}
+              onChange={handleChange}
+              className="w-full bg-white rounded-lg border border-gray-300 px-5 py-3 text-gray-900 shadow-sm  focus:ring-2 focus:ring-black outline-none transition"
+            />
+          </div>
+
+          {/* 🔹 PRICE */}
+          <div>
+            <label className="block text-sm font-medium mb-1">
+              Price (₹)
+            </label>
+            <input
+              type="number"
+              name="price"
+              placeholder="e.g. 999"
+              value={form.price}
+              onChange={handleChange}
+              className="w-full bg-white rounded-lg border border-gray-300 px-5 py-3 text-gray-900 shadow-sm  focus:ring-2 focus:ring-black outline-none transition"
+            />
+          </div>
+
+          {/* 🔹 ICON */}
+          <div>
+            <label className="block text-sm font-medium mb-1">
+              Select Icon
+            </label>
             <select
               name="icon"
               value={form.icon}
               onChange={handleChange}
-              className="border p-3 rounded-lg w-full"
+              className="w-full bg-white rounded-lg border border-gray-300 px-5 py-3 text-gray-900 shadow-sm  focus:ring-2 focus:ring-black outline-none transition"
             >
+              <option value="">Choose an icon</option>
               {iconOptions.map((i) => (
                 <option key={i.name} value={i.name}>
                   {i.name}
                 </option>
               ))}
             </select>
-
-            <div className="mt-2">
-              Preview:
-              {iconOptions.find((i) => i.name === form.icon)?.component}
-            </div>
           </div>
 
-          {/* Short Description */}
-          <textarea
-            name="description"
-            placeholder="Short description"
-            value={form.description}
-            onChange={handleChange}
-            rows={2}
-            className="border p-3 rounded-lg md:col-span-2"
-          />
 
-          {/* Big Description */}
-          <textarea
-            name="bigDescription"
-            placeholder="Full service details"
-            value={form.bigDescription}
-            onChange={handleChange}
-            rows={5}
-            className="border p-3 rounded-lg md:col-span-2"
-          />
+          <div>
+            <label className="block text-sm font-medium mb-1">
+              Description
+            </label>
+            <textarea
+              name="description"
+              placeholder="Short description about the service..."
+              value={form.description}
+              onChange={handleChange}
+              rows={1}
+              className="w-full bg-white rounded-lg border border-gray-300 px-5 py-3 text-gray-900 shadow-sm  focus:ring-2 focus:ring-black outline-none transition"
+            />
+          </div>
 
-          {/* Image */}
+
+          {/* 🔹 BIG DESCRIPTION */}
           <div className="md:col-span-2">
-            <input type="file" accept="image/*" onChange={handleImageUpload} />
+            <label className="block text-sm font-medium mb-1">
+              Full Service Details
+            </label>
+            <textarea
+              name="bigDescription"
+              placeholder="Explain what is included in this service, steps, benefits, etc."
+              value={form.bigDescription}
+              onChange={handleChange}
+              rows={5}
+              className="input"
+            />
+          </div>
+
+          {/* 🔹 IMAGE UPLOAD */}
+          <div className="md:col-span-2">
+            <label className="block text-sm font-medium mb-1">
+              Service Image
+            </label>
+
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleImageUpload}
+              className="input file:mr-3 file:py-2 file:px-4 file:border-0 file:rounded-md
+               file:bg-black file:text-white hover:file:bg-gray-900"
+            />
 
             {imagePreview && (
-              <div className="mt-3 flex gap-4">
+              <div className="mt-3 flex items-center gap-4">
                 <img
                   src={imagePreview}
                   alt="preview"
                   className="w-24 h-24 object-cover rounded-lg border"
                 />
+
                 <button
                   type="button"
                   onClick={removeImage}
-                  className="text-red-500"
+                  className="text-sm text-red-600 hover:underline"
                 >
                   Remove
                 </button>
@@ -665,12 +697,13 @@ const AddCarService = () => {
             )}
           </div>
 
+
           {/* Submit */}
           <div className="md:col-span-2 flex justify-end gap-3">
             <button
               type="button"
               onClick={() => navigate("/admin/services")}
-              className="px-6 py-3 border rounded-lg"
+              className="px-6 py-2 border border-gray-300 rounded-md"
             >
               Back
             </button>
@@ -678,13 +711,13 @@ const AddCarService = () => {
             <button
               type="submit"
               disabled={loading}
-              className="bg-black text-white px-8 py-3 rounded-xl"
+              className="bg-black text-white px-8 py-2 rounded-md"
             >
               {loading
                 ? "Saving..."
                 : editId
-                ? "Update Service"
-                : "Add Service"}
+                  ? "Update Service"
+                  : "Add Service"}
             </button>
           </div>
 

@@ -217,7 +217,7 @@
 //                 ))}
 //               </select>
 
-//               <p className="text-gray-500 text-xs mt-3">
+//               <p className="text-black text-xs mt-3">
 //                 {b.createdAt?.toDate?.().toLocaleString()}
 //               </p>
 //             </div>
@@ -302,6 +302,14 @@ import {
 import { db } from "../../firebase";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import { FaThLarge, FaTable } from "react-icons/fa";
+import {
+  FaCar,
+  FaUser,
+  FaPhone,
+  FaMapMarkerAlt,
+  FaClock,
+} from "react-icons/fa";
 
 /* 🔹 STATUS LIST */
 const BOOKING_STATUS = [
@@ -330,9 +338,9 @@ const ShowAllBookings = () => {
 
     const unsub = onSnapshot(q, (snap) => {
       setBookings(
-        snap.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
+        snap.docs.map((d) => ({
+          id: d.id,
+          ...d.data(),
         }))
       );
     });
@@ -347,8 +355,7 @@ const ShowAllBookings = () => {
       b.name?.toLowerCase().includes(search.toLowerCase()) ||
       b.phone?.includes(search);
 
-    const matchStatus =
-      statusFilter === "All" || b.status === statusFilter;
+    const matchStatus = statusFilter === "All" || b.status === statusFilter;
 
     return matchSearch && matchStatus;
   });
@@ -357,15 +364,15 @@ const ShowAllBookings = () => {
   const statusColor = (status) => {
     switch (status) {
       case "Booked":
-        return "bg-blue-500/20 text-blue-400";
+        return "bg-blue-100 text-blue-700";
       case "Processing":
-        return "bg-yellow-500/20 text-yellow-400";
+        return "bg-yellow-100 text-yellow-700";
       case "Service Completed":
-        return "bg-green-500/20 text-green-400";
+        return "bg-green-100 text-green-700";
       case "Bill Pending":
-        return "bg-orange-500/20 text-orange-400";
+        return "bg-orange-100 text-orange-700";
       default:
-        return "bg-gray-500/20 text-gray-300";
+        return "bg-gray-100 text-gray-700";
     }
   };
 
@@ -375,7 +382,7 @@ const ShowAllBookings = () => {
 
     const previousStatus = booking.status;
 
-    /* 🟢 Optimistic UI update */
+    /* 🟢 Optimistic UI */
     setBookings((prev) =>
       prev.map((b) =>
         b.id === booking.id ? { ...b, status: newStatus } : b
@@ -383,18 +390,14 @@ const ShowAllBookings = () => {
     );
 
     try {
-      /* 🟡 Update global booking */
       await updateDoc(doc(db, "bookings", booking.id), {
         status: newStatus,
       });
 
-      /* 🟡 Update user subcollection */
       if (booking.uid) {
         await updateDoc(
           doc(db, "users", booking.uid, "bookings", booking.id),
-          {
-            status: newStatus,
-          }
+          { status: newStatus }
         );
       }
 
@@ -404,26 +407,21 @@ const ShowAllBookings = () => {
           bookingId: booking.bookingId,
           bookingDocId: booking.id,
           uid: booking.uid,
-
           name: booking.name,
           phone: booking.phone,
           email: booking.email,
-
           brand: booking.brand,
           model: booking.model,
           issue: booking.issue,
           otherIssue: booking.otherIssue || "",
-
           location: booking.location,
           address: booking.address,
-
           serviceStatus: "Pending",
           createdAt: booking.createdAt || new Date(),
         };
 
         await addDoc(collection(db, "allServices"), serviceData);
 
-        /* 🟢 Mark booking as copied */
         await updateDoc(doc(db, "bookings", booking.id), {
           serviceCreated: true,
         });
@@ -433,9 +431,9 @@ const ShowAllBookings = () => {
 
       toast.success("Status updated");
     } catch (err) {
-      console.error("Status update failed", err);
+      console.error(err);
 
-      /* 🔴 Revert UI if error */
+      /* 🔴 Revert UI */
       setBookings((prev) =>
         prev.map((b) =>
           b.id === booking.id ? { ...b, status: previousStatus } : b
@@ -446,29 +444,36 @@ const ShowAllBookings = () => {
     }
   };
 
+  /* 📅 FORMAT DATE SAFE */
+  const formatDate = (ts) => {
+    try {
+      return ts?.toDate?.().toLocaleString() || "-";
+    } catch {
+      return "-";
+    }
+  };
+
   return (
     <div className="p-8 max-w-7xl mx-auto">
-
       {/* 🔝 TOP BAR */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
-        <h2 className="text-3xl font-bold">All Bookings</h2>
-
-        <div className="flex flex-wrap gap-3">
-
-          {/* 🔍 SEARCH */}
+        {/* 🔎 SEARCH */}
+        <div className="w-full max-w-md">
           <input
             type="text"
             placeholder="Search booking, name, phone..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="px-4 py-2 rounded-xl bg-black/50 border border-white/10"
+            className="w-full border border-gray-300 bg-white px-4 py-2.5 rounded-lg text-sm shadow-sm focus:border-black focus:ring-2 focus:ring-black/20 outline-none"
           />
+        </div>
 
+        <div className="flex flex-wrap gap-3">
           {/* 🎯 STATUS FILTER */}
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-4 py-2 rounded-xl bg-black/50 border border-white/10"
+            className="h-[42px] min-w-[140px] border border-gray-300 bg-white px-4 rounded-md text-sm shadow-sm focus:ring-2 focus:ring-black outline-none"
           >
             <option>All</option>
             {BOOKING_STATUS.map((s) => (
@@ -477,18 +482,34 @@ const ShowAllBookings = () => {
           </select>
 
           {/* 🔄 VIEW TOGGLE */}
-          <button
-            onClick={() => setView(view === "card" ? "table" : "card")}
-            className="px-4 py-2 rounded-xl bg-gray-800"
-          >
-            {view === "card" ? "Table View" : "Card View"}
-          </button>
+          <div className="flex gap-2">
+            <button
+              onClick={() => setView("card")}
+              className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm transition ${
+                view === "card"
+                  ? "bg-black text-white"
+                  : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+              }`}
+            >
+              <FaThLarge /> Card
+            </button>
+
+            <button
+              onClick={() => setView("table")}
+              className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm transition ${
+                view === "table"
+                  ? "bg-black text-white"
+                  : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+              }`}
+            >
+              <FaTable /> Table
+            </button>
+          </div>
 
           {/* ➕ ADD BOOKING */}
           <button
             onClick={() => navigate("/admin/addbooking")}
-            className="px-6 py-2 rounded-xl font-semibold
-            bg-gradient-to-r from-sky-500 to-cyan-400 text-black"
+            className="h-[42px] bg-black text-white px-5 rounded-md font-bold shadow hover:bg-gray-900 transition"
           >
             + Add Booking
           </button>
@@ -501,13 +522,13 @@ const ShowAllBookings = () => {
           {filtered.map((b) => (
             <div
               key={b.id}
-              className="p-6 rounded-2xl bg-white/5 border border-white/10"
+              className="p-5 rounded-2xl bg-white border border-gray-300 shadow-sm hover:shadow-md transition"
             >
-              <div className="flex justify-between items-center">
-                <h3 className="text-xl font-semibold">{b.bookingId}</h3>
+              <div className="flex justify-between items-start">
+                <h3 className="text-lg font-semibold">{b.bookingId}</h3>
 
                 <span
-                  className={`text-xs px-3 py-1 rounded-full ${statusColor(
+                  className={`text-xs px-3 py-1 rounded-full font-medium ${statusColor(
                     b.status
                   )}`}
                 >
@@ -515,25 +536,28 @@ const ShowAllBookings = () => {
                 </span>
               </div>
 
-              <p className="text-gray-300 mt-2">
-                {b.brand} • {b.model}
+              <p className="mt-2 flex items-center gap-2 text-sm">
+                <FaCar /> {b.brand} • {b.model}
               </p>
 
-              <p className="text-gray-400 text-sm">👤 {b.name}</p>
-              <p className="text-gray-400 text-sm">📞 {b.phone}</p>
-
-              <p className="text-gray-400 text-sm mt-2 line-clamp-2">
-                📍 {b.location}
+              <p className="text-sm flex items-center gap-2 mt-2">
+                <FaUser /> {b.name}
               </p>
 
-              {/* 🔄 STATUS DROPDOWN */}
+              <p className="text-sm flex items-center gap-2 mt-2">
+                <FaPhone /> {b.phone}
+              </p>
+
+              <p className="text-sm flex items-start gap-2 mt-2 line-clamp-2">
+                <FaMapMarkerAlt className="mt-0.5" />
+                {b.location}
+              </p>
+
               <select
                 value={b.status}
                 disabled={b.status === "Service Completed"}
-                onChange={(e) =>
-                  updateStatus(b, e.target.value)
-                }
-                className="mt-3 w-full px-3 py-2 rounded-lg bg-black/60 border border-white/10 text-sm disabled:opacity-50"
+                onChange={(e) => updateStatus(b, e.target.value)}
+                className="mt-4 w-full px-3 py-2 rounded-lg border border-gray-300 text-sm bg-white"
               >
                 {BOOKING_STATUS.map((s) => (
                   <option key={s} value={s}>
@@ -542,8 +566,8 @@ const ShowAllBookings = () => {
                 ))}
               </select>
 
-              <p className="text-gray-500 text-xs mt-3">
-                {b.createdAt?.toDate?.().toLocaleString()}
+              <p className="text-xs mt-3 flex items-center gap-2 text-gray-500">
+                <FaClock /> {formatDate(b.createdAt)}
               </p>
             </div>
           ))}
@@ -552,49 +576,45 @@ const ShowAllBookings = () => {
 
       {/* 🟨 TABLE VIEW */}
       {view === "table" && (
-        <div className="overflow-auto rounded-xl border border-white/10">
+        <div className="overflow-x-auto bg-white rounded-2xl shadow-sm ">
           <table className="w-full text-sm">
-            <thead className="bg-black/40 text-gray-300">
+            <thead className="bg-gradient-to-r from-black to-cyan-400 text-white text-left">
               <tr>
-                <th className="p-3 text-left">Booking ID</th>
-                <th className="p-3 text-left">Customer</th>
-                <th className="p-3 text-left">Car</th>
-                <th className="p-3 text-left">Phone</th>
-                <th className="p-3 text-left">Status</th>
-                <th className="p-3 text-left">Date</th>
+                <th className="px-4 py-4 text-left">S No</th>
+                <th className="px-4 py-4 text-left">Booking ID</th>
+                <th className="px-4 py-4 text-left">Customer</th>
+                <th className="px-4 py-4 text-left">Car</th>
+                <th className="px-4 py-4 text-left">Phone</th>
+                <th className="px-4 py-4 text-left">Status</th>
+                <th className="px-4 py-4 text-left">Date</th>
               </tr>
             </thead>
 
             <tbody>
-              {filtered.map((b) => (
-                <tr key={b.id} className="border-t border-white/10">
-                  <td className="p-3">{b.bookingId}</td>
-                  <td className="p-3">{b.name}</td>
-                  <td className="p-3">
+              {filtered.map((b, i) => (
+                <tr key={b.id} className="border-t border-gray-300">
+                  <td className="px-4 py-4">{i + 1}</td>
+                  <td className="px-4 py-4">{b.bookingId}</td>
+                  <td className="px-4 py-4">{b.name}</td>
+                  <td className="px-4 py-4">
                     {b.brand} • {b.model}
                   </td>
-                  <td className="p-3">{b.phone}</td>
+                  <td className="px-4 py-4">{b.phone}</td>
 
-                  <td className="p-3">
+                  <td className="px-4 py-4">
                     <select
                       value={b.status}
                       disabled={b.status === "Service Completed"}
-                      onChange={(e) =>
-                        updateStatus(b, e.target.value)
-                      }
-                      className="px-3 py-1 rounded-lg bg-black/60 border border-white/10 text-xs disabled:opacity-50"
+                      onChange={(e) => updateStatus(b, e.target.value)}
+                      className="px-3 py-1 rounded-lg border border-gray-300 text-xs bg-white"
                     >
                       {BOOKING_STATUS.map((s) => (
-                        <option key={s} value={s}>
-                          {s}
-                        </option>
+                        <option key={s}>{s}</option>
                       ))}
                     </select>
                   </td>
 
-                  <td className="p-3">
-                    {b.createdAt?.toDate?.().toLocaleDateString()}
-                  </td>
+                  <td className="px-4 py-4">{formatDate(b.createdAt)}</td>
                 </tr>
               ))}
             </tbody>

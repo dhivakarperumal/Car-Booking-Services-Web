@@ -12,7 +12,7 @@ import {
   FaUsers,
   FaUserCheck,
   FaUserTimes,
-  FaBuilding, 
+  FaBuilding,
   FaEdit,
   FaTrash,
   FaEye
@@ -28,7 +28,7 @@ const Staffs = () => {
   const [departmentFilter, setDepartmentFilter] = useState("all");
 
   const [currentPage, setCurrentPage] = useState(1);
-const itemsPerPage = 10;
+  const itemsPerPage = 10;
 
 
   const loadStaff = async () => {
@@ -37,26 +37,26 @@ const itemsPerPage = 10;
   };
 
   const filteredStaff = staff.filter((s) => {
-  const matchesSearch =
-    s.name?.toLowerCase().includes(search.toLowerCase()) ||
-    s.email?.toLowerCase().includes(search.toLowerCase()) ||
-    s.phone?.includes(search);
+    const matchesSearch =
+      s.name?.toLowerCase().includes(search.toLowerCase()) ||
+      s.email?.toLowerCase().includes(search.toLowerCase()) ||
+      s.phone?.includes(search);
 
-  const matchesStatus =
-    statusFilter === "all" || s.status === statusFilter;
+    const matchesStatus =
+      statusFilter === "all" || s.status === statusFilter;
 
-  const matchesDepartment =
-    departmentFilter === "all" || s.department === departmentFilter;
+    const matchesDepartment =
+      departmentFilter === "all" || s.department === departmentFilter;
 
-  return matchesSearch && matchesStatus && matchesDepartment;
-});
+    return matchesSearch && matchesStatus && matchesDepartment;
+  });
 
-const totalPages = Math.ceil(filteredStaff.length / itemsPerPage);
+  const totalPages = Math.ceil(filteredStaff.length / itemsPerPage);
 
-const paginatedStaff = filteredStaff.slice(
-  (currentPage - 1) * itemsPerPage,
-  currentPage * itemsPerPage
-);
+  const paginatedStaff = filteredStaff.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
 
   // useEffect(() => {
@@ -65,8 +65,8 @@ const paginatedStaff = filteredStaff.slice(
 
   useEffect(() => {
     loadStaff();
-  setCurrentPage(1);
-}, [search, statusFilter, departmentFilter]);
+    setCurrentPage(1);
+  }, [search, statusFilter, departmentFilter]);
 
 
   const handleDelete = async (id) => {
@@ -88,17 +88,24 @@ const paginatedStaff = filteredStaff.slice(
         <h3 className="text-lg font-semibold"></h3>
         <button
           onClick={() => navigate("/admin/addstaff")}
-          className="bg-black hover:bg-orange-500 cursor-pointer text-white px-5 py-3 font-bold rounded-lg transition"
+          className="inline-flex items-center gap-2
+  bg-black text-white
+  px-4 h-10
+  rounded-md border border-gray-300 text-sm font-medium
+  hover:bg-gray-900
+  active:scale-95
+  focus:outline-none focus:ring-2 focus:ring-black/40
+  transition"
         >
           + Add Employees
         </button>
       </div>
 
       {/* ===== TOP CARDS ===== */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 mb-5 gap-6">
 
         {/* Total Staff */}
-        <div className="bg-white rounded-2xl shadow-sm  p-5 flex justify-between items-center">
+        <div className="bg-white rounded-md border border-gray-300 shadow-sm  p-5 flex justify-between items-center">
           <div>
             <p className="text-sm text-gray-500">Total Staff</p>
             <h2 className="text-3xl font-bold text-gray-900">{totalStaff}</h2>
@@ -109,7 +116,7 @@ const paginatedStaff = filteredStaff.slice(
         </div>
 
         {/* Active Staff */}
-        <div className="bg-white rounded-2xl shadow-sm  p-5 flex justify-between items-center">
+        <div className="bg-white rounded-md border border-gray-300 shadow-sm  p-5 flex justify-between items-center">
           <div>
             <p className="text-sm text-gray-500">Active Staff</p>
             <h2 className="text-3xl font-bold text-gray-900">{activeStaff}</h2>
@@ -120,7 +127,7 @@ const paginatedStaff = filteredStaff.slice(
         </div>
 
         {/* Inactive Staff */}
-        <div className="bg-white rounded-2xl shadow-sm  p-5 flex justify-between items-center">
+        <div className="bg-white rounded-md border border-gray-300 shadow-sm  p-5 flex justify-between items-center">
           <div>
             <p className="text-sm text-gray-500">Inactive Staff</p>
             <h2 className="text-3xl font-bold text-gray-900">{inactiveStaff}</h2>
@@ -131,7 +138,7 @@ const paginatedStaff = filteredStaff.slice(
         </div>
 
         {/* Departments */}
-        <div className="bg-white rounded-2xl shadow-sm  p-5 flex justify-between items-center">
+        <div className="bg-white rounded-md border border-gray-300 shadow-sm  p-5 flex justify-between items-center">
           <div>
             <p className="text-sm text-gray-500">Departments</p>
             <h2 className="text-3xl font-bold text-gray-900">{departments}</h2>
@@ -144,46 +151,46 @@ const paginatedStaff = filteredStaff.slice(
       </div>
 
 
-{/* ===== SEARCH & FILTER BAR ===== */}
-<div className="bg-white p-4 rounded-xl shadow flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-  
-  {/* SEARCH - LEFT */}
-  <input
-    type="text"
-    placeholder="Search by name, email or phone..."
-    value={search}
-    onChange={(e) => setSearch(e.target.value)}
-    className="w-full sm:w-80 px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 outline-none"
-  />
+      {/* ===== SEARCH & FILTER BAR ===== */}
+      <div className=" flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
 
-  {/* FILTERS - RIGHT */}
-  <div className="flex gap-3">
-    {/* STATUS FILTER */}
-    <select
-      value={statusFilter}
-      onChange={(e) => setStatusFilter(e.target.value)}
-      className="px-4 py-2 border border-gray-300 rounded-lg bg-white"
-    >
-      <option value="all">All Status</option>
-      <option value="active">Active</option>
-      <option value="inactive">Inactive</option>
-    </select>
+        {/* SEARCH - LEFT */}
+        <input
+          type="text"
+          placeholder="Search by name, email or phone..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="w-full sm:w-80 px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 outline-none"
+        />
 
-    {/* DEPARTMENT FILTER */}
-    <select
-      value={departmentFilter}
-      onChange={(e) => setDepartmentFilter(e.target.value)}
-      className="px-4 py-2 border border-gray-300 rounded-lg bg-white"
-    >
-      <option value="all">All Departments</option>
-      {[...new Set(staff.map(s => s.department))].map((dept) => (
-        <option key={dept} value={dept}>
-          {dept}
-        </option>
-      ))}
-    </select>
-  </div>
-</div>
+        {/* FILTERS - RIGHT */}
+        <div className="flex gap-3">
+          {/* STATUS FILTER */}
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className="px-4 py-2 border border-gray-300 rounded-lg bg-white"
+          >
+            <option value="all">All Status</option>
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+          </select>
+
+          {/* DEPARTMENT FILTER */}
+          <select
+            value={departmentFilter}
+            onChange={(e) => setDepartmentFilter(e.target.value)}
+            className="px-4 py-2 border border-gray-300 rounded-lg bg-white"
+          >
+            <option value="all">All Departments</option>
+            {[...new Set(staff.map(s => s.department))].map((dept) => (
+              <option key={dept} value={dept}>
+                {dept}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
 
 
       {/* ===== HEADER ===== */}
@@ -192,7 +199,7 @@ const paginatedStaff = filteredStaff.slice(
       <div className="bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="min-w-full text-sm text-gray-700">
-            <thead className="bg-black text-white">
+            <thead className="bg-gradient-to-r from-black to-cyan-400 text-white">
               <tr>
                 <th className="px-4 py-4 text-left font-semibold">S.No</th>
                 <th className="px-4 py-4 text-left font-semibold">Name</th>
@@ -233,8 +240,8 @@ const paginatedStaff = filteredStaff.slice(
                   <td className="px-4 py-4">
                     <span
                       className={`px-3 py-1 rounded-full text-xs font-semibold ${s.status === "active"
-                          ? "bg-green-100 text-green-700"
-                          : "bg-red-100 text-red-700"
+                        ? "bg-green-100 text-green-700"
+                        : "bg-red-100 text-red-700"
                         }`}
                     >
                       {s.status}
@@ -244,19 +251,19 @@ const paginatedStaff = filteredStaff.slice(
                   <td className="px-4 py-4 flex gap-2">
                     <button
                       onClick={() => navigate(`/admin/viewstaff/${s.id}`)}
-                      className="p-2 rounded-lg bg-amber-300 text-white  transition"
+                      className="p-2 rounded-full  border border-gray-300  transition"
                     >
                       <FaEye />
                     </button>
                     <button
                       onClick={() => navigate(`/admin/addstaff/${s.id}`)}
-                      className="p-2 rounded-lg bg-green-700 text-white  transition"
+                      className="p-2  border border-gray-300 rounded-full  transition"
                     >
                       <FaEdit />
                     </button>
                     <button
                       onClick={() => handleDelete(s.id)}
-                      className="p-2 rounded-lg bg-red-700 text-white  transition"
+                      className="p-2 rounded-full  border border-red-700 text-red-700  transition"
                     >
                       <FaTrash />
                     </button>
@@ -268,50 +275,50 @@ const paginatedStaff = filteredStaff.slice(
           </table>
         </div>
         {totalPages > 1 && (
-  <div className="flex justify-between items-center px-4 py-4 bg-white ">
+          <div className="flex justify-between items-center px-4 py-4 bg-white ">
 
-    <span className="text-sm text-gray-500">
-      Page {currentPage} of {totalPages}
-    </span>
+            <span className="text-sm text-gray-500">
+              Page {currentPage} of {totalPages}
+            </span>
 
-    <div className="flex gap-2 flex-wrap">
-      <button
-        disabled={currentPage === 1}
-        onClick={() => setCurrentPage(p => p - 1)}
-        className={`px-3 py-1 rounded-lg border
+            <div className="flex gap-2 flex-wrap">
+              <button
+                disabled={currentPage === 1}
+                onClick={() => setCurrentPage(p => p - 1)}
+                className={`px-3 py-1 rounded-lg border
           ${currentPage === 1
-            ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-            : "bg-white hover:bg-gray-100"}`}
-      >
-        Prev
-      </button>
+                    ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                    : "bg-white hover:bg-gray-100"}`}
+              >
+                Prev
+              </button>
 
-      {[...Array(totalPages)].map((_, i) => (
-        <button
-          key={i}
-          onClick={() => setCurrentPage(i + 1)}
-          className={`px-3 py-1 rounded-lg border
+              {[...Array(totalPages)].map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => setCurrentPage(i + 1)}
+                  className={`px-3 py-1 rounded-lg border
             ${currentPage === i + 1
-              ? "bg-blue-600 text-white"
-              : "bg-white hover:bg-gray-100"}`}
-        >
-          {i + 1}
-        </button>
-      ))}
+                      ? "bg-blue-600 text-white"
+                      : "bg-white hover:bg-gray-100"}`}
+                >
+                  {i + 1}
+                </button>
+              ))}
 
-      <button
-        disabled={currentPage === totalPages}
-        onClick={() => setCurrentPage(p => p + 1)}
-        className={`px-3 py-1 rounded-lg border
+              <button
+                disabled={currentPage === totalPages}
+                onClick={() => setCurrentPage(p => p + 1)}
+                className={`px-3 py-1 rounded-lg border
           ${currentPage === totalPages
-            ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-            : "bg-white hover:bg-gray-100"}`}
-      >
-        Next
-      </button>
-    </div>
-  </div>
-)}
+                    ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                    : "bg-white hover:bg-gray-100"}`}
+              >
+                Next
+              </button>
+            </div>
+          </div>
+        )}
 
       </div>
     </div>
