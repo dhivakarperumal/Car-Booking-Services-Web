@@ -3,7 +3,7 @@ import PageContainer from "./PageContainer";
 import { useNavigate, useLocation } from "react-router-dom";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth, db } from "../firebase";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, collection, onSnapshot } from "firebase/firestore";
 import { User } from "lucide-react";
 import { useEffect } from "react";
 import { signOut } from "firebase/auth";
@@ -11,6 +11,7 @@ import { setDoc } from "firebase/firestore";
 import { useRef } from "react";
 import LoginModal from "../Auth/LoginModal";
 import RegisterModal from "../Auth/RegisterModal";
+import { FiShoppingCart } from "react-icons/fi";
 
 const Navbar = () => {
   const location = useLocation();
@@ -21,7 +22,8 @@ const Navbar = () => {
   const [loadingUser, setLoadingUser] = useState(true);
   const [showMenu, setShowMenu] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
-const [showRegister, setShowRegister] = useState(false);
+  const [showRegister, setShowRegister] = useState(false);
+  const [cartCount, setCartCount] = useState(0);
 
   const handleLogout = async () => {
     await signOut(auth);
@@ -68,6 +70,26 @@ const [showRegister, setShowRegister] = useState(false);
   }, []);
 
   useEffect(() => {
+    if (!auth.currentUser) {
+      setCartCount(0);
+      return;
+    }
+
+    const unsub = onSnapshot(
+      collection(db, "users", auth.currentUser.uid, "cart"),
+      (snap) => {
+        let count = 0;
+        snap.docs.forEach((doc) => {
+          count += doc.data().quantity || 1;
+        });
+        setCartCount(count);
+      },
+    );
+
+    return () => unsub();
+  }, [userData]);
+
+  useEffect(() => {
     const handleClickOutside = (e) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
         setShowMenu(false);
@@ -81,7 +103,6 @@ const [showRegister, setShowRegister] = useState(false);
     };
   }, []);
 
-
   const links = [
     { label: "HOME", path: "/" },
     { label: "SERVICES", path: "/services" },
@@ -93,11 +114,9 @@ const [showRegister, setShowRegister] = useState(false);
 
   return (
     <header className="sticky top-0 z-50">
-
       <div className="bg-black backdrop-blur-md border-b border-sky-400/20">
         <PageContainer>
           <div className="flex items-center justify-between h-16">
-
             {/* LOGO */}
             <div
               onClick={() => navigate("/")}
@@ -120,18 +139,20 @@ const [showRegister, setShowRegister] = useState(false);
                   onClick={() => navigate(item.path)}
                   className={`relative cursor-pointer text-[14px] font-bold tracking-[0.2em]
     transition-all duration-300
-    ${location.pathname === item.path
-                      ? "text-sky-400 drop-shadow-[0_0_10px_rgba(56,189,248,0.8)]"
-                      : "text-gray-300 hover:text-sky-400 hover:drop-shadow-[0_0_8px_rgba(56,189,248,0.6)]"
-                    }
+    ${
+      location.pathname === item.path
+        ? "text-sky-400 drop-shadow-[0_0_10px_rgba(56,189,248,0.8)]"
+        : "text-gray-300 hover:text-sky-400 hover:drop-shadow-[0_0_8px_rgba(56,189,248,0.6)]"
+    }
     after:absolute after:left-1/2 after:-bottom-2
     after:h-[2px] after:-translate-x-1/2
     after:bg-gradient-to-r after:from-sky-400 after:to-cyan-300
     after:transition-all after:duration-300
-    ${location.pathname === item.path
-                      ? "after:w-full"
-                      : "after:w-0 hover:after:w-full"
-                    }
+    ${
+      location.pathname === item.path
+        ? "after:w-full"
+        : "after:w-0 hover:after:w-full"
+    }
   `}
                 >
                   {item.label}
@@ -141,10 +162,8 @@ const [showRegister, setShowRegister] = useState(false);
 
             {/* CTA + USER */}
             <div className="flex items-center gap-4">
-
               {/* RIGHT SIDE (DESKTOP + MOBILE) */}
-              <div className="flex items-center gap-3">
-
+              <div className="flex items-center gap-4">
                 {/* BOOK SERVICE (DESKTOP ONLY) */}
                 <button
                   onClick={() => navigate("/bookservice")}
@@ -159,20 +178,43 @@ const [showRegister, setShowRegister] = useState(false);
                   BOOK SERVICE
                 </button>
 
+                {/* CART ICON */}
+                <button
+                  onClick={() => navigate("/cart")}
+                  className="relative cursor-pointer text-sky-400 hover:text-white transition
+  md:order-none order-first"
+                >
+                  <FiShoppingCart size={22} />
+
+                  {cartCount > 0 && (
+                    <span
+                      className="absolute -top-2 -right-2 bg-red-500 text-white text-[10px]
+      w-5 h-5 flex items-center justify-center rounded-full
+      shadow-[0_0_10px_rgba(239,68,68,0.8)]"
+                    >
+                      {cartCount}
+                    </span>
+                  )}
+                </button>
+
                 {/* USER AVATAR (SINGLE INSTANCE) */}
-                {!loadingUser && (
-                  userData ? (
+                {!loadingUser &&
+                  (userData ? (
                     <div className="relative" ref={dropdownRef}>
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          setShowMenu(prev => !prev);
+                          setShowMenu((prev) => !prev);
                         }}
                         className="h-9 w-9 cursor-pointer rounded-full flex items-center justify-center
                      bg-gradient-to-br from-sky-500 to-cyan-400
                      text-black font-bold shadow-[0_0_15px_rgba(56,189,248,0.6)]"
                       >
-                        {(userData.username || userData.displayName || userData.email)
+                        {(
+                          userData.username ||
+                          userData.displayName ||
+                          userData.email
+                        )
                           ?.charAt(0)
                           .toUpperCase()}
                       </button>
@@ -221,37 +263,35 @@ const [showRegister, setShowRegister] = useState(false);
                     </div>
                   ) : (
                     <button
-                      onClick={() => setShowLogin(true)} 
+                      onClick={() => setShowLogin(true)}
                       className="text-sky-400 cursor-pointer hover:text-white transition"
                     >
                       <User size={22} />
                     </button>
-                  )
-                )}
+                  ))}
 
                 {/* HAMBURGER (MOBILE ONLY) */}
                 <button
                   onClick={() => setIsOpen(!isOpen)}
                   className="md:hidden flex flex-col gap-1"
                 >
-                  <span className={`w-6 h-[2px] bg-white transition ${isOpen && "rotate-45 translate-y-2"}`} />
-                  <span className={`w-6 h-[2px] bg-white transition ${isOpen && "opacity-0"}`} />
-                  <span className={`w-6 h-[2px] bg-white transition ${isOpen && "-rotate-45 -translate-y-2"}`} />
+                  <span
+                    className={`w-6 h-[2px] bg-white transition ${isOpen && "rotate-45 translate-y-2"}`}
+                  />
+                  <span
+                    className={`w-6 h-[2px] bg-white transition ${isOpen && "opacity-0"}`}
+                  />
+                  <span
+                    className={`w-6 h-[2px] bg-white transition ${isOpen && "-rotate-45 -translate-y-2"}`}
+                  />
                 </button>
-
               </div>
-
-
             </div>
-
-
-
           </div>
         </PageContainer>
       </div>
 
       <div className="h-[0.5px] bg-gradient-to-r from-transparent via-sky-400 to-transparent animate-pulse" />
-
 
       {/* MOBILE MENU */}
       <div
@@ -259,7 +299,6 @@ const [showRegister, setShowRegister] = useState(false);
         ${isOpen ? "max-h-[420px] border-t border-sky-400/20" : "max-h-0"}`}
       >
         <nav className="flex flex-col px-6 py-6 gap-6">
-
           {links.map((item) => (
             <button
               key={item.label}
@@ -268,10 +307,11 @@ const [showRegister, setShowRegister] = useState(false);
                 setIsOpen(false);
               }}
               className={`text-xs font-bold tracking-[0.2em] text-left transition
-    ${location.pathname === item.path
-                  ? "text-sky-400 pl-3 border-l-2 border-sky-400"
-                  : "text-gray-300 hover:text-sky-400"
-                }
+    ${
+      location.pathname === item.path
+        ? "text-sky-400 pl-3 border-l-2 border-sky-400"
+        : "text-gray-300 hover:text-sky-400"
+    }
   `}
             >
               {item.label}
@@ -291,23 +331,23 @@ const [showRegister, setShowRegister] = useState(false);
           </button>
         </nav>
       </div>
-     <LoginModal
-  open={showLogin}
-  onClose={() => setShowLogin(false)}
-  onOpenRegister={() => {
-    setShowLogin(false);
-    setShowRegister(true);
-  }}
-/>
+      <LoginModal
+        open={showLogin}
+        onClose={() => setShowLogin(false)}
+        onOpenRegister={() => {
+          setShowLogin(false);
+          setShowRegister(true);
+        }}
+      />
 
-<RegisterModal
-  open={showRegister}
-  onClose={() => setShowRegister(false)}
-  onSwitchToLogin={() => {
-    setShowRegister(false);
-    setShowLogin(true);
-  }}
-/>
+      <RegisterModal
+        open={showRegister}
+        onClose={() => setShowRegister(false)}
+        onSwitchToLogin={() => {
+          setShowRegister(false);
+          setShowLogin(true);
+        }}
+      />
     </header>
   );
 };
