@@ -1,12 +1,65 @@
 import React, { useState } from "react";
 import PageContainer from "./PageContainer";
 import { useNavigate, useLocation } from "react-router-dom";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth, db } from "../firebase";
+import { doc, getDoc } from "firebase/firestore";
+import { User } from "lucide-react";
+import { useEffect } from "react";
+import { signOut } from "firebase/auth";
+import { setDoc } from "firebase/firestore";
 
 const Navbar = () => {
   const location = useLocation();
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
+  const [userData, setUserData] = useState(null);
+  const [loadingUser, setLoadingUser] = useState(true);
+  const [showMenu, setShowMenu] = useState(false);
 
+  const handleLogout = async () => {
+    await signOut(auth);
+    setUserData(null);
+    setShowMenu(false);
+    navigate("/login");
+  };
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        setUserData(null);
+        setLoadingUser(false);
+        return;
+      }
+
+      const userRef = doc(db, "users", user.uid);
+      const userSnap = await getDoc(userRef);
+
+      // 🔹 If user exists in Firestore
+      if (userSnap.exists()) {
+        setUserData(userSnap.data());
+      }
+      // 🔹 FIRST TIME GOOGLE LOGIN → SAVE USER
+      else {
+        const newUserData = {
+          uid: user.uid,
+          username: user.displayName || "",
+          displayName: user.displayName || "",
+          email: user.email,
+          photoURL: user.photoURL || "",
+          role: "user",
+          createdAt: new Date(),
+        };
+
+        await setDoc(userRef, newUserData);
+        setUserData(newUserData);
+      }
+
+      setLoadingUser(false);
+    });
+
+    return () => unsubscribe();
+  }, []);
   const links = [
     { label: "HOME", path: "/" },
     { label: "SERVICES", path: "/services" },
@@ -40,29 +93,27 @@ const Navbar = () => {
             {/* DESKTOP MENU */}
             <nav className="hidden md:flex items-center gap-8">
               {links.map((item) => (
-<button
-  key={item.label}
-  onClick={() => navigate(item.path)}
-  className={`relative cursor-pointer text-[14px] font-bold tracking-[0.2em]
+                <button
+                  key={item.label}
+                  onClick={() => navigate(item.path)}
+                  className={`relative cursor-pointer text-[14px] font-bold tracking-[0.2em]
     transition-all duration-300
-    ${
-      location.pathname === item.path
-        ? "text-sky-400 drop-shadow-[0_0_10px_rgba(56,189,248,0.8)]"
-        : "text-gray-300 hover:text-sky-400 hover:drop-shadow-[0_0_8px_rgba(56,189,248,0.6)]"
-    }
+    ${location.pathname === item.path
+                      ? "text-sky-400 drop-shadow-[0_0_10px_rgba(56,189,248,0.8)]"
+                      : "text-gray-300 hover:text-sky-400 hover:drop-shadow-[0_0_8px_rgba(56,189,248,0.6)]"
+                    }
     after:absolute after:left-1/2 after:-bottom-2
     after:h-[2px] after:-translate-x-1/2
     after:bg-gradient-to-r after:from-sky-400 after:to-cyan-300
     after:transition-all after:duration-300
-    ${
-      location.pathname === item.path
-        ? "after:w-full"
-        : "after:w-0 hover:after:w-full"
-    }
+    ${location.pathname === item.path
+                      ? "after:w-full"
+                      : "after:w-0 hover:after:w-full"
+                    }
   `}
->
-  {item.label}
-</button>
+                >
+                  {item.label}
+                </button>
               ))}
             </nav>
 
@@ -78,6 +129,65 @@ const Navbar = () => {
               >
                 BOOK SERVICE
               </button>
+            </div>
+
+            {/* USER ICON / AVATAR */}
+            <div className="relative hidden md:flex items-center ml-6">
+              {!loadingUser && userData && (
+                <>
+                  {/* Avatar */}
+                  <button
+                    onClick={() => setShowMenu(!showMenu)}
+                    className="h-9 w-9 rounded-full flex items-center justify-center
+        bg-gradient-to-br from-sky-500 to-cyan-400
+        text-black font-bold text-sm
+        shadow-[0_0_15px_rgba(56,189,248,0.6)]"
+                    title={userData.username}
+                  >
+                    {(
+                      userData.username ||
+                      userData.displayName ||
+                      userData.email
+                    )?.charAt(0).toUpperCase()}
+                  </button>
+
+                  {/* Dropdown */}
+                  {showMenu && (
+                    <div className="absolute right-0 top-12 w-40 rounded-xl
+        bg-black border border-sky-400/20 backdrop-blur
+        shadow-xl overflow-hidden z-50">
+
+                      <button
+                        onClick={() => {
+                          navigate("/profile");
+                          setShowMenu(false);
+                        }}
+                        className="w-full px-4 py-3 text-left text-sm text-gray-300
+            hover:bg-sky-400/10 hover:text-sky-400"
+                      >
+                        Account
+                      </button>
+
+                      <button
+                        onClick={handleLogout}
+                        className="w-full px-4 py-3 text-left text-sm text-red-400
+            hover:bg-red-400/10"
+                      >
+                        Logout
+                      </button>
+                    </div>
+                  )}
+                </>
+              )}
+
+              {!loadingUser && !userData && (
+                <button
+                  onClick={() => navigate("/login")}
+                  className="text-sky-400 hover:text-white transition"
+                >
+                  <User size={22} />
+                </button>
+              )}
             </div>
 
             {/* HAMBURGER */}
@@ -102,23 +212,46 @@ const Navbar = () => {
         ${isOpen ? "max-h-[420px] border-t border-sky-400/20" : "max-h-0"}`}
       >
         <nav className="flex flex-col px-6 py-6 gap-6">
+          {/* USER – MOBILE */}
+          {!loadingUser && (
+            <button
+              onClick={() => {
+                navigate(userData ? "/profile" : "/login");
+                setIsOpen(false);
+              }}
+              className="flex items-center gap-3 text-left"
+            >
+              <div className="h-9 w-9 rounded-full flex items-center justify-center
+      bg-gradient-to-br from-sky-500 to-cyan-400
+      text-black font-bold text-sm">
+                {userData ? (
+                  userData.username ||
+                  userData.displayName ||
+                  userData.email
+                )?.charAt(0).toUpperCase() : <User size={18} />}
+              </div>
+
+              <span className="text-sm text-gray-300 tracking-widest">
+                {userData ? userData.username : "LOGIN"}
+              </span>
+            </button>
+          )}
           {links.map((item) => (
-<button
-  key={item.label}
-  onClick={() => {
-    navigate(item.path);
-    setIsOpen(false);
-  }}
-  className={`text-xs font-bold tracking-[0.2em] text-left transition
-    ${
-      location.pathname === item.path
-        ? "text-sky-400 pl-3 border-l-2 border-sky-400"
-        : "text-gray-300 hover:text-sky-400"
-    }
+            <button
+              key={item.label}
+              onClick={() => {
+                navigate(item.path);
+                setIsOpen(false);
+              }}
+              className={`text-xs font-bold tracking-[0.2em] text-left transition
+    ${location.pathname === item.path
+                  ? "text-sky-400 pl-3 border-l-2 border-sky-400"
+                  : "text-gray-300 hover:text-sky-400"
+                }
   `}
->
-  {item.label}
-</button>
+            >
+              {item.label}
+            </button>
           ))}
 
           <button

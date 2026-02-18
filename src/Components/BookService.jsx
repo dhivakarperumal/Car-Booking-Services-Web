@@ -1,8 +1,34 @@
 import React, { useState } from "react";
 import PageContainer from "./PageContainer";
 import { useRef } from "react";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "../firebase";
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import {
+    collection,
+    doc,
+    addDoc,
+    setDoc,
+    getDoc,
+    runTransaction,
+    serverTimestamp
+} from "firebase/firestore";
+import { db } from "../firebase";
 
 import { forwardRef } from "react";
+
+const BOOKING_STATUS = {
+    BOOKED: "Booked",
+    CALL_VERIFIED: "Call Verified",
+    APPROVED: "Approved",
+    PROCESSING: "Processing",
+    WAITING_SPARE: "Waiting for Spare",
+    SERVICE_GOING: "Service Going on",
+    BILL_PENDING: "Bill Pending",
+    BILL_COMPLETED: "Bill Completed",
+    SERVICE_COMPLETED: "Service Completed",
+};
 
 const Input = forwardRef(({ label, required, error, ...props }, ref) => (
     <div>
@@ -40,7 +66,6 @@ const Textarea = forwardRef(({ label, required, error, ...props }, ref) => (
     </div>
 ));
 
-
 const Select = forwardRef(({ label, required, error, children, ...props }, ref) => (
     <div>
         <label className="block mb-2 text-sm text-gray-400">
@@ -60,6 +85,7 @@ const Select = forwardRef(({ label, required, error, children, ...props }, ref) 
         <p className="mt-1 h-4 text-xs text-red-400">{error || ""}</p>
     </div>
 ));
+
 const BookService = () => {
     const [formData, setFormData] = useState({
         name: "",
@@ -85,6 +111,17 @@ const BookService = () => {
         address: useRef(),
     };
 
+    const [currentUser, setCurrentUser] = useState(null);
+    const navigate = useNavigate();
+    const [submitting, setSubmitting] = useState(false);
+
+    useEffect(() => {
+        const unsubscribe = onAuthStateChanged(auth, (user) => {
+            setCurrentUser(user);
+        });
+
+        return () => unsubscribe();
+    }, []);
 
     const [locationLoading, setLocationLoading] = useState(false);
     const [locationError, setLocationError] = useState("");
@@ -119,14 +156,14 @@ const BookService = () => {
                         data.address.village ||
                         "";
 
-                    // ✅ Always store address
                     setFormData((prev) => ({
                         ...prev,
                         location: data.display_name,
                     }));
 
-                    // ✅ Just mark Chennai or not (no error here)
-                    setIsChennai(city.toLowerCase() === "chennai");
+                    setIsChennai(
+                        ["chennai", "tirupattur"].includes(city.toLowerCase())
+                    );
                 } catch (err) {
                     console.error("Location fetch failed");
                 } finally {
@@ -139,13 +176,49 @@ const BookService = () => {
         );
     };
 
+    const generateBookingId = async () => {
+        const counterRef = doc(db, "counters", "bookingCounter");
+
+        const bookingId = await runTransaction(db, async (transaction) => {
+            const counterSnap = await transaction.get(counterRef);
+
+            let nextValue = 1;
+
+            if (counterSnap.exists()) {
+                nextValue = counterSnap.data().value + 1;
+            }
+
+            transaction.set(counterRef, { value: nextValue }, { merge: true });
+
+            return `BS${String(nextValue).padStart(3, "0")}`;
+        });
+
+        return bookingId;
+    };
+
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
+        /* -------------------------------------------------
+           1️⃣ BLOCK IF USER NOT LOGGED IN
+        -------------------------------------------------- */
+        if (!currentUser) {
+            setSubmitError("Please login to book a service");
+
+            setTimeout(() => {
+                navigate("/login");
+            }, 1500);
+
+            return;
+        }
+
+        /* -------------------------------------------------
+           2️⃣ FORM VALIDATION
+        -------------------------------------------------- */
         const newErrors = {};
 
         if (!formData.name) newErrors.name = "Name is required";
@@ -158,12 +231,14 @@ const BookService = () => {
         if (!formData.address) newErrors.address = "Service address is required";
 
         if (!isChennai) {
-            newErrors.location = "Service available only in Chennai";
+            newErrors.location = "Service available only in Chennai & Tirupattur";
         }
 
         setErrors(newErrors);
 
-        // 🚀 Scroll to first error
+        /* -------------------------------------------------
+           3️⃣ SCROLL TO FIRST ERROR
+        -------------------------------------------------- */
         const firstErrorKey = Object.keys(newErrors)[0];
         if (firstErrorKey && refs[firstErrorKey]?.current) {
             refs[firstErrorKey].current.scrollIntoView({
@@ -174,8 +249,84 @@ const BookService = () => {
             return;
         }
 
-        // ✅ All good
-        console.log("Booking Data:", formData);
+        /* -------------------------------------------------
+           4️⃣ FIRESTORE SAVE (OPTION 2 – BS_001)
+        -------------------------------------------------- */
+        try {
+            // 🔢 Generate sequential booking ID
+            setSubmitting(true);
+
+            const bookingId = await generateBookingId();
+
+            const bookingData = {
+                bookingId,
+                uid: currentUser.uid,
+
+                // User details
+                name: formData.name,
+                email: formData.email,
+                phone: formData.phone,
+                altPhone: formData.altPhone || "",
+
+                // Vehicle & service details
+                brand: formData.brand,
+                model: formData.model,
+                issue: formData.issue,
+                otherIssue: formData.otherIssue || "",
+                address: formData.address,
+                location: formData.location,
+
+                // Status tracking
+                status: BOOKING_STATUS.BOOKED,
+
+                createdAt: serverTimestamp(),
+            };
+
+            /* -------- 1️⃣ GLOBAL BOOKINGS COLLECTION -------- */
+            const bookingRef = await addDoc(
+                collection(db, "bookings"),
+                bookingData
+            );
+
+            /* -------- 2️⃣ USER SUBCOLLECTION -------- */
+            await setDoc(
+                doc(db, "users", currentUser.uid, "bookings", bookingRef.id),
+                {
+                    ...bookingData,
+                    docId: bookingRef.id,
+                }
+            );
+
+            console.log("✅ Booking Successful:", bookingId);
+
+            setFormData({
+                name: "",
+                phone: "",
+                email: "",
+                altPhone: "",
+                brand: "",
+                model: "",
+                issue: "",
+                otherIssue: "",
+                address: "",
+                location: "",
+            });
+
+            setErrors({});
+            setSubmitError("");
+
+            /* -------------------------------------------------
+               5️⃣ REDIRECT TO SUCCESS PAGE
+            -------------------------------------------------- */
+            navigate(`/booking-success/${bookingId}`);
+
+        } catch (error) {
+            console.error("❌ Booking failed:", error);
+            setSubmitError("Something went wrong. Please try again.");
+        }
+        finally {
+            setSubmitting(false);  // ✅ ADD HERE
+        }
     };
 
     return (
@@ -346,12 +497,14 @@ const BookService = () => {
                         <button
                             type="submit"
                             onClick={handleSubmit}
+                            disabled={!currentUser || submitting}
+
                             className="w-full py-4 rounded-full font-semibold text-black
   bg-gradient-to-r from-sky-500 to-cyan-400
   hover:scale-105 transition-all duration-300
-  shadow-lg shadow-sky-500/40"
+  shadow-lg shadow-sky-500/40 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                            Book Service →
+                            {submitting ? "Booking..." : "Book Service →"}
                         </button>
                     </form>
                 </div>
