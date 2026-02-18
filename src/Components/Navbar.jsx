@@ -1,8 +1,9 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import PageContainer from "./PageContainer";
+import { useNavigate, useLocation } from "react-router-dom";
 
 const Navbar = () => {
+  const location = useLocation();
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
 
@@ -39,21 +40,29 @@ const Navbar = () => {
             {/* DESKTOP MENU */}
             <nav className="hidden md:flex items-center gap-8">
               {links.map((item) => (
-                <button
-                  key={item.label}
-                  onClick={() => navigate(item.path)}
-                  className="relative cursor-pointer text-gray-300 text-[14px] font-bold tracking-[0.2em]
-                             transition-all duration-300
-                             hover:text-sky-400
-                             hover:drop-shadow-[0_0_8px_rgba(56,189,248,0.6)]
-                             after:absolute after:left-1/2 after:-bottom-2
-                             after:h-[2px] after:w-0 after:-translate-x-1/2
-                             after:bg-gradient-to-r after:from-sky-400 after:to-cyan-300
-                             after:transition-all after:duration-300
-                             hover:after:w-full"
-                >
-                  {item.label}
-                </button>
+<button
+  key={item.label}
+  onClick={() => navigate(item.path)}
+  className={`relative cursor-pointer text-[14px] font-bold tracking-[0.2em]
+    transition-all duration-300
+    ${
+      location.pathname === item.path
+        ? "text-sky-400 drop-shadow-[0_0_10px_rgba(56,189,248,0.8)]"
+        : "text-gray-300 hover:text-sky-400 hover:drop-shadow-[0_0_8px_rgba(56,189,248,0.6)]"
+    }
+    after:absolute after:left-1/2 after:-bottom-2
+    after:h-[2px] after:-translate-x-1/2
+    after:bg-gradient-to-r after:from-sky-400 after:to-cyan-300
+    after:transition-all after:duration-300
+    ${
+      location.pathname === item.path
+        ? "after:w-full"
+        : "after:w-0 hover:after:w-full"
+    }
+  `}
+>
+  {item.label}
+</button>
               ))}
             </nav>
 
@@ -84,7 +93,7 @@ const Navbar = () => {
         </PageContainer>
       </div>
 
-      <div className="h-[1px] bg-gradient-to-r from-transparent via-sky-400 to-transparent animate-pulse" />
+      <div className="h-[0.5px] bg-gradient-to-r from-transparent via-sky-400 to-transparent animate-pulse" />
 
 
       {/* MOBILE MENU */}
@@ -94,17 +103,22 @@ const Navbar = () => {
       >
         <nav className="flex flex-col px-6 py-6 gap-6">
           {links.map((item) => (
-            <button
-              key={item.label}
-              onClick={() => {
-                navigate(item.path);
-                setIsOpen(false);
-              }}
-              className="text-gray-300 text-xs font-bold tracking-[0.2em]
-                         hover:text-sky-400 transition text-left"
-            >
-              {item.label}
-            </button>
+<button
+  key={item.label}
+  onClick={() => {
+    navigate(item.path);
+    setIsOpen(false);
+  }}
+  className={`text-xs font-bold tracking-[0.2em] text-left transition
+    ${
+      location.pathname === item.path
+        ? "text-sky-400 pl-3 border-l-2 border-sky-400"
+        : "text-gray-300 hover:text-sky-400"
+    }
+  `}
+>
+  {item.label}
+</button>
           ))}
 
           <button
