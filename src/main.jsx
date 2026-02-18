@@ -54,6 +54,7 @@ import About from "./Components/About.jsx";
 import ServiceDetails from "./Components/ServiceDetails.jsx";
 import PricingList from "./Admin/PricingAll/AllPricesList.jsx";
 import PricingForm from "./Admin/PricingAll/AddPrice.jsx";
+import Contact from "./Components/ContactUs.jsx";
 
 
 const router = createBrowserRouter([
@@ -89,6 +90,7 @@ const router = createBrowserRouter([
       { path: "addservicestype", element: <AddServicesType /> },
       { path: "addserviceparts", element: <AddServiceParts /> },
       { path: "bookings", element: <BookingService /> },
+      { path: "contact", element: <Contact /> },
 
       { path: "allProducts", element: <AllProducts /> },
       { path: "addproducts", element: <AddProducts /> },
