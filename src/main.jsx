@@ -48,6 +48,8 @@ import AddStock from "./Admin/Products/AddStock.jsx";
 import StockDetails from "./Admin/Products/StockDetails.jsx";
 import AddCarServices from "./Admin/ServicesList/AddSerivess.jsx";
 import ServicesListAll from "./Admin/ServicesList/ServicesListAll.jsx";
+import PricingList from "./Admin/PricingAll/AllPricesList.jsx";
+import PricingForm from "./Admin/PricingAll/AddPrice.jsx";
 
 
 const router = createBrowserRouter([
@@ -87,6 +89,10 @@ const router = createBrowserRouter([
 
       { path: "addservices", element: <AddCarServices /> },
       { path: "serviceslist", element: <ServicesListAll /> },
+
+
+      { path: "priceslist", element: <PricingList /> },
+      { path: "addprice", element: <PricingForm /> },
      
       
 

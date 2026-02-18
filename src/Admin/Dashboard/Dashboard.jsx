@@ -6,7 +6,7 @@ import {
   FaMoneyBillWave,
   FaUserCog,
   FaBoxes
- 
+
 } from "react-icons/fa";
 
 import {
@@ -19,7 +19,9 @@ import {
   ResponsiveContainer,
   BarChart,
   Bar,
+  Legend,
 } from "recharts";
+
 
 import { collection, query, where, onSnapshot, Timestamp, orderBy, limit, } from "firebase/firestore";
 import { db } from "../../firebase";
@@ -28,17 +30,55 @@ import { useNavigate } from "react-router-dom";
 
 /* -------------------- COMPONENTS -------------------- */
 
-const StatCard = ({ title, value, icon, color }) => (
-  <div className="bg-white rounded-xl shadow p-5  flex justify-between items-center">
-    <div>
-      <p className="text-sm text-gray-500">{title}</p>
-      <h2 className="text-2xl font-bold mt-1">{value}</h2>
+import { ArrowUp, ArrowDown } from "lucide-react";
+
+const GradientStatCard = ({
+  title,
+  value,
+  change,
+  isUp,
+  gradient,
+}) => {
+  return (
+    <div
+      className={`relative overflow-hidden rounded text-white p-8 shadow-md ${gradient}`}
+    >
+      {/* TITLE */}
+      <p className="text-xs font-semibold opacity-90 tracking-wide">
+        {title}
+      </p>
+
+      {/* VALUE */}
+      <h2 className="text-2xl font-bold mt-2">{value}</h2>
+
+      {/* CHANGE ROW */}
+      <div className="flex items-center justify-between mt-2 text-sm opacity-95">
+        <span>Compared to last week</span>
+
+        <span className="flex items-center gap-1 font-semibold">
+          {isUp ? (
+            <ArrowUp size={16} className="bg-white/20 rounded-full p-1" />
+          ) : (
+            <ArrowDown size={16} className="bg-white/20 rounded-full p-1" />
+          )}
+          {change}
+        </span>
+      </div>
+
+      {/* SPARKLINE */}
+      <div className="absolute bottom-0 top-28 left-0 w-full h-16 opacity-30">
+        <svg viewBox="0 0 100 30" className="w-full h-full">
+          <polyline
+            fill="none"
+            stroke="white"
+            strokeWidth="2"
+            points="0,20 10,15 20,18 30,10 40,12 50,8 60,14 70,6 80,12 90,5 100,9"
+          />
+        </svg>
+      </div>
     </div>
-    <div className={`p-3 rounded-lg ${color} text-white text-xl`}>
-      {icon}
-    </div>
-  </div>
-);
+  );
+};
 
 /* -------------------- DASHBOARD -------------------- */
 
@@ -327,41 +367,41 @@ const Dashboard = () => {
     return new Date(ts).toLocaleDateString("en-IN");
   };
 
-const SERVICE_COLORS = {
-  "Oil Change": "#2563eb",
-  "General Service": "#16a34a",
-  "Wheel Alignment": "#f97316",
-  "Engine Check": "#dc2626",
-};
+  const SERVICE_COLORS = {
+    "Oil Change": "#2563eb",
+    "General Service": "#16a34a",
+    "Wheel Alignment": "#f97316",
+    "Engine Check": "#dc2626",
+  };
 
   const [stats1, setStats1] = useState({});
   const [total, setTotal] = useState(0);
 
- useEffect(() => {
-  const q = query(
-    collection(db, "carServices"),
-    where("status", "in", ["Pending", "In Progress"])
-  );
+  useEffect(() => {
+    const q = query(
+      collection(db, "carServices"),
+      where("status", "in", ["Pending", "In Progress"])
+    );
 
-  const unsub = onSnapshot(q, (snap) => {
-    const counts = {};
-    let sum = 0;
+    const unsub = onSnapshot(q, (snap) => {
+      const counts = {};
+      let sum = 0;
 
-    snap.forEach((doc) => {
-      const data = doc.data();
-      if (!data.serviceType) return;
+      snap.forEach((doc) => {
+        const data = doc.data();
+        if (!data.serviceType) return;
 
-      const serviceType = data.serviceType.trim();
-      counts[serviceType] = (counts[serviceType] || 0) + 1;
-      sum++;
+        const serviceType = data.serviceType.trim();
+        counts[serviceType] = (counts[serviceType] || 0) + 1;
+        sum++;
+      });
+
+      setStats1(counts);
+      setTotal(sum);
     });
 
-    setStats1(counts);
-    setTotal(sum);
-  });
-
-  return () => unsub();
-}, []);
+    return () => unsub();
+  }, []);
 
 
 
@@ -456,49 +496,40 @@ const SERVICE_COLORS = {
     <div className="min-h-screen  p-2">
       {/* STATS */}
 
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-  <StatCard
-    title="Total Services"
-    value={stats.patients}
-    icon={<FaTools />}
-    color="bg-blue-500"
-  />
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 mb-6">
+        <GradientStatCard
+          title="TODAY ORDERS"
+          value="$5,74.12"
+          change="+427"
+          isUp={true}
+          gradient="bg-gradient-to-r from-blue-500 to-blue-300"
+        />
 
-  <StatCard
-    title="Today's Services Booking"
-    value={stats.appointmentsToday}
-    icon={<FaCalendarCheck />}
-    color="bg-teal-500"
-  />
+        <GradientStatCard
+          title="TODAY EARNINGS"
+          value="$1,230.17"
+          change="-23.09%"
+          isUp={false}
+          gradient="bg-gradient-to-r from-pink-500 to-rose-400"
+        />
 
-  <StatCard
-    title="Active Services"
-    value={stats.treatments}
-    icon={<FaCogs />}
-    color="bg-green-500"
-  />
+        <GradientStatCard
+          title="TOTAL EARNINGS"
+          value="$7,125.70"
+          change="52.09%"
+          isUp={true}
+          gradient="bg-gradient-to-r from-green-500 to-emerald-400"
+        />
 
-  <StatCard
-    title="Pending Payments"
-    value={stats.pendingPayments}
-    icon={<FaMoneyBillWave />}
-    color="bg-orange-500"
-  />
+        <GradientStatCard
+          title="PRODUCT SOLD"
+          value="$4,820.50"
+          change="-152.3"
+          isUp={false}
+          gradient="bg-gradient-to-r from-orange-500 to-amber-400"
+        />
+      </div>
 
-  <StatCard
-    title="Available Mechanics"
-    value={stats.doctors}
-    icon={<FaUserCog />}
-    color="bg-indigo-500"
-  />
-
-  <StatCard
-    title="Inventory"
-    value={stats.equipmentDue}
-    icon={<FaBoxes />}
-    color="bg-red-500"
-  />
-</div>
 
 
       {/* APPOINTMENTS */}
@@ -508,59 +539,193 @@ const SERVICE_COLORS = {
         {/* TWO COLUMNS INSIDE */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* APPOINTMENTS */}
-          <div className="bg-white rounded-xl mb-9 shadow p-5">
-            <h4 className="font-semibold mb-3">Booking Serives</h4>
+<div className="bg-white rounded-2xl mb-9 shadow-sm border border-gray-100 p-5">
+  {/* HEADER */}
+  <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 mb-4">
+    <h4 className="font-semibold text-gray-800 text-lg">
+      Booking Services
+    </h4>
 
-            <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={appointmentData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="day" />
-                  <YAxis allowDecimals={false} />
-                  <Tooltip />
+    {/* LEGEND */}
+    <div className="flex flex-wrap gap-3 text-xs">
+      {[
+        { color: "bg-blue-500", label: "This Week" },
+        { color: "bg-green-500", label: "Last Week" },
+        { color: "bg-yellow-500", label: "Pending" },
+        { color: "bg-emerald-600", label: "Completed" },
+        { color: "bg-red-600", label: "Cancelled" },
+      ].map((item) => (
+        <span key={item.label} className="flex items-center gap-1">
+          <span className={`w-3 h-3 rounded-full ${item.color}`} />
+          {item.label}
+        </span>
+      ))}
+    </div>
+  </div>
 
-                  <Line type="monotone" dataKey="thisWeek" stroke="#3b82f6" strokeWidth={3} />
-                  <Line type="monotone" dataKey="lastWeek" stroke="#22c55e" strokeWidth={3} />
-                  <Line type="monotone" dataKey="pending" stroke="#eab308" strokeWidth={2} strokeDasharray="4 4" />
-                  <Line type="monotone" dataKey="completed" stroke="#16a34a" strokeWidth={2} />
-                  <Line type="monotone" dataKey="cancelled" stroke="#dc2626" strokeWidth={2} />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
+  {/* BAR CHART */}
+  <div className="h-64">
+    <ResponsiveContainer width="100%" height="100%">
+      <BarChart data={appointmentData || []} barGap={4}>
+        <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
 
-            <div className="grid grid-cols-3 mt-4 gap-2 text-center">
-              <div className="bg-yellow-50 text-yellow-600 rounded-lg py-2 font-semibold">
-                pending: {counts.pending}
-              </div>
-              <div className="bg-green-50 text-green-600 rounded-lg py-2 font-semibold">
-                completed: {counts.completed}
-              </div>
-              <div className="bg-red-50 text-red-600 rounded-lg py-2 font-semibold">
-                Cancelled: {counts.cancelled}
-              </div>
-            </div>
-          </div>
+        <XAxis
+          dataKey="day"
+          tick={{ fontSize: 12 }}
+          stroke="#94a3b8"
+        />
 
-          {/* REVENUE */}
-          <div className="bg-white rounded-xl mb-9 shadow p-5">
-            <h4 className="font-semibold mb-3">Revenue This Month</h4>
+        <YAxis
+          allowDecimals={false}
+          tick={{ fontSize: 12 }}
+          stroke="#94a3b8"
+          domain={[0, "dataMax + 2"]}
+        />
 
-            <h2 className="text-3xl font-bold mb-4">
-              ₹ {(monthlyTotal || 0).toLocaleString("en-IN")}
-            </h2>
+        <Tooltip
+          contentStyle={{
+            borderRadius: "10px",
+            border: "none",
+            boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
+          }}
+        />
 
-            <div className="h-48">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={revenueData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="month" />
-                  <YAxis tickFormatter={(v) => `₹${v / 1000}k`} />
-                  <Tooltip formatter={(v) => `₹ ${Number(v).toLocaleString("en-IN")}`} />
-                  <Bar dataKey="revenue" fill="#3b82f6" radius={[6, 6, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
+        {/* THIS WEEK */}
+        <Bar
+          dataKey="thisWeek"
+          fill="#3b82f6"
+          radius={[4, 4, 0, 0]}
+          barSize={14}
+        />
+
+        {/* LAST WEEK */}
+        <Bar
+          dataKey="lastWeek"
+          fill="#22c55e"
+          radius={[4, 4, 0, 0]}
+          barSize={14}
+        />
+
+        {/* PENDING */}
+        <Bar
+          dataKey="pending"
+          fill="#eab308"
+          radius={[4, 4, 0, 0]}
+          barSize={14}
+        />
+
+        {/* COMPLETED */}
+        <Bar
+          dataKey="completed"
+          fill="#16a34a"
+          radius={[4, 4, 0, 0]}
+          barSize={14}
+        />
+
+        {/* CANCELLED */}
+        <Bar
+          dataKey="cancelled"
+          fill="#dc2626"
+          radius={[4, 4, 0, 0]}
+          barSize={14}
+        />
+      </BarChart>
+    </ResponsiveContainer>
+  </div>
+
+  {/* STATUS CARDS */}
+  <div className="grid grid-cols-1 sm:grid-cols-3 mt-5 gap-3 text-center">
+    <div className="bg-yellow-50 text-yellow-600 rounded-xl py-3 font-semibold shadow-sm">
+      Pending: {counts?.pending ?? 0}
+    </div>
+
+    <div className="bg-green-50 text-green-600 rounded-xl py-3 font-semibold shadow-sm">
+      Completed: {counts?.completed ?? 0}
+    </div>
+
+    <div className="bg-red-50 text-red-600 rounded-xl py-3 font-semibold shadow-sm">
+      Cancelled: {counts?.cancelled ?? 0}
+    </div>
+  </div>
+</div>
+
+
+
+         <div className="bg-white rounded-2xl mb-9 shadow-sm border border-gray-100 p-5">
+  <h4 className="font-semibold text-gray-800 mb-1">
+    Financial Overview
+  </h4>
+
+  {/* TOTAL */}
+  <h2 className="text-3xl font-bold mb-4">
+    ₹ {(monthlyTotal || 0).toLocaleString("en-IN")}
+  </h2>
+
+  <div className="h-64">
+    <ResponsiveContainer width="100%" height="100%">
+      <BarChart data={revenueData} barGap={6}>
+        <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+
+        <XAxis
+          dataKey="month"
+          tick={{ fontSize: 12 }}
+          stroke="#94a3b8"
+        />
+
+        <YAxis
+          tickFormatter={(v) => `₹${v / 1000}k`}
+          tick={{ fontSize: 12 }}
+          stroke="#94a3b8"
+        />
+
+        <Tooltip
+          formatter={(v) =>
+            `₹ ${Number(v).toLocaleString("en-IN")}`
+          }
+          contentStyle={{
+            borderRadius: "10px",
+            border: "none",
+            boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
+          }}
+        />
+
+        <Legend
+          verticalAlign="bottom"
+          iconType="circle"
+          wrapperStyle={{ fontSize: "12px" }}
+        />
+
+        {/* NET PROFIT */}
+        <Bar
+          dataKey="profit"
+          name="Net Profit"
+          fill="#1d4ed8"
+          radius={[4, 4, 0, 0]}
+          barSize={18}
+        />
+
+        {/* REVENUE */}
+        <Bar
+          dataKey="revenue"
+          name="Revenue"
+          fill="#0ea5e9"
+          radius={[4, 4, 0, 0]}
+          barSize={18}
+        />
+
+        {/* FREE CASH FLOW */}
+        <Bar
+          dataKey="cash"
+          name="Free Cash Flow"
+          fill="#fbbf24"
+          radius={[4, 4, 0, 0]}
+          barSize={18}
+        />
+      </BarChart>
+    </ResponsiveContainer>
+  </div>
+</div>
+
         </div>
       </div>
 
@@ -707,7 +872,7 @@ const SERVICE_COLORS = {
       {/* FOLLOW UPS + EQUIPMENT */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* FOLLOW UPS */}
-        
+
 
         {/* INVENTORY PREVIEW */}
         <div className="bg-white rounded-xl shadow p-5 lg:col-span-2">
@@ -751,8 +916,8 @@ const SERVICE_COLORS = {
                     <tr
                       key={r.id}
                       className={`border-b  border-gray-300 ${r.stockQty <= r.minStock
-                          ? "bg-red-50 text-red-700"
-                          : "hover:bg-gray-50"
+                        ? "bg-red-50 text-red-700"
+                        : "hover:bg-gray-50"
                         }`}
                     >
                       {/* S No */}
