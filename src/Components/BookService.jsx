@@ -44,6 +44,7 @@ const BookService = () => {
     const [formData, setFormData] = useState({
         name: "",
         phone: "",
+        email: "",
         altPhone: "",
         brand: "",
         model: "",
@@ -111,6 +112,11 @@ const BookService = () => {
     const handleSubmit = (e) => {
         e.preventDefault();
 
+        if (!formData.email) {
+            setSubmitError("Please enter your email address");
+            return;
+        }
+
         // ❌ Chennai validation ONLY on submit
         if (!isChennai) {
             setSubmitError("Sorry, currently our service is available only in Chennai.");
@@ -154,6 +160,13 @@ const BookService = () => {
 
                         {/* Name */}
                         <Input label="Full Name" name="name" onChange={handleChange} />
+
+                        <Input
+                            label="Email Address"
+                            name="email"
+                            type="email"
+                            onChange={handleChange}
+                        />
 
                         {/* Phone Numbers */}
                         <div className="grid md:grid-cols-2 gap-6">
