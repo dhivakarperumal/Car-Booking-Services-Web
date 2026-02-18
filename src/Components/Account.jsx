@@ -1,10 +1,16 @@
 import { useState } from "react";
 import PersonalInfo from "./PersonalInfo";
+import PageHeader from "./PageHeader";
 import MyOrders from "./MyOrders";
 import ManageAddress from "./ManageAddress";
 
 const Account = () => {
   const [activeTab, setActiveTab] = useState("personal");
+  const titleMap = {
+  personal: "Personal Information",
+  orders: "My Orders",
+  address: "Manage Address",
+};
 
   const renderComponent = () => {
     switch (activeTab) {
@@ -20,6 +26,8 @@ const Account = () => {
   };
 
   return (
+    <>
+    <PageHeader title={titleMap[activeTab]} />
     <div className="min-h-screen bg-black text-white px-4 py-6">
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-6">
 
@@ -63,6 +71,7 @@ const Account = () => {
 
       </div>
     </div>
+    </>
   );
 };
 
