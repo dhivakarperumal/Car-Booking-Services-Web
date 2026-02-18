@@ -37,7 +37,8 @@ const navItems = [
     ],
   },
 
-  { path: "/admin/serviceslist", label: "Services Price List", icon: CalendarCheck },
+  { path: "/admin/serviceslist", label: "Services List", icon: CalendarCheck },
+  { path: "/admin/priceslist", label: "Pricing List", icon: BarChart3 },
 
 
   /* ===== Services & Bookings ===== */
@@ -115,7 +116,7 @@ const Sidebar = ({ isOpen, onClose, collapsed, onToggleCollapse }) => {
       {/* ========== SIDEBAR ========== */}
       <aside
         className={`fixed top-0 left-0 z-50 h-full
-        bg-gradient-to-b from-red-950 via-red-900 to-red-950
+        bg-gradient-to-b from-blue-950 via-blue-900 to-blue-950
         text-white border-r border-white/10
         shadow-[0_25px_60px_rgba(0,0,0,0.5)]
         flex flex-col transition-all duration-300

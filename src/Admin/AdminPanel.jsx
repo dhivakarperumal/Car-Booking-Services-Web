@@ -22,7 +22,8 @@ const AdminLayout = () => {
   }, []);
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="flex min-h-screen bg-gradient-to-br from-red-50 via-red to-red-100 transition-all duration-500">
+
       {/* Sidebar */}
       <Sidebar
         isOpen={sidebarOpen}
