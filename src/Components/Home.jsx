@@ -1,8 +1,8 @@
 import react from "react";
 import Hero from "./Hero";
-import Services from "./Services";
-import About from "./About";
+import AboutHome from "./AboutHome"
 import Pricing from "./Pricing";
+import ServiceSwiper from "./SeviceSwiper";
 
 export default function Home() {
 
@@ -10,8 +10,8 @@ export default function Home() {
     <>
      <h1>
       <Hero />
-      <About />
-      <Services/>
+      <AboutHome />
+      <ServiceSwiper />
       <Pricing/>
      </h1>
     </>
