@@ -1,4 +1,5 @@
 import { Facebook, Instagram, Linkedin, Mail } from "lucide-react";
+import PageContainer from "./PageContainer";
 
 const services = [
   "Car Detailing",
@@ -20,7 +21,8 @@ const links = [
 export default function Footer() {
   return (
     <footer className="bg-[#050b14] text-white pt-20">
-      <div className="container mx-auto px-6">
+      <PageContainer>
+      <div className="">
         {/* TOP SECTION */}
         <div className="grid lg:grid-cols-4 md:grid-cols-2 gap-12 pb-16 border-b border-white/10">
           {/* LOGO + CONTACT */}
@@ -154,6 +156,7 @@ export default function Footer() {
           </div>
         </div>
       </div>
+      </PageContainer>
     </footer>
   );
 }

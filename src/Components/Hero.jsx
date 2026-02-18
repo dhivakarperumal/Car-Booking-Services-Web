@@ -4,7 +4,7 @@ import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/effect-fade";
 import About from "./About";
-import Footer from "./Footer";
+import PageContainer from "./PageContainer";
 
 const slides = [
   {
@@ -54,7 +54,8 @@ export default function Hero() {
 
               {/* Content */}
               <div className="relative z-10 h-full flex items-center justify-center text-center">
-                <div className="px-6">
+                <PageContainer>
+                <div className="">
                   <div className="max-w-3xl mx-auto text-white space-y-6 animate-fadeIn flex flex-col items-center">
 
                     <p className="text-gray-300 max-w-xl mx-auto">
@@ -82,14 +83,13 @@ export default function Hero() {
                     </button>
                   </div>
                 </div>
+                </PageContainer>
               </div>
             </div>
           </SwiperSlide>
         ))}
       </Swiper>
     </section>
-    <About />
-    <Footer />
     </>
   );
 }

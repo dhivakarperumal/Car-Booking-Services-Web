@@ -1,4 +1,5 @@
 import { Wrench, Settings, Users, Paintbrush } from "lucide-react";
+import PageContainer from "./PageContainer";
 
 export default function AboutStats() {
   return (
@@ -13,7 +14,8 @@ export default function AboutStats() {
       {/* Overlay */}
       <div className="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-black/60" />
 
-      <div className="relative container mx-auto px-6">
+      <PageContainer>
+      <div className="relative">
 
         <div className="grid lg:grid-cols-2 gap-20 items-center">
 
@@ -58,6 +60,7 @@ export default function AboutStats() {
 
         </div>
       </div>
+      </PageContainer>
     </section>
   );
 }

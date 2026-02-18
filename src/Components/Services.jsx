@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../firebase";
 import ServiceCard from "./ServiceCard";
+import PageContainer from "./PageContainer";
 
 const Services = () => {
   const [services, setServices] = useState([]);
@@ -21,7 +22,8 @@ const Services = () => {
 
   return (
     <section className="bg-black py-24">
-      <div className="max-w-7xl mx-auto px-6">
+      <PageContainer>
+      <div className="">
 
         {/* Heading */}
         <h2 className="text-white text-3xl font-bold text-center tracking-widest mb-16">
@@ -35,6 +37,7 @@ const Services = () => {
           ))}
         </div>
       </div>
+      </PageContainer>
     </section>
   );
 };

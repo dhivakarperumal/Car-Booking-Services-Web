@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import PageContainer from "./PageContainer";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -18,7 +19,7 @@ const Navbar = () => {
     <header className="sticky top-0 z-50">
 
       <div className="bg-black backdrop-blur-md border-b border-sky-400/20">
-        <div className="max-w-7xl mx-auto px-6">
+        <PageContainer>
           <div className="flex items-center justify-between h-16">
 
             {/* LOGO */}
@@ -80,7 +81,7 @@ const Navbar = () => {
               <span className={`w-6 h-[2px] bg-white transition ${isOpen && "-rotate-45 -translate-y-2"}`} />
             </button>
           </div>
-        </div>
+        </PageContainer>
       </div>
 
       <div className="h-[1px] bg-gradient-to-r from-transparent via-sky-400 to-transparent animate-pulse" />
