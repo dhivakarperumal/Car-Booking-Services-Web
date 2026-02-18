@@ -69,7 +69,7 @@ const Navbar = () => {
             {/* CTA */}
             <div className="hidden md:block">
               <button
-                onClick={() => navigate("/services")}
+                onClick={() => navigate("/bookservice")}
                 className="relative px-6 py-2.5 cursor-pointer rounded-md font-bold text-xs tracking-[0.2em]
                            text-sky-400 border border-sky-400/60
                            transition-all duration-300
@@ -123,7 +123,7 @@ const Navbar = () => {
 
           <button
             onClick={() => {
-              navigate("/services");
+              navigate("/bookservice");
               setIsOpen(false);
             }}
             className="mt-4 px-5 py-2.5 rounded-md font-bold text-xs tracking-[0.2em]
