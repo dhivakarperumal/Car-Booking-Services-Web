@@ -1,6 +1,7 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import ProductDetails from "./Components/ProductDetails.jsx";
 import "./index.css";
 
 import App from "./App.jsx";
@@ -70,10 +71,12 @@ const router = createBrowserRouter([
       { path: "/services", element: <Services /> },
       { path: "/pricing", element: <Pricing /> },
       { path: "/products", element: <Products /> },
+      { path: "/products/:slug", element: <ProductDetails /> },
       { path: "/services/:id", element: <ServiceDetails /> },
       { path: "/about", element: <About /> },
       { path: "/contact", element: <ContactUs /> },
       { path: "/bookservice", element: <BookService /> },
+
        
     ],
   },
