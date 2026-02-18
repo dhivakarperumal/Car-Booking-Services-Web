@@ -116,9 +116,9 @@ const Sidebar = ({ isOpen, onClose, collapsed, onToggleCollapse }) => {
       {/* ========== SIDEBAR ========== */}
       <aside
         className={`fixed top-0 left-0 z-50 h-full
-        bg-gradient-to-b from-blue-950 via-blue-900 to-blue-950
-        text-white border-r border-white/10
-      
+        bg-white
+        text-blue-900 border-r border-white/10
+        shadow-[0_25px_30px_rgba(0,0,0,0.18)]
         flex flex-col transition-all duration-300
         backdrop-blur-xl
         ${isOpen ? "translate-x-0" : "-translate-x-full"}
@@ -130,22 +130,24 @@ const Sidebar = ({ isOpen, onClose, collapsed, onToggleCollapse }) => {
         {/* ========== LOGO ========== */}
         <div className="flex items-center gap-3 px-4 py-5 border-b border-white/10">
           <div className="w-11 h-11 rounded-2xl 
-            bg-gradient-to-br from-red-600 via-red-500 to-orange-400
-            flex items-center justify-center
-            shadow-lg shadow-red-500/40
-            shrink-0">
+  bg-gradient-to-br from-black to-gray-800
+  flex items-center justify-center
+  shadow-lg shadow-blue-500/30
+  shrink-0 border border-white/10"
+          >
             <img
-              src="/images/logomain.png"
+              src="/logo_no_bg.png"
               alt="Logo"
-              className="w-9 h-9 object-contain drop-shadow-md"
+              className="w-8 h-8 object-contain drop-shadow-[0_0_6px_rgba(59,130,246,0.6)]"
             />
           </div>
 
 
+
           {!collapsed && (
             <div className="overflow-hidden">
-              <h1 className="text-lg font-semibold text-white">Services Booking</h1>
-              <p className="text-xs text-white truncate">
+              <h1 className="text-lg font-semibold text-black">Services Booking</h1>
+              <p className="text-xs text-black truncate">
                 Welcome {userProfile?.displayName?.split(" ")[0] || "Admin"}
               </p>
             </div>
@@ -176,7 +178,7 @@ const Sidebar = ({ isOpen, onClose, collapsed, onToggleCollapse }) => {
                     className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl
                     ${parentActive
                         ? "bg-gray-900 text-white"
-                        : "text-white/80 hover:bg-white/20"
+                        : "text-black/80 hover:bg-white/20"
                       }`}
                   >
                     <Icon className="w-5 h-5 shrink-0" />
@@ -209,7 +211,7 @@ const Sidebar = ({ isOpen, onClose, collapsed, onToggleCollapse }) => {
                           className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm
                           ${isActive
                               ? "bg-gray-900 text-white"
-                              : "text-white hover:bg-white/20"
+                              : "text-black hover:bg-white/20"
                             }`}
                         >
                           <SubIcon className="w-4 h-4 shrink-0" />
@@ -234,7 +236,7 @@ const Sidebar = ({ isOpen, onClose, collapsed, onToggleCollapse }) => {
                 className={`flex items-center gap-3 px-4 py-2.5 rounded
                 ${isActive
                     ? "bg-gray-900 text-white"
-                    : "text-white/80 hover:bg-white/20"
+                    : "text-black/80 hover:bg-white/20"
                   }`}
               >
                 <Icon className="w-5 h-5 shrink-0" />
@@ -249,10 +251,10 @@ const Sidebar = ({ isOpen, onClose, collapsed, onToggleCollapse }) => {
           onClick={onToggleCollapse}
           className="hidden lg:flex absolute -right-4 top-1/2 -translate-y-1/2
           w-9 h-9 rounded-full
-          bg-gradient-to-br from-blue-500 to-red-600
+          bg-gradient-to-br from-black to-sky-500
           shadow-xl shadow-orange-500/40
           items-center justify-center
-          text-white hover:scale-110 transition-all"
+          text-black hover:scale-110 transition-all"
         >
           <ChevronLeft
             className={`w-4 h-4 transition-transform ${collapsed ? "rotate-180" : ""

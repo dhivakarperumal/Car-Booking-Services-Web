@@ -9,6 +9,8 @@ import {
 } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import { FaTable, FaThLarge } from "react-icons/fa";
+import { FaEdit, FaTrash } from "react-icons/fa";
 
 const ITEMS_PER_PAGE = 6;
 
@@ -88,32 +90,35 @@ const AllProducts = () => {
   if (loading) return <div className="p-6">Loading products...</div>;
 
   return (
-    <div className="p-6">
+    <div className="p-6   min-h-screen">
       {/* HEADER */}
-      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
-        <h1 className="text-2xl font-bold">All Products</h1>
-
-        <div className="flex flex-wrap gap-3">
-          {/* SEARCH */}
+      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-8">
+        <div className="w-full max-w-md">
           <input
             type="text"
-            placeholder="Search..."
+            placeholder="Search products..."
             value={search}
             onChange={(e) => {
               setSearch(e.target.value);
               setPage(1);
             }}
-            className="border px-3 py-2 rounded-lg text-sm"
+            className="w-full border border-gray-300 bg-white px-4 py-3 rounded-md text-sm shadow-sm
+               focus:ring-2 focus:ring-black outline-none transition"
           />
+        </div>
 
-          {/* FILTER */}
+
+        <div className="flex flex-wrap items-center gap-3">
+
           <select
             value={filter}
             onChange={(e) => {
               setFilter(e.target.value);
               setPage(1);
             }}
-            className="border px-3 py-2 rounded-lg text-sm"
+            className="h-[42px] w-full sm:w-auto flex-1 min-w-[140px]
+             border border-gray-300 bg-white px-4 rounded-md text-sm shadow-sm
+             focus:ring-2 focus:ring-black outline-none transition"
           >
             <option value="all">All</option>
             <option value="active">Active</option>
@@ -121,69 +126,105 @@ const AllProducts = () => {
             <option value="featured">Featured</option>
           </select>
 
-          {/* VIEW TOGGLE */}
-          <button
-            onClick={() => setView(view === "table" ? "card" : "table")}
-            className="bg-gray-200 px-4 py-2 rounded-lg text-sm"
-          >
-            {view === "table" ? "Card View" : "Table View"}
-          </button>
+
+          <div className="flex w-full sm:w-auto gap-2">
+
+            {/* TABLE VIEW */}
+            <button
+              onClick={() => setView("table")}
+              className={`h-[42px] flex-1 sm:flex-none flex items-center justify-center gap-2 px-4
+      rounded-md text-sm border shadow-sm transition
+      ${view === "table"
+                  ? "bg-black text-white border-black"
+                  : "bg-white text-gray-700 border-gray-300 hover:bg-gray-100"
+                }`}
+            >
+              <FaTable />
+              Table
+            </button>
+
+            {/* CARD VIEW */}
+            <button
+              onClick={() => setView("card")}
+              className={`h-[42px] flex-1 sm:flex-none flex items-center justify-center gap-2 px-4
+      rounded-md text-sm border shadow-sm transition
+      ${view === "card"
+                  ? "bg-black text-white border-black"
+                  : "bg-white text-gray-700 border-gray-300 hover:bg-gray-100"
+                }`}
+            >
+              <FaThLarge />
+              Card
+            </button>
+
+          </div>
+
 
           {/* ADD BUTTON */}
           <button
             onClick={() => navigate("/admin/addproducts")}
-            className="bg-black text-white px-5 py-2 rounded-lg"
+            className="h-[42px] w-full sm:w-auto bg-black text-white px-5 rounded-md font-bold shadow
+             hover:bg-gray-900 transition"
           >
             + Add Product
           </button>
+
+
         </div>
       </div>
 
       {/* EMPTY */}
       {paginatedProducts.length === 0 ? (
-        <div className="bg-white rounded-xl shadow p-6 text-gray-500">
+        <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-10 text-center text-gray-500">
           No products found
         </div>
       ) : view === "table" ? (
         /* ================= TABLE VIEW ================= */
-        <div className="overflow-x-auto bg-white rounded-xl shadow">
-          <table className="w-full text-sm">
-            <thead className="bg-gray-100 text-left">
+        <div className="overflow-x-auto bg-white rounded-2xl shadow-sm border border-gray-200">
+          <table className="w-full text-md">
+            <thead className="bg-black text-white text-left">
               <tr>
-                <th className="p-3">Image</th>
-                <th className="p-3">Name</th>
-                <th className="p-3">Price</th>
-                <th className="p-3">Stock</th>
-                <th className="p-3">Rating</th>
-                <th className="p-3">Status</th>
-                <th className="p-3">Actions</th>
+                <th className="px-4 py-4 text-left font-bold ">S No</th>
+                <th className="px-4 py-4 text-left font-bold ">Image</th>
+                <th className="px-4 py-4 text-left font-bold ">Name</th>
+                <th className="px-4 py-4 text-left font-bold ">Price</th>
+                <th className="px-4 py-4 text-left font-bold ">Stock</th>
+                <th className="px-4 py-4 text-left font-bold ">Rating</th>
+                <th className="px-4 py-4 text-left font-bold ">Status</th>
+                <th className="px-4 py-4 text-left font-bold ">Actions</th>
               </tr>
             </thead>
 
             <tbody>
-              {paginatedProducts.map((p) => (
-                <tr key={p.docId} className="border-t">
-                  <td className="p-3">
+              {paginatedProducts.map((p, index) => (
+                <tr
+                  key={p.docId}
+                  className="border-t border-gray-300 hover:bg-gray-50 transition"
+                >
+                  <td className="p-4">{(page - 1) * ITEMS_PER_PAGE + index + 1}</td>
+                  <td className="p-4">
                     {p.thumbnail ? (
                       <img
                         src={p.thumbnail}
-                        className="w-12 h-12 rounded object-cover"
+                        className="w-12 h-12 rounded-lg object-cover border"
                       />
                     ) : (
-                      "No Image"
+                      <div className="w-12 h-12 rounded-lg bg-gray-200 flex items-center justify-center text-xs text-gray-500">
+                        No Img
+                      </div>
                     )}
                   </td>
 
-                  <td className="p-3 font-medium">
+                  <td className="p-4 font-medium text-gray-900">
                     {p.name}
                     {p.isFeatured && (
-                      <span className="ml-2 text-xs bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded">
+                      <span className="ml-2 text-xs bg-black text-white px-2 py-0.5 rounded-full">
                         Featured
                       </span>
                     )}
                   </td>
 
-                  <td className="p-3">
+                  <td className="px-4 py-4 text-left  text-gray-900">
                     ₹ {p.offerPrice || p.mrp}
                     {p.offerPrice && (
                       <div className="text-xs text-gray-400 line-through">
@@ -192,40 +233,47 @@ const AllProducts = () => {
                     )}
                   </td>
 
-                  <td className="p-3">{p.totalStock || 0}</td>
+                  <td className="p-4">{p.totalStock || 0}</td>
 
-                  <td className="p-3">
-                    ⭐ {p.rating || 0}
-                  </td>
+                  <td className="p-4">⭐ {p.rating || 0}</td>
 
-                  <td className="p-3">
+                  <td className="p-4">
                     <button
                       onClick={() => toggleStatus(p)}
-                      className={`px-3 py-1 rounded text-xs ${
-                        p.isActive
-                          ? "bg-green-100 text-green-700"
-                          : "bg-red-100 text-red-600"
-                      }`}
+                      className={`px-3 py-1 rounded-full text-xs font-medium transition ${p.isActive
+                        ? "bg-black text-white hover:bg-gray-800"
+                        : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                        }`}
                     >
                       {p.isActive ? "Active" : "Inactive"}
                     </button>
                   </td>
 
-                  <td className="p-3 flex gap-2">
-                    <button
-                      onClick={() => handleEdit(p)}
-                      className="bg-blue-500 text-white px-3 py-1 rounded text-xs"
-                    >
-                      Edit
-                    </button>
+                  <td className="p-4">
+  <div className="flex items-center gap-2">
 
-                    <button
-                      onClick={() => handleDelete(p.docId)}
-                      className="bg-red-500 text-white px-3 py-1 rounded text-xs"
-                    >
-                      Delete
-                    </button>
-                  </td>
+    {/* EDIT */}
+    <button
+      onClick={() => handleEdit(p)}
+      className="flex items-center gap-1 border border-gray-300 px-3 py-1.5 rounded-lg text-xs
+                 hover:bg-gray-100 transition"
+    >
+      <FaEdit className="text-gray-600" />
+      Edit
+    </button>
+
+    {/* DELETE */}
+    <button
+      onClick={() => handleDelete(p.docId)}
+      className="flex items-center gap-1 bg-black text-white px-3 py-1.5 rounded-lg text-xs
+                 hover:bg-gray-900 transition"
+    >
+      <FaTrash />
+      Delete
+    </button>
+
+  </div>
+</td>
                 </tr>
               ))}
             </tbody>
@@ -237,38 +285,47 @@ const AllProducts = () => {
           {paginatedProducts.map((p) => (
             <div
               key={p.docId}
-              className="bg-white rounded-xl shadow p-4 flex flex-col"
+              className="bg-white border border-gray-200 rounded-2xl shadow-sm hover:shadow-md transition p-4 flex flex-col"
             >
-              <img
-                src={p.thumbnail || ""}
-                className="w-full h-40 object-cover rounded mb-3"
-              />
+              <div className="relative">
+                <img
+                  src={p.thumbnail || ""}
+                  className="w-full h-44 object-cover rounded-xl mb-3"
+                />
+                {p.isFeatured && (
+                  <span className="absolute top-2 left-2 bg-black text-white text-xs px-2 py-0.5 rounded-full">
+                    Featured
+                  </span>
+                )}
+              </div>
 
-              <h3 className="font-semibold text-lg">{p.name}</h3>
+              <h3 className="font-semibold text-lg text-gray-900">
+                {p.name}
+              </h3>
 
               <div className="text-sm text-gray-500 mb-2">
                 ⭐ {p.rating || 0}
               </div>
 
-              <div className="text-green-600 font-bold">
+              <div className="text-black font-bold text-lg">
                 ₹ {p.offerPrice || p.mrp}
               </div>
 
-              <div className="text-xs text-gray-400 mb-2">
+              <div className="text-xs text-gray-400 mb-3">
                 Stock: {p.totalStock || 0}
               </div>
 
-              <div className="flex justify-between mt-auto">
+              <div className="flex justify-between mt-auto gap-2">
                 <button
                   onClick={() => handleEdit(p)}
-                  className="bg-blue-500 text-white px-3 py-1 rounded text-xs"
+                  className="flex-1 border border-gray-300 py-1 rounded-lg text-xs hover:bg-gray-100 transition"
                 >
                   Edit
                 </button>
 
                 <button
                   onClick={() => handleDelete(p.docId)}
-                  className="bg-red-500 text-white px-3 py-1 rounded text-xs"
+                  className="flex-1 bg-black text-white py-1 rounded-lg text-xs hover:bg-gray-900 transition"
                 >
                   Delete
                 </button>
@@ -280,16 +337,15 @@ const AllProducts = () => {
 
       {/* ================= PAGINATION ================= */}
       {totalPages > 1 && (
-        <div className="flex justify-center mt-6 gap-2 flex-wrap">
+        <div className="flex justify-center mt-8 gap-2 flex-wrap">
           {Array.from({ length: totalPages }, (_, i) => i + 1).map((num) => (
             <button
               key={num}
               onClick={() => setPage(num)}
-              className={`px-3 py-1 rounded ${
-                page === num
-                  ? "bg-black text-white"
-                  : "bg-gray-200"
-              }`}
+              className={`px-4 py-2 rounded-xl text-sm transition ${page === num
+                ? "bg-black text-white shadow"
+                : "bg-white border border-gray-300 hover:bg-gray-100"
+                }`}
             >
               {num}
             </button>
@@ -297,6 +353,7 @@ const AllProducts = () => {
         </div>
       )}
     </div>
+
   );
 };
 

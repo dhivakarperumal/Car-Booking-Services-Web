@@ -596,6 +596,14 @@ const Dashboard = () => {
           gradient="bg-gradient-to-r from-green-500 to-emerald-400"
         />
 
+        <GradientStatCard
+          title="TOTAL SERVICES"
+          value={topStats.totalServices}
+          change="+"
+          isUp={true}
+          gradient="bg-gradient-to-r from-pink-500 to-rose-400"
+        />
+
       </div>
       <div >
 

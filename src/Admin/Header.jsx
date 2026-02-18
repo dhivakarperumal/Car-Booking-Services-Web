@@ -75,7 +75,7 @@ const handleLogout = async () => {
 
 
   return (
-    <header className="sticky top-0 z-30 bg-white border-b border-slate-200">
+    <header className="sticky top-0 z-30 shadow-[0_10px_10px_rgba(0,0,0,0.18)] bg-white">
       <div className="flex items-center justify-between px-4 py-3 sm:px-6">
 
         {/* Left */}

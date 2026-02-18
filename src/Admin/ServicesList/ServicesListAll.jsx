@@ -16,6 +16,8 @@ import {
   List,
   Plus,
   Search,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
@@ -26,6 +28,9 @@ const ServicesListAll = () => {
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [loading, setLoading] = useState(true);
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 8;
+
   const navigate = useNavigate();
 
   /* ================= FETCH DATA ================= */
@@ -35,7 +40,6 @@ const ServicesListAll = () => {
     try {
       q = query(collection(db, "services"), orderBy("createdAt", "desc"));
     } catch {
-      // fallback if createdAt missing
       q = query(collection(db, "services"));
     }
 
@@ -58,6 +62,11 @@ const ServicesListAll = () => {
 
     return () => unsub();
   }, []);
+
+  /* ================= RESET PAGE ON FILTER ================= */
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [search, categoryFilter]);
 
   /* ================= DELETE ================= */
   const handleDelete = async (id) => {
@@ -99,6 +108,14 @@ const ServicesListAll = () => {
     });
   }, [services, search, categoryFilter]);
 
+  /* ================= PAGINATION LOGIC ================= */
+  const totalPages = Math.ceil(filteredServices.length / itemsPerPage);
+
+  const paginatedServices = useMemo(() => {
+    const start = (currentPage - 1) * itemsPerPage;
+    return filteredServices.slice(start, start + itemsPerPage);
+  }, [filteredServices, currentPage]);
+
   /* ================= LOADING ================= */
   if (loading) {
     return (
@@ -110,167 +127,247 @@ const ServicesListAll = () => {
 
   return (
     <div className="p-6 max-w-7xl mx-auto pb-5">
-      <div className="bg-gradient-to-br from-white to-gray-50 p-8 rounded-2xl shadow-xl border border-gray-100">
 
-        {/* HEADER */}
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-          <h2 className="text-xl font-bold">Car Service List</h2>
+      {/* ================= HEADER ================= */}
+      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
 
-          <div className="flex flex-wrap items-center gap-2 justify-end">
+        {/* SEARCH */}
+        <div className="relative w-full lg:w-94">
+          <Search
+            size={16}
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+          />
 
-            {/* SEARCH */}
-            <div className="relative">
-              <Search size={16} className="absolute left-2 top-2.5 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Search service..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="pl-8 pr-3 py-2 border rounded-lg text-sm w-44 sm:w-56"
-              />
-            </div>
-
-          
-
-            {/* VIEW TOGGLE */}
-            <button
-              onClick={() => setView("card")}
-              className={`p-2 rounded-lg border ${
-                view === "card" ? "bg-black text-white" : "bg-white"
-              }`}
-            >
-              <LayoutGrid size={18} />
-            </button>
-
-            <button
-              onClick={() => setView("table")}
-              className={`p-2 rounded-lg border ${
-                view === "table" ? "bg-black text-white" : "bg-white"
-              }`}
-            >
-              <List size={18} />
-            </button>
-
-            {/* ADD BUTTON */}
-            <button
-              onClick={() => navigate("/admin/addservices")}
-              className="flex items-center gap-2 bg-black text-white px-4 py-2 rounded-lg text-sm"
-            >
-              <Plus size={16} />
-              <span className="hidden sm:inline">Add</span>
-            </button>
-          </div>
+          <input
+            type="text"
+            placeholder="Search service..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="h-[42px] w-full pl-9 pr-3 py-3 border border-gray-300 bg-white
+               rounded-md text-sm shadow-sm
+               focus:ring-2 focus:ring-black outline-none transition"
+          />
         </div>
 
-        {/* ================= CARD VIEW ================= */}
-        {view === "card" && (
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mt-10">
-            {filteredServices.map((srv) => (
-              <div
-                key={srv.docId}
-                className="border border-gray-300 rounded-xl p-4 shadow-sm hover:shadow-md transition bg-white"
-              >
-                {srv.image && (
-                  <img
-                    src={srv.image}
-                    alt={srv.name}
-                    className="w-full h-32 object-cover rounded-lg mb-3"
-                  />
-                )}
 
-                <h3 className="font-semibold text-sm">{srv.name}</h3>
-                
+        {/* CONTROLS */}
+        <div className="flex flex-wrap items-center gap-2 justify-end">
 
-                <p className="text-sm font-medium mt-1">
-                  ₹{Number(srv.price || 0).toLocaleString()}
-                </p>
 
-                <div className="flex justify-end gap-3 mt-3">
-                  <button
-                    onClick={() =>
-                      navigate(`/admin/addservices/${srv.docId}`)
-                    }
-                    className="border border-gray-300 p-2 rounded-full text-blue-600 hover:scale-110 transition"
-                  >
-                    <Pencil size={16} />
-                  </button>
 
-                  <button
-                    onClick={() => handleDelete(srv.docId)}
-                    className="border border-gray-300 p-2 rounded-full text-red-500 hover:scale-110 transition"
-                  >
-                    <Trash2 size={16} />
-                  </button>
-                </div>
-              </div>
-            ))}
+          {/* VIEW TOGGLE */}
+          <button
+            onClick={() => setView("card")}
+            className={`h-[42px] flex-1 sm:flex-none flex items-center justify-center gap-2 px-4
+      rounded-md text-sm border shadow-sm transition
+      ${view === "card"
+                ? "bg-black text-white border-black"
+                : "bg-white text-gray-700 border-gray-300 hover:bg-gray-100"
+              }`}
+          >
+            <LayoutGrid size={18} /> Card
+          </button>
 
-            {filteredServices.length === 0 && (
-              <p className="text-gray-500 col-span-full text-center py-10">
-                No services found
-              </p>
-            )}
-          </div>
-        )}
+          <button
+            onClick={() => setView("table")}
+            className={`h-[42px] flex-1 sm:flex-none flex items-center justify-center gap-2 px-4
+      rounded-md text-sm border shadow-sm transition
+      ${view === "table"
+                ? "bg-black text-white border-black"
+                : "bg-white text-gray-700 border-gray-300 hover:bg-gray-100"
+              }`}
+          >
+            <List size={18} /> Table
+          </button>
 
-        {/* ================= TABLE VIEW ================= */}
-        {view === "table" && (
-          <div className="overflow-x-auto border border-gray-300 rounded-xl mt-10">
-            <table className="min-w-full text-sm">
-              <thead className="bg-gray-100 text-left">
-                <tr>
-                  <th className="p-3">S No</th>
-                  <th className="p-3">Name</th>
-                  
-                  <th className="p-3">Price</th>
-                  <th className="p-3 text-right">Actions</th>
-                </tr>
-              </thead>
+          {/* ADD BUTTON */}
+          <button
+            onClick={() => navigate("/admin/addservices")}
+            className="h-[42px] w-full sm:w-auto flex items-center justify-center gap-2
+             bg-black text-white px-4 rounded-md font-semibold shadow
+             hover:bg-gray-900 transition"
+          >
+            <Plus size={16} />
+            <span className="hidden sm:inline">Add Service</span>
+          </button>
 
-              <tbody>
-                {filteredServices.map((srv,i) => (
-                  <tr key={srv.docId} className="border-t border-gray-300 hover:bg-gray-50">
-                    <td className="p-3 font-medium">{i+1}</td>
-                    <td className="p-3 font-medium">{srv.name}</td>
-                    
-                    <td className="p-3">
-                      ₹{Number(srv.price || 0).toLocaleString()}
-                    </td>
-
-                    <td className="p-3">
-                      <div className="flex justify-end gap-3">
-                        <button
-                          onClick={() =>
-                            navigate(`/admin/addservices/${srv.docId}`)
-                          }
-                          className="text-blue-600 hover:scale-110 transition"
-                        >
-                          <Pencil size={16} />
-                        </button>
-
-                        <button
-                          onClick={() => handleDelete(srv.docId)}
-                          className="text-red-500 hover:scale-110 transition"
-                        >
-                          <Trash2 size={16} />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-
-                {filteredServices.length === 0 && (
-                  <tr>
-                    <td colSpan="4" className="text-center p-6 text-gray-500">
-                      No services found
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-        )}
+        </div>
       </div>
+
+      {/* ================= CARD VIEW ================= */}
+      {view === "card" && (
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mt-10">
+          {paginatedServices.map((srv) => (
+            <div
+              key={srv.docId}
+              className="border border-gray-300 rounded-xl p-4 shadow-sm hover:shadow-md transition bg-white"
+            >
+              {srv.image && (
+                <img
+                  src={srv.image}
+                  alt={srv.name}
+                  className="w-full h-32 object-cover rounded-lg mb-3"
+                />
+              )}
+
+              <h3 className="font-semibold text-sm">{srv.name}</h3>
+
+              {srv.category && (
+                <span className="inline-block mt-1 text-xs bg-gray-100 px-2 py-1 rounded">
+                  {srv.category}
+                </span>
+              )}
+
+              <p className="text-sm font-medium mt-2">
+                ₹{Number(srv.price || 0).toLocaleString()}
+              </p>
+
+              <div className="flex justify-end gap-3 mt-3">
+                <button
+                  onClick={() =>
+                    navigate(`/admin/addservices/${srv.docId}`)
+                  }
+                  className="border border-gray-300 p-2 rounded-full text-blue-600 hover:scale-110 transition"
+                >
+                  <Pencil size={16} />
+                </button>
+
+                <button
+                  onClick={() => handleDelete(srv.docId)}
+                  className="border border-gray-300 p-2 rounded-full text-red-500 hover:scale-110 transition"
+                >
+                  <Trash2 size={16} />
+                </button>
+              </div>
+            </div>
+          ))}
+
+          {paginatedServices.length === 0 && (
+            <p className="text-gray-500 col-span-full text-center py-10">
+              No services found
+            </p>
+          )}
+        </div>
+      )}
+
+      {/* ================= TABLE VIEW ================= */}
+      {view === "table" && (
+        <div className="overflow-x-auto bg-white rounded-2xl shadow-sm border border-gray-200 mt-10">
+          <table className="w-full text-md">
+            <thead className="bg-black text-white text-left">
+              <tr>
+                <th className="px-4 py-4 font-bold">S No</th>
+                <th className="px-4 py-4 font-bold">Image</th>
+                <th className="px-4 py-4 font-bold">Name</th>
+
+                <th className="px-4 py-4 font-bold">Price</th>
+                <th className="px-4 py-4 text-right font-bold">Actions</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {paginatedServices.map((srv, i) => (
+                <tr
+                  key={srv.docId}
+                  className="border-t border-gray-300 hover:bg-gray-50"
+                >
+                  <td className="px-4 py-4 font-medium">
+                    {(currentPage - 1) * itemsPerPage + i + 1}
+                  </td>
+                  <td className="px-4 py-4">
+  {srv.image ? (
+    <img
+      src={srv.image}
+      alt={srv.name}
+      className="w-12 h-12 object-cover rounded-md border"
+    />
+  ) : (
+    <span className="text-gray-400 text-xs">No image</span>
+  )}
+</td>
+
+                  <td className="px-4 py-4 font-medium">{srv.name}</td>
+
+
+
+                  <td className="px-4 py-4">
+                    ₹{Number(srv.price || 0).toLocaleString()}
+                  </td>
+
+                  <td className="px-4 py-4">
+                    <div className="flex justify-end gap-3">
+                      <button
+                        onClick={() =>
+                          navigate(`/admin/addservices/${srv.docId}`)
+                        }
+                        className="flex items-center gap-1 border border-gray-300 px-3 py-1.5 rounded-lg text-xs
+                 hover:bg-gray-100 transition"
+                      >
+                        <Pencil size={16} /> Edit
+                      </button>
+
+                      <button
+                        onClick={() => handleDelete(srv.docId)}
+                        className="flex items-center gap-1 border border-gray-300 px-3 py-1.5 rounded-lg text-xs text-red-500 hover:bg-red-50 transition"
+                      >
+                        <Trash2 size={16} /> Delete
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+
+              {paginatedServices.length === 0 && (
+                <tr>
+                  <td colSpan="5" className="text-center p-6 text-gray-500">
+                    No services found
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {/* ================= PAGINATION ================= */}
+      {totalPages > 1 && (
+        <div className="flex justify-center items-center gap-2 mt-6 flex-wrap">
+
+          {/* PREV */}
+          <button
+            onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
+            disabled={currentPage === 1}
+            className="p-2 border rounded-lg disabled:opacity-40"
+          >
+            <ChevronLeft size={16} />
+          </button>
+
+          {/* PAGE NUMBERS */}
+          {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+            <button
+              key={page}
+              onClick={() => setCurrentPage(page)}
+              className={`px-3 py-1 rounded-lg border text-sm ${currentPage === page
+                ? "bg-black text-white"
+                : "bg-white"
+                }`}
+            >
+              {page}
+            </button>
+          ))}
+
+          {/* NEXT */}
+          <button
+            onClick={() =>
+              setCurrentPage((p) => Math.min(p + 1, totalPages))
+            }
+            disabled={currentPage === totalPages}
+            className="p-2 border rounded-lg disabled:opacity-40"
+          >
+            <ChevronRight size={16} />
+          </button>
+        </div>
+      )}
     </div>
   );
 };
