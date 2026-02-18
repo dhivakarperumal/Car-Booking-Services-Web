@@ -3,11 +3,10 @@ import PageContainer from "./PageContainer";
 import PageHeader from "./PageHeader";
 import { useNavigate } from "react-router-dom";
 
-export default function AboutStats() {
+export default function AboutHome() {
   const navigate = useNavigate();
   return (
     <>
-      <PageHeader title="About " />
       <section className="relative py-24 bg-black text-white overflow-hidden">
         {/* Background Image */}
         <div
