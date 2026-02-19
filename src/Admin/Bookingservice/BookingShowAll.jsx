@@ -580,50 +580,58 @@ const ShowAllBookings = () => {
     <div className="p-8 max-w-7xl mx-auto">
       {/* 🔝 TOP BAR */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
-        <input
-          type="text"
-          placeholder="Search booking, name, phone..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="w-full max-w-sm border px-4 py-2 rounded-lg"
-        />
+  
+  {/* LEFT → SEARCH */}
+  <div className="flex-1 min-w-0">
+    <input
+      type="text"
+      placeholder="Search booking, name, phone..."
+      value={search}
+      onChange={(e) => setSearch(e.target.value)}
+      className="w-1/2 border border-gray-300 bg-white px-4 py-2.5 rounded-lg text-sm shadow-sm focus:border-black focus:ring-2 focus:ring-black/20 outline-none"
+    />
+  </div>
 
-        <div className="flex gap-3 flex-wrap">
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="border px-4 py-2 rounded-md"
-          >
-            <option>All</option>
-            {BOOKING_STATUS.map((s) => (
-              <option key={s}>{s}</option>
-            ))}
-          </select>
+  {/* RIGHT → FILTERS + BUTTONS */}
+  <div className="flex items-center gap-3 flex-wrap justify-end">
+    <select
+      value={statusFilter}
+      onChange={(e) => setStatusFilter(e.target.value)}
+      className="h-[42px] min-w-[140px] border border-gray-300 bg-white px-4 rounded-md text-sm shadow-sm focus:ring-2 focus:ring-black outline-none"
+    >
+      <option>All</option>
+      {BOOKING_STATUS.map((s) => (
+        <option key={s}>{s}</option>
+      ))}
+    </select>
 
-          <button
-            onClick={() => setView("card")}
-            className={`px-4 py-2 rounded ${view === "card" ? "bg-black text-white" : "bg-gray-200"
-              }`}
-          >
-            <FaThLarge />
-          </button>
+    <button
+      onClick={() => setView("card")}
+      className={`px-4 py-2 rounded ${
+        view === "card" ? "bg-black text-white" : "bg-gray-200"
+      }`}
+    >
+      <FaThLarge />
+    </button>
 
-          <button
-            onClick={() => setView("table")}
-            className={`px-4 py-2 rounded ${view === "table" ? "bg-black text-white" : "bg-gray-200"
-              }`}
-          >
-            <FaTable />
-          </button>
+    <button
+      onClick={() => setView("table")}
+      className={`px-4 py-2 rounded ${
+        view === "table" ? "bg-black text-white" : "bg-gray-200"
+      }`}
+    >
+      <FaTable />
+    </button>
 
-          <button
-            onClick={() => navigate("/admin/addbooking")}
-            className="bg-black text-white px-5 py-2 rounded-md"
-          >
-            + Add Booking
-          </button>
-        </div>
-      </div>
+    <button
+      onClick={() => navigate("/admin/addbooking")}
+      className="bg-black text-white px-5 py-2 rounded-md"
+    >
+      + Add Booking
+    </button>
+  </div>
+</div>
+
 
       {/* 🟦 CARD VIEW */}
       {view === "card" && (
@@ -677,20 +685,20 @@ const ShowAllBookings = () => {
       {view === "table" && (
         <div className="overflow-x-auto bg-white rounded-2xl shadow-sm">
           <table className="w-full text-sm">
-            <thead className="bg-black text-white">
+            <thead className="bg-gradient-to-r from-black to-cyan-400 text-white">
               <tr>
-                <th className="px-4 py-3">S No</th>
-                <th className="px-4 py-3">Booking ID</th>
-                <th className="px-4 py-3">Customer</th>
-                <th className="px-4 py-3">Car</th>
-                <th className="px-4 py-3">Phone</th>
-                <th className="px-4 py-3">Status</th>
-                <th className="px-4 py-3">Date</th>
+                <th className="px-4 py-4">S No</th>
+                <th className="px-4 py-4">Booking ID</th>
+                <th className="px-4 py-4">Customer</th>
+                <th className="px-4 py-4">Car</th>
+                <th className="px-4 py-4">Phone</th>
+                <th className="px-4 py-4">Status</th>
+                <th className="px-4 py-4">Date</th>
               </tr>
             </thead>
             <tbody>
               {filtered.map((b, i) => (
-                <tr key={b.id} className="border-t">
+                <tr key={b.id} className="border-t border-gray-300">
                   <td className="px-4 py-3">{i + 1}</td>
                   <td className="px-4 py-3">{b.bookingId}</td>
                   <td className="px-4 py-3">{b.name}</td>

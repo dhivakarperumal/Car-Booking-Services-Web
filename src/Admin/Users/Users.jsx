@@ -214,7 +214,6 @@ const Users = () => {
                 <th className="px-4 py-4 text-left font-semibold">Username</th>
                 <th className="px-4 py-4 text-left font-semibold">Role</th>
                 <th className="px-4 py-4 text-left font-semibold">Status</th>
-                <th className="px-4 py-4 text-left font-semibold">Actions</th>
               </tr>
             </thead>
 
@@ -231,18 +230,7 @@ const Users = () => {
                     <td className="px-4 py-4">{u.username || "N/A"}</td>
 
                     <td className="px-4 py-4">
-                      <select
-                        value={u.role || "mechanic"}
-                        onChange={(e) => updateRole(u.id, e.target.value)}
-                        className="border border-gray-300 px-3 py-2 rounded-lg text-sm
-               focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-                      >
-                        <option value="admin">Admin</option>
-                        <option value="manager">Manager</option>
-                        <option value="mechanic">Mechanic</option>
-                        <option value="receptionist">Receptionist</option>
-                        <option value="customer">Customer</option>
-                      </select>
+                      {u.role}
                     </td>
 
                     <td className="px-4 py-4">
@@ -254,25 +242,6 @@ const Users = () => {
                       >
                         {u.active ? "Active" : "Inactive"}
                       </span>
-                    </td>
-
-                    <td className="px-4 py-4 flex gap-2">
-                      <button
-                        onClick={() => toggleStatus(u.id, u.active)}
-                        className={`px-3 py-1 rounded text-xs font-medium text-white transition ${u.active
-                          ? "bg-orange-500 hover:bg-orange-600"
-                          : "bg-green-500 hover:bg-green-600"
-                          }`}
-                      >
-                        {u.active ? "Disable" : "Enable"}
-                      </button>
-                      <button
-                        onClick={() => deleteUser(u.id)}
-                        className="p-3 rounded-full  border border-gray-300  transition"
-                      >
-                        <FaTrash />
-                        
-                      </button>
                     </td>
                   </tr>
                 ))
