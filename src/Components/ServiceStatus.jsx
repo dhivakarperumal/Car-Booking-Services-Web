@@ -95,8 +95,8 @@ const ServiceStatus = () => {
     );
 
   return (
-    <div className="p-6 max-w-5xl mx-auto">
-      <h2 className="text-3xl font-bold mb-8 text-sky-400">
+    <div className="p-1 md:p-6 max-w-5xl mx-auto">
+      <h2 className="text-2xl md:text-3xl font-bold mb-8 text-sky-400">
         My Service Bookings
       </h2>
 
@@ -107,7 +107,7 @@ const ServiceStatus = () => {
             onClick={() => setSelectedBooking(booking)}
             className="cursor-pointer bg-[#020617]
                        border border-sky-500/30
-                       rounded-xl px-6 py-4
+                       rounded-xl px-2 md:px-6 py-4
                        flex justify-between items-center
                        hover:shadow-lg hover:shadow-sky-500/30
                        transition"

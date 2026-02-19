@@ -15,12 +15,10 @@ const Account = () => {
   );
 
   useEffect(() => {
-  if (location.state?.tab) {
-    setActiveTab(location.state.tab);
-  }
-}, [location.state]);
-
-  const defaultTab = location.state?.tab || "profile";
+    if (location.state?.tab) {
+      setActiveTab(location.state.tab);
+    }
+  }, [location.state]);
 
   const titleMap = {
     personal: "Personal Information",
@@ -48,67 +46,71 @@ const Account = () => {
     <>
       <PageHeader title={titleMap[activeTab]} />
 
-      {/* Page scroll */}
-      <div className="min-h-screen bg-black text-white py-6">
-        <PageContainer>
+      <div className="min-h-screen bg-black text-white py-10">
+        <PageContainer className="overflow-visible">
+
+          {/* ===== MOBILE TABS ===== */}
+          <div className="md:hidden flex gap-2 overflow-x-auto pb-3 mb-4 hide-scrollbar">
+            {[
+              ["servicestatus", "Service"],
+              ["personal", "Profile"],
+              ["orders", "Orders"],
+              ["address", "Address"],
+            ].map(([key, label]) => (
+              <button
+                key={key}
+                onClick={() => setActiveTab(key)}
+                className={`px-4 py-2 rounded-full whitespace-nowrap text-sm font-semibold
+                  ${
+                    activeTab === key
+                      ? "bg-sky-500 text-black"
+                      : "bg-slate-800 text-white"
+                  }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 items-start">
 
-            {/* ===== LEFT SIDEBAR (STICKY) ===== */}
-            <div
-              className="
-                sticky top-24
-                h-[calc(100vh-8rem)]
-                bg-slate-900
-                rounded-2xl
-                p-4
-                space-y-3
-                border border-sky-400
-                overflow-y-auto
-              "
-            >
-              <button
-                onClick={() => setActiveTab("servicestatus")}
-                className={`w-full text-left px-4 py-3 rounded-lg font-semibold transition
-                  ${activeTab === "servicestatus"
-                    ? "bg-sky-500 text-black"
-                    : "bg-slate-800 hover:bg-slate-700"}`}
+            {/* ===== DESKTOP SIDEBAR (STICKY WORKING) ===== */}
+            <div className="hidden md:block">
+              <div
+                className="
+                  sticky top-24
+                  bg-slate-900
+                  rounded-2xl
+                  p-4
+                  space-y-3
+                  border border-sky-400
+                "
               >
-                Service Status
-              </button>
-
-              <button
-                onClick={() => setActiveTab("personal")}
-                className={`w-full text-left px-4 py-3 rounded-lg font-semibold transition
-                  ${activeTab === "personal"
-                    ? "bg-sky-500 text-black"
-                    : "bg-slate-800 hover:bg-slate-700"}`}
-              >
-                Personal Info
-              </button>
-
-              <button
-                onClick={() => setActiveTab("orders")}
-                className={`w-full text-left px-4 py-3 rounded-lg font-semibold transition
-                  ${activeTab === "orders"
-                    ? "bg-sky-500 text-black"
-                    : "bg-slate-800 hover:bg-slate-700"}`}
-              >
-                My Orders
-              </button>
-
-              <button
-                onClick={() => setActiveTab("address")}
-                className={`w-full text-left px-4 py-3 rounded-lg font-semibold transition
-                  ${activeTab === "address"
-                    ? "bg-sky-500 text-black"
-                    : "bg-slate-800 hover:bg-slate-700"}`}
-              >
-                Manage Address
-              </button>
+                <SidebarButton
+                  active={activeTab === "servicestatus"}
+                  onClick={() => setActiveTab("servicestatus")}
+                  label="Service Status"
+                />
+                <SidebarButton
+                  active={activeTab === "personal"}
+                  onClick={() => setActiveTab("personal")}
+                  label="Personal Info"
+                />
+                <SidebarButton
+                  active={activeTab === "orders"}
+                  onClick={() => setActiveTab("orders")}
+                  label="My Orders"
+                />
+                <SidebarButton
+                  active={activeTab === "address"}
+                  onClick={() => setActiveTab("address")}
+                  label="Manage Address"
+                />
+              </div>
             </div>
 
-            {/* ===== RIGHT CONTENT (SCROLLS) ===== */}
-            <div className="md:col-span-3 bg-slate-900 rounded-2xl p-6 border border-sky-400">
+            {/* ===== RIGHT CONTENT ===== */}
+            <div className="md:col-span-3 bg-slate-900 rounded-2xl p-4 sm:p-6 border border-sky-400">
               {renderComponent()}
             </div>
 
@@ -120,3 +122,18 @@ const Account = () => {
 };
 
 export default Account;
+
+/* ===== Sidebar Button ===== */
+const SidebarButton = ({ active, onClick, label }) => (
+  <button
+    onClick={onClick}
+    className={`w-full text-left px-4 py-3 rounded-lg font-semibold transition
+      ${
+        active
+          ? "bg-sky-500 text-black"
+          : "bg-slate-800 hover:bg-slate-700"
+      }`}
+  >
+    {label}
+  </button>
+);
