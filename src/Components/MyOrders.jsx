@@ -188,7 +188,7 @@ const OrderModal = ({ order, onClose }) => {
   const currentStepIndex = statusInfo.step;
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center">
+    <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center px-3 sm:px-6">
       <div className="bg-slate-900 w-full max-w-3xl rounded-2xl p-6 relative border border-sky-400 max-h-[85vh] overflow-y-auto hide-scrollbar">
 
         {/* Close */}
@@ -285,57 +285,115 @@ const OrderModal = ({ order, onClose }) => {
         </div>
 
         {/* ===== ORDER TRACKING ===== */}
-        <div className="mb-8">
-          <h4 className="text-white font-semibold mb-4">
-            Order Status
-          </h4>
+<div className="mb-8">
+  <h4 className="text-white font-semibold mb-4">
+    Order Status
+  </h4>
 
-          {/* CANCELLED */}
-          {order.status === "cancelled" ? (
-            <div className="bg-red-900/30 border border-red-500 text-red-400 rounded-xl p-4 font-semibold">
-              ❌ This order has been cancelled
-            </div>
-          ) : (
-            <div className="flex items-center justify-between">
-              {STATUS_STEPS.map((step, index) => (
-                <div key={step} className="flex-1 flex flex-col items-center">
-                  {/* Circle */}
-                  <div
-                    className={`
-              w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold
-              ${index <= currentStepIndex
-                        ? "bg-sky-500 text-black"
-                        : "bg-slate-700 text-slate-400"
-                      }
-            `}
-                  >
-                    {index + 1}
-                  </div>
+  {/* CANCELLED */}
+  {order.status === "cancelled" ? (
+    <div className="bg-red-900/30 border border-red-500 text-red-400 rounded-xl p-4 font-semibold">
+      ❌ This order has been cancelled
+    </div>
+  ) : (
+    <>
+      {/* ===== DESKTOP (HORIZONTAL) ===== */}
+<div className="hidden md:block">
+  {/* Steps */}
+  <div className="flex justify-between items-start">
+    {STATUS_STEPS.map((step, index) => (
+      <div
+        key={step}
+        className="flex flex-col items-center flex-1"
+      >
+        {/* Circle */}
+        <div
+          className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold
+            ${
+              index <= currentStepIndex
+                ? "bg-sky-500 text-black"
+                : "bg-slate-700 text-slate-400"
+            }`}
+        >
+          {index + 1}
+        </div>
 
-                  {/* Label */}
-                  <p
-                    className={`text-xs mt-2 text-center ${index <= currentStepIndex
-                      ? "text-sky-400"
-                      : "text-slate-500"
-                      }`}
-                  >
-                    {step}
-                  </p>
+        {/* Label */}
+        <p
+          className={`text-xs mt-2 text-center
+            ${
+              index <= currentStepIndex
+                ? "text-sky-400"
+                : "text-slate-500"
+            }`}
+        >
+          {step}
+        </p>
+      </div>
+    ))}
+  </div>
 
-                  {/* Line */}
-                  {index !== STATUS_STEPS.length - 1 && (
-                    <div
-                      className={`h-1 w-full mt-2 ${index < currentStepIndex
+  {/* Progress Line (BELOW TEXT) */}
+  <div className="relative mt-6">
+    {/* Base line */}
+    <div className="h-1 bg-slate-700 rounded-full w-full" />
+
+    {/* Active progress */}
+    <div
+      className="h-1 bg-sky-500 rounded-full absolute top-0 left-0 transition-all"
+      style={{
+        width: `${(currentStepIndex / (STATUS_STEPS.length - 1)) * 100}%`,
+      }}
+    />
+  </div>
+</div>
+
+      {/* ===== MOBILE (VERTICAL) ===== */}
+      <div className="md:hidden  space-y-4">
+        {STATUS_STEPS.map((step, index) => (
+          <div key={step} className="flex items-start gap-4">
+            {/* Indicator */}
+            <div className="flex flex-col items-center">
+              <div
+                className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold
+                  ${
+                    index <= currentStepIndex
+                      ? "bg-sky-500 text-black"
+                      : "bg-slate-700 text-slate-400"
+                  }`}
+              >
+                {index + 1}
+              </div>
+
+              {index !== STATUS_STEPS.length - 1 && (
+                <div
+                  className={`w-1 h-8 mt-1
+                    ${
+                      index < currentStepIndex
                         ? "bg-sky-500"
                         : "bg-slate-700"
-                        }`}
-                    />
-                  )}
-                </div>
-              ))}
+                    }`}
+                />
+              )}
             </div>
-          )}
-        </div>
+
+            {/* Label */}
+            <p
+              className={`text-sm mt-1
+                ${
+                  index <= currentStepIndex
+                    ? "text-sky-400 font-medium"
+                    : "text-slate-400"
+                }`}
+            >
+              {step}
+            </p>
+          </div>
+        ))}
+      </div>
+    </>
+  )}
+</div>
       </div>
     </div>
   );
