@@ -25,21 +25,21 @@ const Navbar = () => {
   const [showRegister, setShowRegister] = useState(false);
   const [cartCount, setCartCount] = useState(0);
 
- const handleLogout = async () => {
-  try {
-    await signOut(auth);
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
 
-    setUserData(null);
-    setShowMenu(false);
-    setCartCount(0);
+      setUserData(null);
+      setShowMenu(false);
+      setCartCount(0);
 
-    navigate("/", { replace: true });
+      navigate("/", { replace: true });
 
-    setShowLogin(true);
-  } catch (error) {
-    console.error("Logout error:", error);
-  }
-};
+      setShowLogin(true);
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
+  };
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
@@ -148,20 +148,18 @@ const Navbar = () => {
                   onClick={() => navigate(item.path)}
                   className={`relative cursor-pointer text-[14px] font-bold tracking-[0.1em]
     transition-all duration-300
-    ${
-      location.pathname === item.path
-        ? "text-sky-400 drop-shadow-[0_0_10px_rgba(56,189,248,0.8)]"
-        : "text-gray-300 hover:text-sky-400 hover:drop-shadow-[0_0_8px_rgba(56,189,248,0.6)]"
-    }
+    ${location.pathname === item.path
+                      ? "text-sky-400 drop-shadow-[0_0_10px_rgba(56,189,248,0.8)]"
+                      : "text-gray-300 hover:text-sky-400 hover:drop-shadow-[0_0_8px_rgba(56,189,248,0.6)]"
+                    }
     after:absolute after:left-1/2 after:-bottom-2
     after:h-[2px] after:-translate-x-1/2
     after:bg-gradient-to-r after:from-sky-400 after:to-cyan-300
     after:transition-all after:duration-300
-    ${
-      location.pathname === item.path
-        ? "after:w-full"
-        : "after:w-0 hover:after:w-full"
-    }
+    ${location.pathname === item.path
+                      ? "after:w-full"
+                      : "after:w-0 hover:after:w-full"
+                    }
   `}
                 >
                   {item.label}
@@ -173,7 +171,7 @@ const Navbar = () => {
             <div className="flex items-center gap-4">
               {/* RIGHT SIDE (DESKTOP + MOBILE) */}
               <div className="flex items-center gap-4">
-               
+
 
                 {/* CART ICON */}
                 <button
@@ -248,19 +246,19 @@ const Navbar = () => {
                           </button>
 
                           {/* ADMIN PANEL (ONLY FOR ADMIN) */}
-{userData?.role === "admin" && (
-  <button
-    onClick={() => {
-      navigate("/admin");
-      setShowMenu(false);
-    }}
-    className="w-full cursor-pointer px-4 py-3 text-left
+                          {userData?.role === "admin" && (
+                            <button
+                              onClick={() => {
+                                navigate("/admin");
+                                setShowMenu(false);
+                              }}
+                              className="w-full cursor-pointer px-4 py-3 text-left
                text-white hover:text-yellow-300
                hover:bg-yellow-400/10 transition font-semibold"
-  >
-    Admin Panel
-  </button>
-)}
+                            >
+                              Admin Panel
+                            </button>
+                          )}
 
                           {/* LOGOUT */}
                           <button
@@ -282,7 +280,7 @@ const Navbar = () => {
                     </button>
                   ))}
 
-                   {/* BOOK NOW (DESKTOP ONLY) */}
+                {/* BOOK NOW (DESKTOP ONLY) */}
                 <button
                   onClick={() => navigate("/bookservice")}
                   className="hidden md:flex relative px-4 py-2 rounded-full
@@ -333,11 +331,10 @@ const Navbar = () => {
                 setIsOpen(false);
               }}
               className={`text-xs font-bold tracking-[0.2em] text-left transition
-    ${
-      location.pathname === item.path
-        ? "text-sky-400 pl-3 border-l-2 border-sky-400"
-        : "text-gray-300 hover:text-sky-400"
-    }
+    ${location.pathname === item.path
+                  ? "text-sky-400 pl-3 border-l-2 border-sky-400"
+                  : "text-gray-300 hover:text-sky-400"
+                }
   `}
             >
               {item.label}
