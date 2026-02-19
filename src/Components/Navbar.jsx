@@ -29,15 +29,12 @@ const Navbar = () => {
   try {
     await signOut(auth);
 
-    // clear local states immediately
     setUserData(null);
     setShowMenu(false);
     setCartCount(0);
 
-    // 🔴 IMPORTANT: force navigation to home
     navigate("/", { replace: true });
 
-    // optional: open login modal
     setShowLogin(true);
   } catch (error) {
     console.error("Logout error:", error);
@@ -149,7 +146,7 @@ const Navbar = () => {
                 <button
                   key={item.label}
                   onClick={() => navigate(item.path)}
-                  className={`relative cursor-pointer text-[14px] font-bold tracking-[0.2em]
+                  className={`relative cursor-pointer text-[14px] font-bold tracking-[0.1em]
     transition-all duration-300
     ${
       location.pathname === item.path
