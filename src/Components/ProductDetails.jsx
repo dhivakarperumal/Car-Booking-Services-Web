@@ -9,7 +9,7 @@ import {
   getDocs,
   query,
   where,
-  serverTimestamp 
+  serverTimestamp,
 } from "firebase/firestore";
 import { auth, db } from "../firebase";
 import { useEffect, useState } from "react";
@@ -18,6 +18,7 @@ export default function ProductDetails() {
   const { slug } = useParams();
   const [product, setProduct] = useState(null);
   const [activeImage, setActiveImage] = useState(0);
+  const [selectedVariantIndex, setSelectedVariantIndex] = useState(0);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -27,54 +28,60 @@ export default function ProductDetails() {
       const snap = await getDocs(q);
 
       if (!snap.empty) {
-        setProduct({ docId: snap.docs[0].id, ...snap.docs[0].data() });
+        const data = {
+          docId: snap.docs[0].id,
+          ...snap.docs[0].data(),
+        };
+
+        setProduct(data);
+        setSelectedVariantIndex(0);
       }
     };
 
     fetchProduct();
   }, [slug]);
 
-const handleAddToCart = async () => {
-  const user = auth.currentUser;
+  const handleAddToCart = async () => {
+    const user = auth.currentUser;
 
-  if (!user) {
-    alert("Please login first");
-    return;
-  }
+    if (!user) {
+      alert("Please login first");
+      return;
+    }
 
-  // ✅ pick first variant (you have only one now)
-  const variant = product.variants?.[0];
+    // ✅ pick first variant (you have only one now)
+    const variant = product.variants?.[selectedVariantIndex];
 
-  if (!variant?.sku) {
-    alert("Product variant not available");
-    return;
-  }
+    if (!variant?.sku) {
+      alert("Product variant not available");
+      return;
+    }
 
-  const cartRef = doc(db, "users", user.uid, "cart", product.docId);
-  const existing = await getDoc(cartRef);
+    const cartRef = doc(db, "users", user.uid, "cart", product.docId);
+    const existing = await getDoc(cartRef);
 
-  if (existing.exists()) {
-    await updateDoc(cartRef, {
-      quantity: existing.data().quantity + 1,
-    });
-  } else {
-    await setDoc(cartRef, {
-      // 🔥 REQUIRED FOR CHECKOUT + STOCK
-      docId: product.docId,      // product document id
-      sku: variant.sku,          // variant sku (OF-BOSCH-001)
+    if (existing.exists()) {
+      await updateDoc(cartRef, {
+        quantity: existing.data().quantity + 1,
+      });
+    } else {
+      await setDoc(cartRef, {
+        // 🔥 REQUIRED FOR CHECKOUT + STOCK
+        docId: product.docId, // product document id
+        sku: variant.sku, // variant sku (OF-BOSCH-001)
 
-      // UI fields
-      name: product.name,
-      price: product.offerPrice,
-      image: product.images?.[0],
-      quantity: 1,
+        // UI fields
+        name: product.name,
+        price: product.offerPrice,
+        image: product.images?.[0],
+        quantity: 1,
 
-      createdAt: serverTimestamp(),
-    });
-  }
+        createdAt: serverTimestamp(),
+      });
+    }
 
-  navigate("/cart");
-};
+    navigate("/cart");
+  };
 
   if (!product)
     return <div className="text-white text-center py-40">Loading...</div>;
@@ -157,31 +164,43 @@ const handleAddToCart = async () => {
             </div>
 
             {/* PRODUCT DETAILS */}
-            {/* PRODUCT DETAILS */}
             <div className="mt-6 grid grid-cols-2 gap-y-3 text-xl">
-              {product.variants?.[0]?.material && (
+              {/* SKU DROPDOWN */}
+              {product.variants?.length > 0 && (
+                <>
+                  <span className="text-gray-400">SKU</span>
+
+                  <select
+                    value={selectedVariantIndex}
+                    onChange={(e) =>
+                      setSelectedVariantIndex(Number(e.target.value))
+                    }
+                    className="bg-[#050b14] border border-sky-400/40 rounded-lg px-3 py-2
+      text-sky-400 outline-none"
+                  >
+                    {product.variants.map((v, i) => (
+                      <option key={i} value={i} className="bg-black">
+                        {v.sku}
+                      </option>
+                    ))}
+                  </select>
+                </>
+              )}
+
+              {product.variants?.[selectedVariantIndex]?.material && (
                 <>
                   <span className="text-gray-400">Material</span>
                   <span className="text-sky-400 font-medium">
-                    {product.variants[0].material}
+                    {product.variants[selectedVariantIndex].material}
                   </span>
                 </>
               )}
 
-              {product.variants?.[0]?.position && (
+              {product.variants?.[selectedVariantIndex]?.position && (
                 <>
                   <span className="text-gray-400">Position</span>
                   <span className="text-sky-400 font-medium">
-                    {product.variants[0].position}
-                  </span>
-                </>
-              )}
-
-              {product.variants?.[0]?.sku && (
-                <>
-                  <span className="text-gray-400">SKU</span>
-                  <span className="text-sky-400 font-medium">
-                    {product.variants[0].sku}
+                    {product.variants[selectedVariantIndex].position}
                   </span>
                 </>
               )}
@@ -204,6 +223,24 @@ const handleAddToCart = async () => {
                     </span>
                   </>
                 )}
+              {product.variants?.[selectedVariantIndex]?.stock !==
+                undefined && (
+                <>
+                  <span className="text-gray-400">Stock</span>
+
+                  <span
+                    className={`font-medium ${
+                      product.variants[selectedVariantIndex].stock > 0
+                        ? "text-green-400"
+                        : "text-red-400"
+                    }`}
+                  >
+                    {product.variants[selectedVariantIndex].stock > 0
+                      ? `${product.variants[selectedVariantIndex].stock} Available`
+                      : "Out of Stock"}
+                  </span>
+                </>
+              )}
             </div>
 
             {/* CTA BUTTONS */}
