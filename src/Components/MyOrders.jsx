@@ -4,18 +4,59 @@ import {
   query,
   orderBy,
   where,
-  getDocs
+  getDocs,
 } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth, db } from "../firebase";
 
+const STATUS_CONFIG = {
+  orderplaced: {
+    label: "Order Placed",
+    step: 0,
+  },
+  processing: {
+    label: "Processing",
+    step: 1,
+  },
+  packing: {
+    label: "Packing",
+    step: 2,
+  },
+  outfordelivery: {
+    label: "Out for Delivery",
+    step: 3,
+  },
+  delivered: {
+    label: "Delivered",
+    step: 4,
+  },
+  cancelled: {
+    label: "Cancelled",
+    step: -1,
+  },
+};
+
+const STATUS_STEPS = [
+  "Order Placed",
+  "Processing",
+  "Packing",
+  "Out for Delivery",
+  "Delivered",
+];
+
 const MyOrders = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
-  useEffect(() => {
-    let unsubscribe;
+  const [selectedOrder, setSelectedOrder] = useState(null);
 
-    const fetchMyOrders = async (user) => {
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        setOrders([]);
+        setLoading(false);
+        return;
+      }
+
       try {
         const q = query(
           collection(db, "orders"),
@@ -24,123 +65,266 @@ const MyOrders = () => {
         );
 
         const snapshot = await getDocs(q);
-
         const ordersData = snapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
         }));
 
-        // ✅ NOW it's safe to use
-        console.log("Orders fetched:", ordersData);
-
         setOrders(ordersData);
-      } catch (error) {
-        console.error("Error fetching orders:", error);
+      } catch (err) {
+        console.error(err);
       } finally {
-        setLoading(false);
-      }
-    };
-
-    unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        fetchMyOrders(user);
-      } else {
-        setOrders([]);
         setLoading(false);
       }
     });
 
     return () => unsubscribe();
   }, []);
+
   if (loading) {
-    return (
-      <p className="text-slate-400">Loading orders...</p>
-    );
+    return <p className="text-slate-400">Loading orders...</p>;
   }
 
   return (
-    <div>
-      <h2 className="text-2xl font-bold mb-6 text-sky-400">
-        My Orders
-      </h2>
+    <>
+      <h2 className="text-2xl font-bold mb-6 text-sky-400">My Orders</h2>
 
       {orders.length === 0 ? (
-        <div className="bg-black border border-slate-700 rounded-xl p-4">
-          <p className="text-slate-400">
-            No orders found.
-          </p>
-        </div>
+        <p className="text-slate-400">No orders found.</p>
       ) : (
         <div className="space-y-4">
-          {orders.map((order) => (
-            <div
-              key={order.id}
-              className="bg-black border border-slate-700 rounded-xl p-4"
-            >
-              {/* Header */}
-              <div className="flex justify-between items-center mb-2">
-                <p className="text-white font-semibold">
-                  Order ID: {order.orderId}
-                </p>
-                <span className="text-xs px-3 py-1 rounded-full bg-sky-900 text-sky-300">
-                  {order.paymentStatus}
-                </span>
-              </div>
+          {orders.map((order) => {
+            const statusKey = order.status || "orderplaced";
+            const statusLabel =
+              STATUS_CONFIG[statusKey]?.label || "Order Placed";
 
-              <p className="text-slate-400 text-sm mb-2">
-                Placed on:{" "}
-                {order.createdAt?.toDate().toLocaleString()}
-              </p>
+            return (
+              <div
+                key={order.id}
+                onClick={() => setSelectedOrder(order)}
+                className="
+          cursor-pointer
+          bg-black
+          border border-slate-700
+          rounded-xl
+          p-4
+          hover:border-sky-400
+          transition
+        "
+              >
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
 
-              {/* Items */}
-              <div className="divide-y divide-slate-700">
-                {order.items.map((item, index) => (
-                  <div
-                    key={index}
-                    className="py-3 flex gap-4 items-center"
-                  >
-                    {item.image && (
-                      <img
-                        src={item.image}
-                        alt={item.name}
-                        className="w-16 h-16 rounded-lg object-cover"
-                      />
-                    )}
+                  {/* ===== LEFT ===== */}
+                  <div>
+                    <p className="text-white font-semibold">
+                      Order ID: {order.orderId}
+                    </p>
 
-                    <div className="flex-1">
-                      <p className="text-white font-medium">
-                        {item.name}
-                      </p>
-                      <p className="text-slate-400 text-sm">
-                        Qty: {item.quantity} × ₹{item.price}
-                      </p>
-                    </div>
-
-                    <p className="text-sky-400 font-semibold">
-                      ₹{item.price * item.quantity}
+                    <p className="text-slate-400 text-sm mt-1">
+                      Placed on:{" "}
+                      {order.createdAt?.toDate().toLocaleString()}
                     </p>
                   </div>
-                ))}
-              </div>
 
-              {/* Footer */}
-              <div className="flex justify-between items-center mt-3 pt-3 border-t border-slate-700">
-                <p className="text-slate-300">
-                  Status:{" "}
-                  <span className="text-sky-400">
-                    {order.status}
-                  </span>
-                </p>
-                <p className="text-white font-bold">
-                  Total: ₹{order.total}
-                </p>
+                  {/* ===== RIGHT (ONE COLUMN) ===== */}
+                  <div className="flex flex-col items-start md:items-end gap-2">
+
+                    {/* STATUS */}
+                    <span
+                      className={`text-xs px-3 py-1 rounded-full font-semibold
+                ${statusKey === "cancelled"
+                          ? "bg-red-900 text-red-400"
+                          : statusKey === "delivered"
+                            ? "bg-green-900 text-green-400"
+                            : statusKey === "outfordelivery"
+                              ? "bg-yellow-900 text-yellow-400"
+                              : "bg-sky-900 text-sky-400"
+                        }
+              `}
+                    >
+                      {statusLabel}
+                    </span>
+
+                    {/* TOTAL */}
+                    <p className="text-sky-400 font-bold whitespace-nowrap">
+                      Total: ₹{order.total}
+                    </p>
+
+                  </div>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
-    </div>
+
+      {/* ===== MODAL ===== */}
+      {selectedOrder && (
+        <OrderModal
+          order={selectedOrder}
+          onClose={() => setSelectedOrder(null)}
+        />
+      )}
+    </>
   );
 };
 
 export default MyOrders;
+
+const OrderModal = ({ order, onClose }) => {
+  const statusInfo = STATUS_CONFIG[order.status] || STATUS_CONFIG.orderplaced;
+  const currentStepIndex = statusInfo.step;
+
+  return (
+    <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center">
+      <div className="bg-slate-900 w-full max-w-3xl rounded-2xl p-6 relative border border-sky-400 max-h-[85vh] overflow-y-auto hide-scrollbar">
+
+        {/* Close */}
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 text-slate-400 hover:text-white"
+        >
+          ✕
+        </button>
+
+        {/* Header */}
+        <h3 className="text-xl font-bold text-sky-400 mb-2">
+          Order ID: {order.orderId}
+        </h3>
+        <p className="text-slate-400 mb-6">
+          Placed on: {order.createdAt?.toDate().toLocaleString()}
+        </p>
+
+        {/* ===== ITEMS ===== */}
+        <div className="space-y-4">
+          {order.items.map((item, i) => (
+            <div
+              key={i}
+              className="flex gap-4 items-center border-b border-slate-700 pb-3"
+            >
+              {item.image && (
+                <img
+                  src={item.image}
+                  alt={item.name}
+                  className="w-16 h-16 rounded-lg object-cover"
+                />
+              )}
+
+              <div className="flex-1">
+                <p className="text-white">{item.name}</p>
+                <p className="text-slate-400 text-sm">
+                  Qty: {item.quantity} × ₹{item.price}
+                </p>
+              </div>
+
+              <p className="text-sky-400 font-semibold">
+                ₹{item.price * item.quantity}
+              </p>
+            </div>
+          ))}
+        </div>
+
+        {/* ===== TOTAL ===== */}
+        <div className="flex justify-between items-center mt-6 pt-4 border-t border-slate-700">
+          <span className="text-slate-300">Total</span>
+          <span className="text-white text-lg font-bold">
+            ₹{order.total}
+          </span>
+        </div>
+
+
+
+        {/* ===== SHIPPING ADDRESS ===== */}
+        <div className="mb-8">
+          <h4 className="text-white font-semibold mb-3">
+            Shipping Details
+          </h4>
+
+          <div className="bg-black border border-slate-700 rounded-xl p-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+              {/* ===== LEFT COLUMN ===== */}
+              <div className="space-y-2">
+                <p className="text-white font-medium">
+                  {order.shipping?.name}
+                </p>
+
+                <p className="text-slate-400 text-sm">
+                  📞 {order.shipping?.phone}
+                </p>
+
+                <p className="text-slate-400 text-sm">
+                  ✉️ {order.shipping?.email}
+                </p>
+              </div>
+
+              {/* ===== RIGHT COLUMN ===== */}
+              <div className="text-slate-300 text-sm leading-relaxed space-y-1">
+                <p>{order.shipping?.address}</p>
+                <p>
+                  {order.shipping?.city}, {order.shipping?.state} –{" "}
+                  {order.shipping?.zip}
+                </p>
+                <p>{order.shipping?.country}</p>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        {/* ===== ORDER TRACKING ===== */}
+        <div className="mb-8">
+          <h4 className="text-white font-semibold mb-4">
+            Order Status
+          </h4>
+
+          {/* CANCELLED */}
+          {order.status === "cancelled" ? (
+            <div className="bg-red-900/30 border border-red-500 text-red-400 rounded-xl p-4 font-semibold">
+              ❌ This order has been cancelled
+            </div>
+          ) : (
+            <div className="flex items-center justify-between">
+              {STATUS_STEPS.map((step, index) => (
+                <div key={step} className="flex-1 flex flex-col items-center">
+                  {/* Circle */}
+                  <div
+                    className={`
+              w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold
+              ${index <= currentStepIndex
+                        ? "bg-sky-500 text-black"
+                        : "bg-slate-700 text-slate-400"
+                      }
+            `}
+                  >
+                    {index + 1}
+                  </div>
+
+                  {/* Label */}
+                  <p
+                    className={`text-xs mt-2 text-center ${index <= currentStepIndex
+                      ? "text-sky-400"
+                      : "text-slate-500"
+                      }`}
+                  >
+                    {step}
+                  </p>
+
+                  {/* Line */}
+                  {index !== STATUS_STEPS.length - 1 && (
+                    <div
+                      className={`h-1 w-full mt-2 ${index < currentStepIndex
+                        ? "bg-sky-500"
+                        : "bg-slate-700"
+                        }`}
+                    />
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
