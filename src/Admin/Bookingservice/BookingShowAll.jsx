@@ -358,7 +358,15 @@ import {
 import { db } from "../../firebase";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
-import { FaThLarge, FaTable, FaCar, FaUser, FaPhone, FaMapMarkerAlt, FaClock } from "react-icons/fa";
+import {
+  FaThLarge,
+  FaTable,
+  FaCar,
+  FaUser,
+  FaPhone,
+  FaMapMarkerAlt,
+  FaClock,
+} from "react-icons/fa";
 
 /* 🔹 STATUS LIST */
 const BOOKING_STATUS = [
@@ -387,7 +395,6 @@ const cardBgColor = (status) => {
       return "bg-white border-gray-300";
   }
 };
-
 
 const ShowAllBookings = () => {
   const navigate = useNavigate();
@@ -431,43 +438,18 @@ const ShowAllBookings = () => {
   });
 
   /* 🎨 STATUS COLOR */
- const statusColor = (status) => {
-  switch (status) {
-    case "Booked":
-      return "bg-green-100 text-blue-700 ring-1 ring-blue-200";
-
-    case "Call Verified":
-      return "bg-cyan-100 text-cyan-700 ring-1 ring-cyan-200";
-
-    case "Approved":
-      return "bg-gradient-to-r from-indigo-500 to-purple-500 text-white shadow-sm";
-
-    case "Processing":
-      return "bg-yellow-100 text-yellow-800 ring-1 ring-yellow-200";
-
-    case "Waiting for Spare":
-      return "bg-orange-100 text-orange-700 ring-1 ring-orange-200";
-
-    case "Service Going on":
-      return "bg-sky-100 text-sky-700 ring-1 ring-sky-200";
-
-    case "Bill Pending":
-      return "bg-amber-100 text-amber-800 ring-1 ring-amber-200";
-
-    case "Bill Completed":
-      return "bg-emerald-100 text-emerald-700 ring-1 ring-emerald-200";
-
-    case "Service Completed":
-      return "bg-green-500 text-white shadow";
-
-    case "Cancelled":
-      return "bg-red-500 text-white shadow";
-
-    default:
-      return "bg-gray-100 text-gray-700";
-  }
-};
-
+  const statusColor = (status) => {
+    switch (status) {
+      case "Approved":
+        return "bg-gradient-to-r from-indigo-500 to-purple-500 text-white";
+      case "Service Completed":
+        return "bg-green-500 text-white";
+      case "Cancelled":
+        return "bg-red-500 text-white";
+      default:
+        return "bg-gray-100 text-gray-700";
+    }
+  };
 
   /* 🔄 STATUS CHANGE HANDLER */
   const handleStatusChange = (booking, newStatus) => {
@@ -506,7 +488,7 @@ const ShowAllBookings = () => {
       }
 
       /* 🚀 MOVE TO allServices WHEN APPROVED */
-      if (newStatus === "Approved") {
+      if (newStatus === "Approved" && !booking.serviceCreated) {
         const q = query(
           collection(db, "allServices"),
           where("bookingDocId", "==", booking.id)
@@ -533,7 +515,6 @@ const ShowAllBookings = () => {
             address: booking.address || "",
 
             trackNumber: extraData.trackNumber || "",
-
             serviceStatus: "Pending",
 
             createdAt:
@@ -599,23 +580,19 @@ const ShowAllBookings = () => {
     <div className="p-8 max-w-7xl mx-auto">
       {/* 🔝 TOP BAR */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
-        {/* 🔎 SEARCH */}
-        <div className="w-full max-w-sm">
-          <input
-            type="text"
-            placeholder="Search booking, name, phone..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-full border border-gray-300 bg-white px-4 py-2.5 rounded-lg text-sm shadow-sm focus:border-black focus:ring-2 focus:ring-black/20 outline-none"
-          />
-        </div>
+        <input
+          type="text"
+          placeholder="Search booking, name, phone..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="w-full max-w-sm border px-4 py-2 rounded-lg"
+        />
 
-        <div className="flex flex-wrap gap-3">
-          {/* 🎯 STATUS FILTER */}
+        <div className="flex gap-3 flex-wrap">
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="h-[42px] min-w-[140px] border border-gray-300 bg-white px-4 rounded-md text-sm shadow-sm focus:ring-2 focus:ring-black outline-none"
+            className="border px-4 py-2 rounded-md"
           >
             <option>All</option>
             {BOOKING_STATUS.map((s) => (
@@ -623,33 +600,25 @@ const ShowAllBookings = () => {
             ))}
           </select>
 
-          {/* 🔄 VIEW TOGGLE */}
-          <div className="flex gap-2">
-            <button
-              onClick={() => setView("card")}
-              className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm transition ${view === "card"
-                  ? "bg-black text-white"
-                  : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                }`}
-            >
-              <FaThLarge /> Card
-            </button>
+          <button
+            onClick={() => setView("card")}
+            className={`px-4 py-2 rounded ${view === "card" ? "bg-black text-white" : "bg-gray-200"
+              }`}
+          >
+            <FaThLarge />
+          </button>
 
-            <button
-              onClick={() => setView("table")}
-              className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm transition ${view === "table"
-                  ? "bg-black text-white"
-                  : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                }`}
-            >
-              <FaTable /> Table
-            </button>
-          </div>
+          <button
+            onClick={() => setView("table")}
+            className={`px-4 py-2 rounded ${view === "table" ? "bg-black text-white" : "bg-gray-200"
+              }`}
+          >
+            <FaTable />
+          </button>
 
-          {/* ➕ ADD BOOKING */}
           <button
             onClick={() => navigate("/admin/addbooking")}
-            className="h-[42px] bg-black text-white px-5 rounded-md font-bold shadow hover:bg-gray-900 transition"
+            className="bg-black text-white px-5 py-2 rounded-md"
           >
             + Add Booking
           </button>
@@ -658,20 +627,16 @@ const ShowAllBookings = () => {
 
       {/* 🟦 CARD VIEW */}
       {view === "card" && (
-        <div className="grid md:grid-cols-2 mt-15 lg:grid-cols-3 gap-6">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filtered.map((b) => (
             <div
               key={b.id}
-              className={`p-5 rounded-2xl border shadow-sm hover:shadow-md transition ${cardBgColor(
-                b.status
-              )}`}
+              className={`p-5 rounded-2xl border ${cardBgColor(b.status)}`}
             >
-
-              <div className="flex justify-between items-start">
-                <h3 className="text-lg font-semibold">{b.bookingId}</h3>
-
+              <div className="flex justify-between">
+                <h3 className="font-semibold">{b.bookingId}</h3>
                 <span
-                  className={`text-xs px-3 py-1 rounded-full font-medium ${statusColor(
+                  className={`text-xs px-3 py-1 rounded-full ${statusColor(
                     b.status
                   )}`}
                 >
@@ -679,39 +644,30 @@ const ShowAllBookings = () => {
                 </span>
               </div>
 
-              <p className="mt-2 flex items-center gap-2 text-sm">
+              <p className="mt-2 text-sm flex gap-2">
                 <FaCar /> {b.brand} • {b.model}
               </p>
-
-              <p className="text-sm flex items-center gap-2 mt-2">
+              <p className="text-sm flex gap-2 mt-2">
                 <FaUser /> {b.name}
               </p>
-
-              <p className="text-sm flex items-center gap-2 mt-2">
+              <p className="text-sm flex gap-2 mt-2">
                 <FaPhone /> {b.phone}
               </p>
-
-              <p className="text-sm flex items-start gap-2 mt-2 line-clamp-2">
-                <FaMapMarkerAlt className="mt-0.5" />
-                {b.location}
+              <p className="text-xs mt-2 flex gap-2 text-gray-500">
+                <FaClock /> {formatDate(b.createdAt)}
               </p>
 
+              {/* 🔥 FIXED SELECT */}
               <select
                 value={b.status}
                 disabled={b.status === "Service Completed"}
-                onChange={(e) => updateStatus(b, e.target.value)}
-                className="mt-4 w-full px-3 py-2 rounded-lg border border-gray-300 text-sm bg-white"
+                onChange={(e) => handleStatusChange(b, e.target.value)}
+                className="mt-4 w-full border px-3 py-2 rounded-lg"
               >
                 {BOOKING_STATUS.map((s) => (
-                  <option key={s} value={s}>
-                    {s}
-                  </option>
+                  <option key={s}>{s}</option>
                 ))}
               </select>
-
-              <p className="text-xs mt-3 flex items-center gap-2 text-gray-500">
-                <FaClock /> {formatDate(b.createdAt)}
-              </p>
             </div>
           ))}
         </div>
@@ -719,49 +675,51 @@ const ShowAllBookings = () => {
 
       {/* 🟨 TABLE VIEW */}
       {view === "table" && (
-        <div className="overflow-x-auto bg-white mt-15 rounded-2xl shadow-sm">
+        <div className="overflow-x-auto bg-white rounded-2xl shadow-sm">
           <table className="w-full text-sm">
-            <thead className="bg-gradient-to-r from-black to-cyan-400 text-white text-left">
+            <thead className="bg-black text-white">
               <tr>
-                <th className="px-4 py-4">S No</th>
-                <th className="px-4 py-4">Booking ID</th>
-                <th className="px-4 py-4">Customer</th>
-                <th className="px-4 py-4">Car</th>
-                <th className="px-4 py-4">Phone</th>
-                <th className="px-4 py-4">Status</th>
-                <th className="px-4 py-4">Date</th>
+                <th className="px-4 py-3">S No</th>
+                <th className="px-4 py-3">Booking ID</th>
+                <th className="px-4 py-3">Customer</th>
+                <th className="px-4 py-3">Car</th>
+                <th className="px-4 py-3">Phone</th>
+                <th className="px-4 py-3">Status</th>
+                <th className="px-4 py-3">Date</th>
               </tr>
             </thead>
             <tbody>
               {filtered.map((b, i) => (
-                <tr key={b.id} className="border-t border-gray-300">
-                  <td className="px-4 py-4">{i + 1}</td>
-                  <td className="px-4 py-4">{b.bookingId}</td>
-                  <td className="px-4 py-4">{b.name}</td>
-                  <td className="px-4 py-4">{b.brand} • {b.model}</td>
-                  <td className="px-4 py-4">{b.phone}</td>
-                  <td className="px-4 py-4">
+                <tr key={b.id} className="border-t">
+                  <td className="px-4 py-3">{i + 1}</td>
+                  <td className="px-4 py-3">{b.bookingId}</td>
+                  <td className="px-4 py-3">{b.name}</td>
+                  <td className="px-4 py-3">
+                    {b.brand} • {b.model}
+                  </td>
+                  <td className="px-4 py-3">{b.phone}</td>
+                  <td className="px-4 py-3">
                     <select
                       value={b.status}
                       disabled={b.status === "Service Completed"}
-                      onChange={(e) => handleStatusChange(b, e.target.value)}
-                      className="px-3 py-1 rounded-lg border text-xs"
+                      onChange={(e) =>
+                        handleStatusChange(b, e.target.value)
+                      }
+                      className="border px-2 py-1 rounded"
                     >
                       {BOOKING_STATUS.map((s) => (
                         <option key={s}>{s}</option>
                       ))}
                     </select>
                   </td>
-                  <td className="px-4 py-4">{formatDate(b.createdAt)}</td>
+                  <td className="px-4 py-3">
+                    {formatDate(b.createdAt)}
+                  </td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
-      )}
-
-      {filtered.length === 0 && (
-        <p className="text-center text-gray-400 mt-10">No bookings found</p>
       )}
 
       {/* 🔴 POPUP MODAL */}
@@ -779,7 +737,10 @@ const ShowAllBookings = () => {
                 />
                 <button
                   onClick={submitApproved}
-                  className="bg-green-600 text-white px-4 py-2 rounded w-full"
+                  className="w-full md:w-auto px-10 py-4 rounded-md font-semibold text-white
+    bg-gradient-to-r from-black to-cyan-400
+    hover:scale-105 transition-all duration-300
+    shadow-lg shadow-sky-500/40 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Submit
                 </button>
