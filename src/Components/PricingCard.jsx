@@ -1,6 +1,8 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function PricingCard({ pkg }) {
+  const navigate = useNavigate();
   return (
     <div className="relative flex h-full rounded-3xl p-[1px] bg-gradient-to-b from-sky-500/40 to-transparent hover:from-sky-400 transition-all duration-300">
 
@@ -46,10 +48,11 @@ export default function PricingCard({ pkg }) {
 
         {/* CTA */}
         <button
+        onClick={() => navigate("/bookservice")}
   className="mt-auto w-full py-4 rounded-xl font-semibold text-black
   bg-gradient-to-r from-sky-400 to-cyan-300
   hover:from-sky-300 hover:to-cyan-200
-  transition-all duration-300 shadow-lg shadow-sky-500/30"
+  transition-all duration-300 shadow-lg shadow-sky-500/30 cursor-pointer"
 >
 
           Book Now →
