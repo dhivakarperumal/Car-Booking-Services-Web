@@ -204,10 +204,10 @@ body {
   }
 }
 
-html,
+/* html,
 body {
   overflow-x: hidden;
-}
+} */
 
 /* Only Pricing swiper */
 .pricing-swiper {
