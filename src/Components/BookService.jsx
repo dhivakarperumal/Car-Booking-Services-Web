@@ -32,7 +32,7 @@ const BOOKING_STATUS = {
 
 const Input = forwardRef(({ label, required, error, ...props }, ref) => (
     <div>
-        <label className="block mb-2 text-sm text-gray-400">
+        <label className="block mb-2 text-sm text-gray-200">
             {label} {required && <span className="text-red-400">*</span>}
         </label>
 
@@ -41,7 +41,7 @@ const Input = forwardRef(({ label, required, error, ...props }, ref) => (
             {...props}
             className={`w-full rounded-xl bg-black/60 border px-4 py-3 text-white
       focus:outline-none
-      ${error ? "border-red-400" : "border-white/10 focus:border-sky-400 focus:ring-1 focus:ring-sky-400"}`}
+      ${error ? "border-red-400" : "border-sky-200/70 focus:border-sky-400 focus:ring-1 focus:ring-sky-400"}`}
         />
 
         <p className="mt-1 h-4 text-xs text-red-400">{error || ""}</p>
@@ -50,7 +50,7 @@ const Input = forwardRef(({ label, required, error, ...props }, ref) => (
 
 const Textarea = forwardRef(({ label, required, error, ...props }, ref) => (
     <div>
-        <label className="block mb-2 text-sm text-gray-400">
+        <label className="block mb-2 text-sm text-gray-200">
             {label} {required && <span className="text-red-400">*</span>}
         </label>
 
@@ -59,7 +59,7 @@ const Textarea = forwardRef(({ label, required, error, ...props }, ref) => (
             {...props}
             className={`w-full rounded-xl bg-black/60 border px-4 py-3 text-white
       focus:outline-none
-      ${error ? "border-red-400" : "border-white/10 focus:border-sky-400 focus:ring-1 focus:ring-sky-400"}`}
+      ${error ? "border-red-400" : "border-sky-200/70 focus:border-sky-400 focus:ring-1 focus:ring-sky-400"}`}
         />
 
         <p className="mt-1 h-4 text-xs text-red-400">{error || ""}</p>
@@ -68,7 +68,7 @@ const Textarea = forwardRef(({ label, required, error, ...props }, ref) => (
 
 const Select = forwardRef(({ label, required, error, children, ...props }, ref) => (
     <div>
-        <label className="block mb-2 text-sm text-gray-400">
+        <label className="block mb-2 text-sm text-gray-200">
             {label} {required && <span className="text-red-400">*</span>}
         </label>
 
@@ -77,7 +77,7 @@ const Select = forwardRef(({ label, required, error, children, ...props }, ref) 
             {...props}
             className={`w-full rounded-xl bg-black/60 border px-4 py-3 text-white
       focus:outline-none
-      ${error ? "border-red-400" : "border-white/10 focus:border-sky-400 focus:ring-1 focus:ring-sky-400"}`}
+      ${error ? "border-red-400" : "border-sky-200/70 focus:border-sky-400 focus:ring-1 focus:ring-sky-400"}`}
         >
             {children}
         </select>
@@ -565,7 +565,7 @@ const BookService = () => {
 
                         <div>
                             <div>
-                                <label className="block mb-2 text-sm text-gray-400">
+                                <label className="block mb-2 text-sm text-gray-200">
                                     Location <span className="text-red-400">*</span>
                                 </label>
 
@@ -580,7 +580,7 @@ const BookService = () => {
                                         setCoords({ lat: null, lng: null });
                                         searchLocation(e.target.value);
                                     }}
-                                    className="w-full rounded-xl bg-black/60 border px-4 py-3 text-white border-white/10"
+                                    className="w-full rounded-xl bg-black/60 border px-4 py-3 text-white border-sky-200/70 focus:outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-400"
                                 />
 
                                 {/* SEARCH RESULTS */}

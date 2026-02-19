@@ -1,11 +1,10 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import PageContainer from "./PageContainer";
 import { useNavigate, useLocation } from "react-router-dom";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth, db } from "../firebase";
 import { doc, getDoc, collection, onSnapshot } from "firebase/firestore";
 import { User } from "lucide-react";
-import { useEffect } from "react";
 import { signOut } from "firebase/auth";
 import { setDoc } from "firebase/firestore";
 import { useRef } from "react";
@@ -112,6 +111,22 @@ const Navbar = () => {
     };
   }, []);
 
+  useEffect(() => {
+    if (!auth.currentUser) {
+      setCartCount(0);
+      return;
+    }
+
+    const unsub = onSnapshot(
+      collection(db, "users", auth.currentUser.uid, "cart"),
+      (snap) => {
+        setCartCount(snap.size); 
+      }
+    );
+
+    return () => unsub();
+  }, [userData]);
+
   const links = [
     { label: "HOME", path: "/" },
     { label: "SERVICES", path: "/services" },
@@ -187,7 +202,7 @@ const Navbar = () => {
                   {cartCount > 0 && (
                     <span
                       className="absolute -top-2 -right-2 bg-red-500 text-white text-[10px]
-      w-5 h-5 flex items-center justify-center rounded-full
+      w-4 h-4 flex items-center justify-center rounded-full
       shadow-[0_0_10px_rgba(239,68,68,0.8)]"
                     >
                       {cartCount}

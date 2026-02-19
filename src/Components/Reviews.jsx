@@ -140,27 +140,27 @@ export default function Reviews() {
                 <SwiperSlide key={r.id}>
                   <div
                     className="group relative min-h-[260px] rounded-3xl p-8
-  bg-[#050b14]/80 backdrop-blur-xl
-  border border-sky-400 overflow-hidden mt-5 mb-5
-  hover:-translate-y-2
-  hover:border-sky-400/40
-  hover:shadow-[0_35px_120px_rgba(56,189,248,0.45)]
+                      bg-[#050b14]/80 backdrop-blur-xl
+                      border border-sky-400 overflow-hidden mt-5 mb-5
+                      hover:-translate-y-2
+                      hover:border-sky-400/40
+                      hover:shadow-[0_35px_120px_rgba(56,189,248,0.45)]
 
-  transition-all duration-700 ease-out
-  flex flex-col mr-0.5"
+                      transition-all duration-700 ease-out
+                      flex flex-col mr-0.5"
                   >
                     {/* Glow sweep */}
                     <div
                       className="absolute inset-0 opacity-0 group-hover:opacity-100
-  bg-gradient-to-r from-sky-500/20 via-sky-400/30 to-sky-500/20
-  transition duration-700"
+                        bg-gradient-to-r from-sky-500/20 via-sky-400/30 to-sky-500/20
+                        transition duration-700"
                     />
 
                     {/* Inner glass ring */}
                     <div
                       className="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100
-  shadow-[inset_0_0_40px_rgba(56,189,248,0.4)]
-  transition duration-700"
+                        shadow-[inset_0_0_40px_rgba(56,189,248,0.4)]
+                        transition duration-700"
                     />
 
                     {/* HEADER */}
