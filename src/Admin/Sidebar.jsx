@@ -2,21 +2,23 @@ import { useState, useEffect } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import {
   LayoutDashboard,
-  Dumbbell,
-  Boxes,
-  Users,
-  Receipt,
+  Car,
   ClipboardList,
-  BarChart3,
-  X,
-  ChevronDown,
-  ChevronLeft,
-  Home,
-  CalendarCheck,
-  Package,
   Wrench,
+  Users,
   UserCog,
+  Receipt,
   PackageSearch,
+  CalendarCheck,
+  BarChart3,
+  Home,
+  Settings,
+  FileText,
+  CarFront,
+  ShieldCheck,
+  Fuel,
+  X, ChevronDown, ChevronLeft,
+  Boxes,
 } from "lucide-react";
 
 import { useAuth } from "../PrivateRouter/AuthContext";
@@ -25,37 +27,45 @@ import { useAuth } from "../PrivateRouter/AuthContext";
 const navItems = [
   { path: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
 
+  { path: "/admin/bookings", label: "Service Bookings", icon: CalendarCheck },
+  { path: "/admin/services", label: "Service", icon: Wrench },
+  { path: "/admin/customers", label: "Customers", icon: Users },
+  { path: "/admin/billing", label: "Billing", icon: Receipt },
+
+
+  { path: "/admin/serviceslist", label: "Service Packages", icon: ShieldCheck },
+  { path: "/admin/priceslist", label: "Service Pricing", icon: BarChart3 },
+
   {
     label: "Products",
-    icon: Package,
+    icon: Car,
     children: [
-      { path: "/admin/allProducts", label: "Products", icon: Dumbbell },
-      { path: "/admin/productbilling", label: "Product Billing", icon: ClipboardList },
-      { path: "/admin/stockdetails", label: "Supplements Stock", icon: Boxes },
+      { path: "/admin/allProducts", label: "Products", icon: CarFront },
+      { path: "/admin/productbilling", label: "Product Billing", icon: Receipt },
+      { path: "/admin/stockdetails", label: "Spare Parts Stock", icon: Boxes },
     ],
   },
 
-  { path: "/admin/orders", label: "Orders", icon: CalendarCheck },
+  { path: "/admin/orders", label: "Orders", icon: ClipboardList },
 
-  { path: "/admin/serviceslist", label: "Services List", icon: CalendarCheck },
-  { path: "/admin/priceslist", label: "Pricing List", icon: BarChart3 },
 
-  { path: "/admin/services", label: "Services", icon: Wrench },
-  { path: "/admin/bookings", label: "Booking Service", icon: CalendarCheck },
 
-  { path: "/admin/customers", label: "Customers", icon: Users },
-  { path: "/admin/employees", label: "Employees", icon: UserCog },
 
-  { path: "/admin/billing", label: "Billings", icon: Receipt },
-  { path: "/admin/inventory", label: "Inventory", icon: PackageSearch },
+
+
+
+  { path: "/admin/employees", label: "Technicians", icon: UserCog },
+
+
+  { path: "/admin/inventory", label: "Parts Inventory", icon: PackageSearch },
 
   {
     path: "/admin/overall-attendance",
-    label: "Overall Attendance",
+    label: "Staff Attendance",
     icon: ClipboardList,
   },
 
-  { path: "/admin/reports", label: "Reports", icon: BarChart3 },
+  { path: "/admin/reports", label: "Service Reports", icon: FileText },
 
   { path: "/", label: "Back Home", icon: Home },
 ];
@@ -93,9 +103,8 @@ const Sidebar = ({ isOpen, onClose, collapsed, onToggleCollapse }) => {
       {/* ========== MOBILE OVERLAY ========== */}
       <div
         onClick={onClose}
-        className={`fixed inset-0 z-40 bg-black/60 backdrop-blur-sm lg:hidden transition-opacity ${
-          isOpen ? "opacity-100 visible" : "opacity-0 invisible"
-        }`}
+        className={`fixed inset-0 z-40 bg-black/60 backdrop-blur-sm lg:hidden transition-opacity ${isOpen ? "opacity-100 visible" : "opacity-0 invisible"
+          }`}
       />
 
       {/* ========== SIDEBAR ========== */}
@@ -109,7 +118,7 @@ const Sidebar = ({ isOpen, onClose, collapsed, onToggleCollapse }) => {
         ${collapsed ? "w-20" : "w-64"}`}
       >
         {/* ========== LOGO ========== */}
-        <div className="flex items-center gap-3 px-4 py-5 border-b border-white/10">
+        <div className="flex items-center gap-3 px-4 py-5 border-b border-gray-200">
           <div
             className="w-11 h-11 rounded-2xl 
             bg-gradient-to-br from-black to-gray-800
@@ -158,11 +167,10 @@ const Sidebar = ({ isOpen, onClose, collapsed, onToggleCollapse }) => {
                   <button
                     onClick={() => toggleMenu(item.label)}
                     className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl
-                    ${
-                      hasActiveChild
+                    ${hasActiveChild
                         ? "text-black font-semibold"
                         : "text-black/80 hover:bg-white/20"
-                    }`}
+                      }`}
                   >
                     <Icon className="w-5 h-5 shrink-0" />
 
@@ -172,9 +180,8 @@ const Sidebar = ({ isOpen, onClose, collapsed, onToggleCollapse }) => {
                           {item.label}
                         </span>
                         <ChevronDown
-                          className={`w-4 h-4 transition-transform ${
-                            isMenuOpen ? "rotate-180" : ""
-                          }`}
+                          className={`w-4 h-4 transition-transform ${isMenuOpen ? "rotate-180" : ""
+                            }`}
                         />
                       </>
                     )}
@@ -183,11 +190,10 @@ const Sidebar = ({ isOpen, onClose, collapsed, onToggleCollapse }) => {
                   {/* ===== SUB MENU ===== */}
                   <div
                     className={`ml-10 mt-1 space-y-1 overflow-hidden transition-all duration-300
-                    ${
-                      isMenuOpen
+                    ${isMenuOpen
                         ? "max-h-96 opacity-100"
                         : "max-h-0 opacity-0"
-                    }`}
+                      }`}
                   >
                     {item.children.map((sub) => {
                       const SubIcon = sub.icon;
@@ -198,13 +204,13 @@ const Sidebar = ({ isOpen, onClose, collapsed, onToggleCollapse }) => {
                           key={sub.path}
                           to={sub.path}
                           onClick={() => isOpen && onClose()}
-                          className={`flex items-center gap-2 px-3 py-2 rounded-md text-md
-                          ${
-                            isActive
+                          className={`flex items-center gap-3 px-4 py-2.5 rounded transition-all duration-300
+  ${isActive
                               ? "bg-gradient-to-r from-black to-cyan-400 text-white"
-                              : "text-black hover:bg-white/20"
-                          }`}
+                              : "text-black/80 hover:bg-gradient-to-r hover:from-cyan-400 hover:to-black/30 hover:text-white"
+                            }`}
                         >
+
                           <SubIcon className="w-4 h-4 shrink-0" />
                           <span>{sub.label}</span>
                         </NavLink>
@@ -224,12 +230,11 @@ const Sidebar = ({ isOpen, onClose, collapsed, onToggleCollapse }) => {
                 to={item.path}
                 end={item.exact}
                 onClick={() => isOpen && onClose()}
-                className={`flex items-center gap-3 px-4 py-2.5 rounded
-                ${
-                  isActive
+                className={`flex items-center gap-3 px-4 py-2.5 rounded transition-all duration-300
+  ${isActive
                     ? "bg-gradient-to-r from-black to-cyan-400 text-white"
-                    : "text-black/80 hover:bg-white/20"
-                }`}
+                    : "text-black/80 hover:bg-gradient-to-r hover:from-cyan-400 hover:to-black/30 hover:text-white"
+                  }`}
               >
                 <Icon className="w-5 h-5 shrink-0" />
                 {!collapsed && <span>{item.label}</span>}
@@ -249,9 +254,8 @@ const Sidebar = ({ isOpen, onClose, collapsed, onToggleCollapse }) => {
           text-black hover:scale-110 transition-all"
         >
           <ChevronLeft
-            className={`w-4 h-4 transition-transform ${
-              collapsed ? "rotate-180" : ""
-            }`}
+            className={`w-4 h-4 transition-transform ${collapsed ? "rotate-180" : ""
+              }`}
           />
         </button>
       </aside>

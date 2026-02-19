@@ -22,9 +22,7 @@ const AdminLayout = () => {
   }, []);
 
   return (
-    <div className="flex min-h-screen bg-white text-black">
-
-
+    <div className="flex min-h-screen bg-gray-100/35 text-black">
 
       {/* Sidebar */}
       <Sidebar

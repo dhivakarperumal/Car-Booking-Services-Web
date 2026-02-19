@@ -84,112 +84,148 @@ const GradientStatCard = ({
 
 const Dashboard = () => {
 
-  const [topStats, setTopStats] = useState({
-    todayBookings: 0,
-    totalServices: 0,
-    totalCustomers: 0,
-    totalEmployees: 0,
-    totalOrders: 0,
-    totalProducts: 0,   // ✅ NEW
-    totalEarnings: 0,
-  });
+const [topStats, setTopStats] = useState({
+  todayBookings: 0,
+  todayCustomers: 0,
+  totalServices: 0,
+  totalCustomers: 0,
+  totalEmployees: 0,
+  totalOrders: 0,
+  totalDeliveryOrders: 0,
+  totalProducts: 0,
+  totalEarnings: 0,
+});
 
+useEffect(() => {
+  const start = Timestamp.fromDate(
+    new Date(new Date().setHours(0, 0, 0, 0))
+  );
+  const end = Timestamp.fromDate(
+    new Date(new Date().setHours(23, 59, 59, 999))
+  );
 
-  useEffect(() => {
-    const start = Timestamp.fromDate(
-      new Date(new Date().setHours(0, 0, 0, 0))
-    );
-    const end = Timestamp.fromDate(
-      new Date(new Date().setHours(23, 59, 59, 999))
-    );
+  // ✅ TODAY BOOKINGS
+  const unsubTodayBookings = onSnapshot(
+    query(
+      collection(db, "bookings"),
+      where("createdAt", ">=", start),
+      where("createdAt", "<=", end)
+    ),
+    (snap) =>
+      setTopStats((p) => ({ ...p, todayBookings: snap.size }))
+  );
 
-    // TODAY BOOKINGS
-    const unsubToday = onSnapshot(
-      query(
-        collection(db, "bookings"),
-        where("createdAt", ">=", start),
-        where("createdAt", "<=", end)
-      ),
-      (snap) =>
-        setTopStats((p) => ({ ...p, todayBookings: snap.size }))
-    );
-
-    // TOTAL SERVICES
-    const unsubServices = onSnapshot(
-      collection(db, "services"),
-      (snap) =>
-        setTopStats((p) => ({ ...p, totalServices: snap.size }))
-    );
-
-    // TOTAL CUSTOMERS (unique mobile)
-    const unsubCustomers = onSnapshot(
+  // ✅ TODAY CUSTOMERS (unique mobile created today)
+  const unsubTodayCustomers = onSnapshot(
+    query(
       collection(db, "users"),
-      (snap) => {
-        const unique = new Set();
-        snap.forEach((d) => {
-          const data = d.data();
-          if (data.mobileNumber) unique.add(data.mobileNumber);
-        });
-        setTopStats((p) => ({
-          ...p,
-          totalCustomers: unique.size,
-        }));
-      }
-    );
+      where("createdAt", ">=", start),
+      where("createdAt", "<=", end)
+    ),
+    (snap) => {
+      const unique = new Set();
+      snap.forEach((d) => {
+        const data = d.data();
+        if (data.mobileNumber) unique.add(data.mobileNumber);
+      });
 
-    // TOTAL EMPLOYEES
-    const unsubEmp = onSnapshot(
-      collection(db, "employees"),
-      (snap) =>
-        setTopStats((p) => ({ ...p, totalEmployees: snap.size }))
-    );
+      setTopStats((p) => ({
+        ...p,
+        todayCustomers: unique.size,
+      }));
+    }
+  );
 
-    // TOTAL ORDERS
-    const unsubOrders = onSnapshot(
-      collection(db, "orders"),
-      (snap) =>
-        setTopStats((p) => ({ ...p, totalOrders: snap.size }))
-    );
+  // ✅ TOTAL SERVICES
+  const unsubServices = onSnapshot(
+    collection(db, "services"),
+    (snap) =>
+      setTopStats((p) => ({ ...p, totalServices: snap.size }))
+  );
 
-    // TOTAL EARNINGS
-    const unsubEarnings = onSnapshot(
-      collection(db, "billings"),
-      (snap) => {
-        let total = 0;
+  // ✅ TOTAL CUSTOMERS (unique mobile)
+  const unsubCustomers = onSnapshot(
+  collection(db, "users"),
+  (snap) =>
+    setTopStats((p) => ({
+      ...p,
+      totalCustomers: snap.size,
+    }))
+);
 
-        snap.forEach((doc) => {
-          const data = doc.data();
-          const status = (data.paymentStatus || "").toLowerCase();
 
-          if (status === "paid") {
-            total += Number(data.grandTotal || 0);
-          }
+  // ✅ TOTAL EMPLOYEES
+  const unsubEmployees = onSnapshot(
+    collection(db, "employees"),
+    (snap) =>
+      setTopStats((p) => ({ ...p, totalEmployees: snap.size }))
+  );
 
-          if (status === "partial") {
-            total += Number(data.paidAmount || 0);
-          }
-        });
+  // ✅ TOTAL ORDERS
+  const unsubOrders = onSnapshot(
+    collection(db, "orders"),
+    (snap) =>
+      setTopStats((p) => ({ ...p, totalOrders: snap.size }))
+  );
 
-        setTopStats((p) => ({ ...p, totalEarnings: total }));
-      }
-    );
+// ✅ TOTAL DELIVERY ORDERS (status === "delivered")
+const unsubDeliveryOrders = onSnapshot(
+  query(
+    collection(db, "orders"),
+    where("status", "==", "delivered")
+  ),
+  (snap) =>
+    setTopStats((p) => ({
+      ...p,
+      totalDeliveryOrders: snap.size,
+    }))
+);
 
-    const unsubProducts = onSnapshot(
-      collection(db, "products"),
-      (snap) =>
-        setTopStats((p) => ({ ...p, totalProducts: snap.size }))
-    );
 
-    return () => {
-      unsubToday();
-      unsubServices();
-      unsubCustomers();
-      unsubEmp();
-      unsubProducts();
-      unsubOrders();
-      unsubEarnings();
-    };
-  }, []);
+  // ✅ TOTAL EARNINGS (paid + partial)
+  const unsubEarnings = onSnapshot(
+    collection(db, "billings"),
+    (snap) => {
+      let total = 0;
+
+      snap.forEach((doc) => {
+        const data = doc.data();
+        const status = (data.paymentStatus || "").toLowerCase();
+
+        if (status === "paid") {
+          total += Number(data.grandTotal || 0);
+        }
+
+        if (status === "partial") {
+          total += Number(data.paidAmount || 0);
+        }
+      });
+
+      setTopStats((p) => ({ ...p, totalEarnings: total }));
+    }
+  );
+
+  // ✅ TOTAL PRODUCTS
+  const unsubProducts = onSnapshot(
+    collection(db, "products"),
+    (snap) =>
+      setTopStats((p) => ({ ...p, totalProducts: snap.size }))
+  );
+
+  // ✅ CLEANUP
+  return () => {
+    unsubTodayBookings();
+    unsubTodayCustomers();
+    unsubServices();
+    unsubCustomers();
+    unsubEmployees();
+    unsubProducts();
+    unsubOrders();
+    unsubDeliveryOrders();
+    unsubEarnings();
+  };
+}, []);
+
 
 
 
@@ -429,23 +465,23 @@ const Dashboard = () => {
     return new Date(ts).toLocaleDateString("en-IN");
   };
 
- const BRAND_COLORS = {
-  BMW: "#2563eb",        // blue
-  Audi: "#111827",       // black
-  Benz: "#6b7280",       // silver
-  Mercedes: "#6b7280",
-  Toyota: "#dc2626",     // red
-  Honda: "#16a34a",      // green
-  Hyundai: "#0891b2",    // teal
-  Kia: "#7c3aed",        // violet
-  Ford: "#1d4ed8",       // dark blue
-  Tata: "#0f766e",       // dark teal
-  Mahindra: "#92400e",   // brown
-  Renault: "#f59e0b",    // yellow
-  Nissan: "#374151",     // gray
-  Volkswagen: "#0ea5e9", // light blue
-  Skoda: "#15803d",      // green
-};
+  const BRAND_COLORS = {
+    BMW: "#2563eb",        // blue
+    Audi: "#111827",       // black
+    Benz: "#6b7280",       // silver
+    Mercedes: "#6b7280",
+    Toyota: "#dc2626",     // red
+    Honda: "#16a34a",      // green
+    Hyundai: "#0891b2",    // teal
+    Kia: "#7c3aed",        // violet
+    Ford: "#1d4ed8",       // dark blue
+    Tata: "#0f766e",       // dark teal
+    Mahindra: "#92400e",   // brown
+    Renault: "#f59e0b",    // yellow
+    Nissan: "#374151",     // gray
+    Volkswagen: "#0ea5e9", // light blue
+    Skoda: "#15803d",      // green
+  };
 
 
   const getColor = (name, index) => {
@@ -609,8 +645,8 @@ const Dashboard = () => {
         />
 
         <GradientStatCard
-          title="TOTAL SERVICES"
-          value={topStats.totalServices}
+          title="DELIVERY ORDERS"
+          value={topStats.totalDeliveryOrders}
           change="+"
           isUp={true}
           gradient="bg-gradient-to-r from-pink-500 to-rose-400"
@@ -625,7 +661,7 @@ const Dashboard = () => {
           {/* APPOINTMENTS */}
           <div className="bg-white rounded-2xl mb-9 shadow-sm border border-gray-100 p-5">
             {/* HEADER */}
-            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 mb-4">
+            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-2 mb-4">
               <h4 className="font-semibold text-gray-800 text-lg">
                 Booking Services
               </h4>
