@@ -107,7 +107,7 @@ const StockDetails = () => {
         <div className="flex gap-3 items-center justify-end">
           <button
             onClick={() => setView("table")}
-            className={`flex items-center gap-2 px-3 py-1 rounded ${
+            className={`flex items-center gap-2 px-3 py-2.5 rounded ${
               view === "table"
                 ? "bg-black text-white"
                 : "bg-gray-200 text-gray-700"
@@ -119,7 +119,7 @@ const StockDetails = () => {
 
           <button
             onClick={() => setView("card")}
-            className={`flex items-center gap-2 px-3 py-1 rounded ${
+            className={`flex items-center gap-2 px-3 py-2.5 rounded ${
               view === "card"
                 ? "bg-black text-white"
                 : "bg-gray-200 text-gray-700"
@@ -131,7 +131,7 @@ const StockDetails = () => {
 
           <button
             onClick={() => navigate("/admin/addstock")}
-            className="flex items-center gap-2 bg-gradient-to-r from-black to-cyan-400 text-white px-4 py-2 rounded"
+            className="flex items-center  gap-2 bg-black  text-white px-4 py-2.5 rounded"
           >
             <FaPlus />
             Add Stock
@@ -141,7 +141,7 @@ const StockDetails = () => {
 
       {/* TABLE VIEW */}
       {view === "table" && (
-        <div className="overflow-x-auto bg-white rounded-xl shadow">
+        <div className="overflow-x-auto bg-white rounded-xl mt-15 shadow">
           <table className="w-full text-sm">
             <thead className="bg-gradient-to-r from-black to-cyan-400 text-white">
               <tr>

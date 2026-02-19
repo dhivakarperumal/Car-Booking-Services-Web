@@ -371,7 +371,13 @@ const AddProduct = () => {
             </div>
           ))}
 
-          <button type="button" onClick={addVariant} className="btn">
+          <button type="button" onClick={addVariant} className="
+bg-gradient-to-r from-black to-cyan-400
+text-white px-6 py-3 rounded
+hover:from-cyan-400 hover:to-black
+transition-all duration-500 ease-in-out
+hover:scale-105 hover:shadow-lg
+">
             + Add Variant
           </button>
         </div>
@@ -478,7 +484,13 @@ const AddProduct = () => {
         </div>
 
         <div className="flex justify-end">
-          <button disabled={loading} className="bg-black text-white px-6 py-3 rounded-lg">
+          <button disabled={loading} className="
+bg-gradient-to-r from-black to-cyan-400
+text-white px-6 py-3 rounded
+hover:from-cyan-400 hover:to-black
+transition-all duration-500 ease-in-out
+hover:scale-105 hover:shadow-lg
+">
             {loading ? "Saving..." : editData ? "Update Product" : "Save Product"}
           </button>
         </div>

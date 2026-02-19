@@ -83,7 +83,7 @@ const AddStock = () => {
   };
 
   return (
-    <div className="p-6 max-w-xl mx-auto bg-white rounded-2xl shadow space-y-5">
+    <div className="p-6 max-w-6xl mx-auto bg-white rounded-2xl shadow space-y-5">
       <h2 className="text-2xl font-bold">Add Stock</h2>
 
       {/* PRODUCT SELECT */}
@@ -96,7 +96,7 @@ const AddStock = () => {
             setSelectedVariantIndex("");
             setAddQty("");
           }}
-          className="border px-3 py-2 rounded w-full mt-1"
+          className="w-full bg-white rounded-lg border border-gray-300 px-5 py-3 text-gray-900 shadow-sm  focus:ring-2 focus:ring-black outline-none transition transition"
         >
           <option value="">Select Product</option>
           {products.map((p) => (
@@ -116,7 +116,7 @@ const AddStock = () => {
           <select
             value={selectedVariantIndex}
             onChange={(e) => setSelectedVariantIndex(e.target.value)}
-            className="border px-3 py-2 rounded w-full mt-1"
+            className="w-full bg-white rounded-lg border border-gray-300 px-5 py-3 text-gray-900 shadow-sm  focus:ring-2 focus:ring-black outline-none transition transition"
           >
             <option value="">Select Variant</option>
             {selectedProduct.variants?.map((v, i) => (
@@ -131,7 +131,7 @@ const AddStock = () => {
 
       {/* STOCK DETAILS */}
       {selectedVariant && (
-        <div className="bg-gray-50 p-4 rounded-lg space-y-2 text-sm">
+        <div className="">
           <div>
             Current Stock:{" "}
             <span className="font-semibold text-blue-600">
@@ -144,12 +144,12 @@ const AddStock = () => {
             placeholder="Enter quantity to add"
             value={addQty}
             onChange={(e) => setAddQty(e.target.value)}
-            className="border px-3 py-2 rounded w-full"
+            className="w-full bg-white rounded-lg border border-gray-300 px-5 py-3 text-gray-900 shadow-sm  focus:ring-2 focus:ring-black outline-none transition transition"
           />
 
           <div>
             New Stock:{" "}
-            <span className="font-semibold text-green-600">
+            <span className="font-bold text-green-600">
               {newStock}
             </span>
           </div>
@@ -159,7 +159,13 @@ const AddStock = () => {
       {/* BUTTON */}
       <button
         onClick={handleUpdateStock}
-        className="bg-black text-white px-4 py-2 rounded w-full"
+        className=" 
+bg-gradient-to-r from-black to-cyan-400
+text-white px-6 py-3 rounded
+hover:from-cyan-400 hover:to-black
+transition-all duration-500 ease-in-out
+hover:scale-105 hover:shadow-lg
+"
       >
         Update Stock
       </button>

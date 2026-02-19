@@ -251,19 +251,19 @@ const Staffs = () => {
                   <td className="px-4 py-4 flex gap-2">
                     <button
                       onClick={() => navigate(`/admin/viewstaff/${s.id}`)}
-                      className="p-2 rounded-full  border border-gray-300  transition"
+                      className="p-3 rounded-full  border border-gray-300  transition"
                     >
                       <FaEye />
                     </button>
                     <button
                       onClick={() => navigate(`/admin/addstaff/${s.id}`)}
-                      className="p-2  border border-gray-300 rounded-full  transition"
+                      className="p-3  border border-gray-300 rounded-full  transition"
                     >
                       <FaEdit />
                     </button>
                     <button
                       onClick={() => handleDelete(s.id)}
-                      className="p-2 rounded-full  border border-red-700 text-red-700  transition"
+                      className="p-3 rounded-full  border border-gray-300 transition"
                     >
                       <FaTrash />
                     </button>

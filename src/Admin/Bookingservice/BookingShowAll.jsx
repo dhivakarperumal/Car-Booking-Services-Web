@@ -458,7 +458,7 @@ const ShowAllBookings = () => {
       {/* 🔝 TOP BAR */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
         {/* 🔎 SEARCH */}
-        <div className="w-full max-w-md">
+        <div className="w-full max-w-sm">
           <input
             type="text"
             placeholder="Search booking, name, phone..."

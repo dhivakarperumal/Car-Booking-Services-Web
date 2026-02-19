@@ -180,9 +180,9 @@ const AllProducts = () => {
         </div>
       ) : view === "table" ? (
         /* ================= TABLE VIEW ================= */
-        <div className="overflow-x-auto bg-white rounded-2xl shadow-sm border border-gray-200">
+        <div className="overflow-x-auto bg-white rounded-2xl mt-15 shadow-sm border border-gray-200">
           <table className="w-full text-md">
-            <thead className="bg-black text-white text-left">
+            <thead className="bg-gradient-to-r from-black to-cyan-400 text-white">
               <tr>
                 <th className="px-4 py-4 text-left font-bold ">S No</th>
                 <th className="px-4 py-4 text-left font-bold ">Image</th>
@@ -255,21 +255,19 @@ const AllProducts = () => {
     {/* EDIT */}
     <button
       onClick={() => handleEdit(p)}
-      className="flex items-center gap-1 border border-gray-300 px-3 py-1.5 rounded-lg text-xs
-                 hover:bg-gray-100 transition"
+      className="p-3 rounded-full  border border-gray-300  transition"
     >
-      <FaEdit className="text-gray-600" />
-      Edit
+      <FaEdit  />
+   
     </button>
 
     {/* DELETE */}
     <button
       onClick={() => handleDelete(p.docId)}
-      className="flex items-center gap-1 bg-black text-white px-3 py-1.5 rounded-lg text-xs
-                 hover:bg-gray-900 transition"
+      className="p-3 rounded-full  border border-gray-300  transition"
     >
       <FaTrash />
-      Delete
+      
     </button>
 
   </div>

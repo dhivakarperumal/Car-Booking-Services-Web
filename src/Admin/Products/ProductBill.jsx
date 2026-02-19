@@ -127,17 +127,16 @@ const ProductBilling = () => {
           <p>Name: ${billData.customer.name}</p>
           <p>Phone: ${billData.customer.phone}</p>
 
-          ${
-            billData.orderType === "online"
-              ? `
+          ${billData.orderType === "online"
+        ? `
               <h3>Shipping</h3>
               <p>${billData.shipping.name}</p>
               <p>${billData.shipping.phone}</p>
               <p>${billData.shipping.address}</p>
               <p>${billData.shipping.city} - ${billData.shipping.pincode}</p>
             `
-              : ""
-          }
+        : ""
+      }
 
           <table>
             <thead>
@@ -151,8 +150,8 @@ const ProductBilling = () => {
             </thead>
             <tbody>
               ${billData.items
-                .map(
-                  (item) => `
+        .map(
+          (item) => `
                 <tr>
                   <td>${item.name}</td>
                   <td>${item.variant}</td>
@@ -161,8 +160,8 @@ const ProductBilling = () => {
                   <td>₹ ${item.total}</td>
                 </tr>
               `
-                )
-                .join("")}
+        )
+        .join("")}
             </tbody>
           </table>
 
@@ -402,7 +401,13 @@ const ProductBilling = () => {
 
         <button
           onClick={addToCart}
-          className="bg-gradient-to-r from-black to-cyan-400 text-white px-4 py-2 rounded"
+          className="
+bg-gradient-to-r from-black to-cyan-400
+text-white px-6 py-3 rounded
+hover:from-cyan-400 hover:to-black
+transition-all duration-500 ease-in-out
+hover:scale-105 hover:shadow-lg
+"
         >
           Add
         </button>
@@ -449,14 +454,20 @@ const ProductBilling = () => {
         Grand Total: ₹ {grandTotal}
       </div>
 
-   <div className="flex justify-end">
-       <button
-        onClick={handleSaveBill}
-        className="bg-gradient-to-r from-black to-cyan-400 text-white px-6 py-3 rounded"
-      >
-        Save Order & Print
-      </button>
-   </div>
+      <div className="flex justify-end">
+        <button
+          onClick={handleSaveBill}
+          className="
+bg-gradient-to-r from-black to-cyan-400
+text-white px-6 py-3 rounded
+hover:from-cyan-400 hover:to-black
+transition-all duration-500 ease-in-out
+hover:scale-105 hover:shadow-lg
+"
+        >
+          Save Order & Print
+        </button>
+      </div>
     </div>
   );
 };
@@ -471,7 +482,7 @@ export default ProductBilling;
 // import axios from "axios";
 
 // const WHATSAPP_TOKEN = "EAAU8tj4dalsBQtHkqZAIHzkNLWdNjCslcZBrT4GbQ6PKjz0jCM99yp1yL2ECqeB3WrB2TPx9Yoce9a3oLZB3GsoqebGyFcNryWHYJvuIImnAW6oWZAS9LSoxiOiOXfbqwaPn826EsmyAwlujRf1gcW0e8vnZAZBJDxhFKCZBQn1ulPUAqWZBQa6a5r323KhJxtKBH8ZCYu1jdA9JIrTMg1bGOQ5iXpSFkAkPALTMZAUJZBPPJLyvkaY0Ihi7YoMZArCtR1ZCIiZCPVXjJfxx0GZAvTs7NaCHVUx"; // ⚠️ testing only
-// const PHONE_NUMBER_ID = "1028620890326186"; 
+// const PHONE_NUMBER_ID = "1028620890326186";
 
 // const ProductBilling = () => {
 //   const [loading, setLoading] = useState(false);

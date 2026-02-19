@@ -833,7 +833,7 @@ const Dashboard = () => {
     <table className="min-w-full text-sm text-gray-700 border-collapse">
 
       {/* TABLE HEAD */}
-      <thead className="bg-black text-white border-b border-gray-200">
+     <thead className="bg-gradient-to-r from-black to-cyan-400 text-white">
         <tr>
           <th className="px-3 py-4 text-left font-bold">S No</th>
           <th className="px-3 py-4 text-left font-bold">Customer</th>
@@ -996,8 +996,7 @@ const Dashboard = () => {
           <div className="bg-white rounded-2xl shadow border border-gray-200 overflow-hidden">
             <div className="overflow-x-auto">
               <table className="min-w-full text-sm text-gray-700">
-
-                <thead className="bg-black text-white">
+                 <thead className="bg-gradient-to-r from-black to-cyan-400 text-white">
                   <tr>
                     <th className="px-3 py-4 text-left font-bold">S No</th>
                     <th className="px-3 py-4 text-left font-bold">Item</th>

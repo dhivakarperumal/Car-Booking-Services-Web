@@ -185,7 +185,7 @@ const Services = () => {
       <div className="bg-white rounded-2xl shadow overflow-hidden">
         <div className="overflow-x-auto">
           <table className="min-w-full text-sm border-collapse">
-            <thead className="bg-black text-white">
+            <thead className="bg-gradient-to-r from-black to-cyan-400 text-white">
               <tr>
                 <th className="px-4 py-4 text-left">S No</th>
                 <th className="px-4 py-4 text-left">Booking ID</th>
