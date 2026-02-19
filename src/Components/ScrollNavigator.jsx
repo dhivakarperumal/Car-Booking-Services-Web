@@ -26,7 +26,7 @@ const ScrollNavigator = () => {
       <div className="fixed right-4 bottom-5 z-30 flex flex-col gap-3">
         <button
           onClick={scrollToTop}
-          className="bg-orange600 text-white p-2 cursor-pointer rounded-full shadow-md  transition"
+          className="bg-sky-500 text-white p-2 cursor-pointer rounded-full shadow-md  transition"
           aria-label="Scroll to top"
         >
           <IoIosArrowUp size={24} />

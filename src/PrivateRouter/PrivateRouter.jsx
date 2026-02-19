@@ -7,6 +7,7 @@ import { doc, getDoc } from "firebase/firestore";
 const PrivateRoute = ({ children, allowedRoles = [] }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [showLogin, setShowLogin] = useState(false);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
@@ -20,6 +21,7 @@ const PrivateRoute = ({ children, allowedRoles = [] }) => {
         }
       } else {
         setUser(null);
+setShowLogin(true); // 🔥 open login popup
       }
       setLoading(false);
     });
@@ -29,7 +31,9 @@ const PrivateRoute = ({ children, allowedRoles = [] }) => {
 
   if (loading) return <div>Loading...</div>;
 
-  if (!user) return <Navigate to="/login" replace />;
+  if (!user) {
+  return <LoginModal open={showLogin} onClose={() => setShowLogin(false)} />;
+}
 
   if (allowedRoles.length && !allowedRoles.includes(user.role)) {
     return (

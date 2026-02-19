@@ -4,10 +4,8 @@ import { Outlet, useLocation } from "react-router-dom";
 
 import ScrollToTop from "./Components/ScrollToTop";
 import ScrollNavigator from "./Components/ScrollNavigator";
-
-
-
-
+import Navbar from "./Components/Navbar";
+import Footer from "./Components/Footer";
 
 function App() {
   const location = useLocation();
@@ -22,11 +20,12 @@ function App() {
   return (
     <section>
       
-      
+      <Navbar/>
       <ScrollToTop />
       <ScrollNavigator />
       
       <Outlet />
+      <Footer/>
       {!hideLayout }
     </section>
   );

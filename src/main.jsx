@@ -1,6 +1,7 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import ProductDetails from "./Components/ProductDetails.jsx";
 import "./index.css";
 
 import App from "./App.jsx";
@@ -8,11 +9,11 @@ import { AuthProvider } from "./PrivateRouter/AuthContext.jsx";
 import PrivateRoute from "./PrivateRouter/PrivateRouter.jsx";
 import { Toaster } from "react-hot-toast";
 import Home from "./Components/Home.jsx";
-
-
+import Pricing from "./Components/Pricing.jsx";
+import Products from "./Components/Products.jsx";
+import ContactUs from "./Components/ContactUs.jsx";
 
 // Auth
-import Login from "./Auth/Login.jsx";
 import Register from "./Auth/Register.jsx";
 
 
@@ -48,10 +49,17 @@ import AddStock from "./Admin/Products/AddStock.jsx";
 import StockDetails from "./Admin/Products/StockDetails.jsx";
 import AddCarServices from "./Admin/ServicesList/AddSerivess.jsx";
 import ServicesListAll from "./Admin/ServicesList/ServicesListAll.jsx";
+import Services from "./Components/Services.jsx";
+import About from "./Components/About.jsx";
+import ServiceDetails from "./Components/ServiceDetails.jsx";
 import PricingList from "./Admin/PricingAll/AllPricesList.jsx";
 import PricingForm from "./Admin/PricingAll/AddPrice.jsx";
 import ProductBilling from "./Admin/Products/ProductBill.jsx";
 import ShowAllBookings from "./Admin/Bookingservice/BookingShowAll.jsx";
+import Contact from "./Components/ContactUs.jsx";
+import BookService from "./Components/BookService.jsx";
+import Account from "./Components/Account.jsx";
+import Cart from "./Components/Cart.jsx";
 
 
 const router = createBrowserRouter([
@@ -60,11 +68,17 @@ const router = createBrowserRouter([
     element: <App />,
     children: [
       { index: true, element: <Home /> },
-  
-      { path: "/login", element: <Login /> },
       { path: "/register", element: <Register /> },
-
-     
+      { path: "/services", element: <Services /> },
+      { path: "/pricing", element: <Pricing /> },
+      { path: "/products", element: <Products /> },
+      { path: "/products/:slug", element: <ProductDetails /> },
+      { path: "/services/:id", element: <ServiceDetails /> },
+      { path: "/about", element: <About /> },
+      { path: "/contact", element: <ContactUs /> },
+      { path: "/cart", element: <Cart /> },
+      { path: "/bookservice", element: <BookService /> },
+      { path: "/account", element: <Account /> },       
     ],
   },
 
@@ -83,6 +97,7 @@ const router = createBrowserRouter([
       { path: "addserviceparts", element: <AddServiceParts /> },
       { path: "bookings", element: <ShowAllBookings/> },
       { path: "addbooking", element: <BookingService /> },
+      { path: "contact", element: <Contact /> },
 
       { path: "allProducts", element: <AllProducts /> },
       { path: "addproducts", element: <AddProducts /> },
