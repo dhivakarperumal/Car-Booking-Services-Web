@@ -442,7 +442,7 @@ const BookService = () => {
             /* -------------------------------------------------
                5️⃣ REDIRECT TO SUCCESS PAGE
             -------------------------------------------------- */
-            navigate(`/booking-success/${bookingId}`);
+            navigate(`/account`);
 
         } catch (error) {
             console.error("❌ Booking failed:", error);
@@ -512,7 +512,7 @@ const BookService = () => {
                         </div>
 
                         {/* Brand & Model */}
-                        <div className="grid md:grid-cols-2 gap-6">
+                        <div className="grid md:grid-cols-2 gap-6 cursor-pointer">
                             <Select
                                 ref={refs.brand}
                                 label="Car Brand"
@@ -543,6 +543,7 @@ const BookService = () => {
                             ref={refs.issue}
                             label="Issue"
                             name="issue"
+                            className="cursor-pointer"
                             required
                             error={errors.issue}
                             onChange={handleChange}
@@ -602,7 +603,7 @@ const BookService = () => {
                                     type="button"
                                     onClick={handleUseCurrentLocation}
                                     disabled={locationLoading}
-                                    className="mt-4 px-6 py-3 rounded-xl font-semibold text-black
+                                    className="mt-4 px-6 py-3 cursor-pointer rounded-xl font-semibold text-black
     bg-gradient-to-r from-sky-500 to-cyan-400"
                                 >
                                     {locationLoading ? "Fetching..." : "Use Current Location"}
@@ -634,7 +635,7 @@ const BookService = () => {
                             onClick={handleSubmit}
                             disabled={!currentUser || submitting}
 
-                            className="w-full py-4 rounded-full font-semibold text-black
+                            className="w-full py-4 cursor-pointer rounded-full font-semibold text-black
   bg-gradient-to-r from-sky-500 to-cyan-400
   hover:scale-105 transition-all duration-300
   shadow-lg shadow-sky-500/40 disabled:opacity-50 disabled:cursor-not-allowed"
