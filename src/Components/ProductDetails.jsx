@@ -19,7 +19,12 @@ export default function ProductDetails() {
   const [product, setProduct] = useState(null);
   const [activeImage, setActiveImage] = useState(0);
   const [selectedVariantIndex, setSelectedVariantIndex] = useState(0);
+  const [qty, setQty] = useState(1);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    setQty(1);
+  }, [selectedVariantIndex]);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -41,6 +46,16 @@ export default function ProductDetails() {
     fetchProduct();
   }, [slug]);
 
+  const currentStock = product?.variants?.[selectedVariantIndex]?.stock || 0;
+
+  const increaseQty = () => {
+    if (qty < currentStock) setQty((q) => q + 1);
+  };
+
+  const decreaseQty = () => {
+    if (qty > 1) setQty((q) => q - 1);
+  };
+
   const handleAddToCart = async () => {
     const user = auth.currentUser;
 
@@ -57,25 +72,35 @@ export default function ProductDetails() {
       return;
     }
 
+    const currentStock = variant.stock || 0;
+
+    if (qty > currentStock) {
+      alert("Selected quantity exceeds stock");
+      return;
+    }
+
     const cartRef = doc(db, "users", user.uid, "cart", product.docId);
     const existing = await getDoc(cartRef);
 
     if (existing.exists()) {
+      const newQty = existing.data().quantity + qty;
+
+      if (newQty > currentStock) {
+        alert("Total quantity exceeds stock");
+        return;
+      }
+
       await updateDoc(cartRef, {
-        quantity: existing.data().quantity + 1,
+        quantity: newQty,
       });
     } else {
       await setDoc(cartRef, {
-        // 🔥 REQUIRED FOR CHECKOUT + STOCK
-        docId: product.docId, // product document id
-        sku: variant.sku, // variant sku (OF-BOSCH-001)
-
-        // UI fields
+        docId: product.docId,
+        sku: variant.sku,
         name: product.name,
         price: product.offerPrice,
         image: product.images?.[0],
-        quantity: 1,
-
+        quantity: qty, // ✅ use selected quantity
         createdAt: serverTimestamp(),
       });
     }
@@ -98,6 +123,13 @@ export default function ProductDetails() {
       return;
     }
 
+    const currentStock = variant.stock || 0;
+
+    if (qty > currentStock) {
+      alert("Selected quantity exceeds stock");
+      return;
+    }
+
     // 🔥 Pass product directly to checkout page
     navigate("/checkout", {
       state: {
@@ -108,7 +140,7 @@ export default function ProductDetails() {
           name: product.name,
           price: product.offerPrice,
           image: product.images?.[0],
-          quantity: 1,
+          quantity: qty,
         },
       },
     });
@@ -196,6 +228,36 @@ export default function ProductDetails() {
 
             {/* PRODUCT DETAILS */}
             <div className="mt-6 grid grid-cols-2 gap-y-3 text-xl">
+              {/* QUANTITY */}
+              <span className="text-gray-400">Quantity</span>
+
+              <div className="flex items-center gap-4">
+                <button
+                  onClick={decreaseQty}
+                  className="w-9 h-9 rounded-full bg-[#050b14] border border-sky-400/40
+hover:bg-sky-400 hover:text-black transition"
+                >
+                  −
+                </button>
+
+                <span className="font-bold text-sky-400 min-w-[30px] text-center">
+                  {qty}
+                </span>
+
+                <button
+                  onClick={increaseQty}
+                  disabled={qty >= currentStock}
+                  className={`w-9 h-9 rounded-full border border-sky-400/40 transition
+      ${
+        qty >= currentStock
+          ? "opacity-40 cursor-not-allowed"
+          : "bg-[#050b14] hover:bg-sky-400 hover:text-black"
+      }`}
+                >
+                  +
+                </button>
+              </div>
+
               {product.variants?.[selectedVariantIndex]?.stock !==
                 undefined && (
                 <>
