@@ -391,7 +391,7 @@ const Dashboard = () => {
 
   useEffect(() => {
     const q = query(
-      collection(db, "services"),
+      collection(db, "bookings"),
       orderBy("createdAt", "desc"),
       limit(5)
     );
@@ -429,26 +429,36 @@ const Dashboard = () => {
     return new Date(ts).toLocaleDateString("en-IN");
   };
 
-  const SERVICE_COLORS = {
-    "Oil Change": "#2563eb",
-    "General Service": "#16a34a",
-    "Wheel Alignment": "#f97316",
-    "Engine Check": "#dc2626",
-  };
+ const BRAND_COLORS = {
+  BMW: "#2563eb",        // blue
+  Audi: "#111827",       // black
+  Benz: "#6b7280",       // silver
+  Mercedes: "#6b7280",
+  Toyota: "#dc2626",     // red
+  Honda: "#16a34a",      // green
+  Hyundai: "#0891b2",    // teal
+  Kia: "#7c3aed",        // violet
+  Ford: "#1d4ed8",       // dark blue
+  Tata: "#0f766e",       // dark teal
+  Mahindra: "#92400e",   // brown
+  Renault: "#f59e0b",    // yellow
+  Nissan: "#374151",     // gray
+  Volkswagen: "#0ea5e9", // light blue
+  Skoda: "#15803d",      // green
+};
+
 
   const getColor = (name, index) => {
-    if (SERVICE_COLORS[name]) return SERVICE_COLORS[name];
+    if (BRAND_COLORS[name]) return BRAND_COLORS[name];
     return colors[index % colors.length];
   };
+
 
   const [stats1, setStats1] = useState({});
   const [total, setTotal] = useState(0);
 
   useEffect(() => {
-    const q = query(
-      collection(db, "allServices"),
-      where("serviceStatus", "in", ["Pending", "In Progress"])
-    );
+    const q = query(collection(db, "bookings"));
 
     const unsub = onSnapshot(q, (snap) => {
       const counts = {};
@@ -457,12 +467,17 @@ const Dashboard = () => {
       snap.forEach((doc) => {
         const data = doc.data();
 
-        /* 🔧 SERVICE NAME FIELD */
-        const serviceName =
-          data.serviceName || data.packageName || "General Service";
+        // ❗ use model instead of brand
+        const brand = data.model || "Unknown";
 
-        counts[serviceName] = (counts[serviceName] || 0) + 1;
-        sum++;
+        // ❗ count bookings instead of stock
+        const value = 1;
+
+        // ❗ ignore cancelled (optional)
+        if (data.status === "Cancelled") return;
+
+        counts[brand] = (counts[brand] || 0) + value;
+        sum += value;
       });
 
       setStats1(counts);
@@ -471,9 +486,6 @@ const Dashboard = () => {
 
     return () => unsub();
   }, []);
-
-
-
 
 
   const colors = [
@@ -819,7 +831,7 @@ const Dashboard = () => {
         {/* PATIENT LIST */}
         <div className="bg-white rounded-xl shadow p-5 lg:col-span-2">
           <div className="flex justify-between mb-4">
-            <h3 className="font-semibold">Service List</h3>
+            <h3 className="font-semibold">Booking List</h3>
             <span
               className="text-blue-600 cursor-pointer hover:underline"
               onClick={() => navigate("/carservies")}
@@ -828,80 +840,80 @@ const Dashboard = () => {
             </span>
           </div>
 
-         <div className="bg-white rounded-2xl shadow border border-gray-200 overflow-hidden">
-  <div className="overflow-x-auto">
-    <table className="min-w-full text-sm text-gray-700 border-collapse">
+          <div className="bg-white rounded-2xl shadow border border-gray-200 overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="min-w-full text-sm text-gray-700 border-collapse">
 
-      {/* TABLE HEAD */}
-     <thead className="bg-gradient-to-r from-black to-cyan-400 text-white">
-        <tr>
-          <th className="px-3 py-4 text-left font-bold">S No</th>
-          <th className="px-3 py-4 text-left font-bold">Customer</th>
-          <th className="px-3 py-4 text-left font-bold">Contact</th>
-          <th className="px-3 py-4 text-left font-bold">Car</th>
-          <th className="px-3 py-4 text-left font-bold">Last Visit</th>
-        </tr>
-      </thead>
+                {/* TABLE HEAD */}
+                <thead className="bg-gradient-to-r from-black to-cyan-400 text-white">
+                  <tr>
+                    <th className="px-3 py-4 text-left font-bold">S No</th>
+                    <th className="px-3 py-4 text-left font-bold">Customer</th>
+                    <th className="px-3 py-4 text-left font-bold">Contact</th>
+                    <th className="px-3 py-4 text-left font-bold">Car</th>
+                    <th className="px-3 py-4 text-left font-bold">Last Visit</th>
+                  </tr>
+                </thead>
 
-      {/* TABLE BODY */}
-      <tbody>
-        {patients.map((item, index) => (
-          <tr
-            key={item.id}
-            className="border-b border-gray-300 hover:bg-gray-50 cursor-pointer"
-            onClick={() => navigate(`/services/view/${item.id}`)}
-          >
-            {/* S No */}
-            <td className="px-3 py-3 font-semibold">
-              {index + 1}
-            </td>
+                {/* TABLE BODY */}
+                <tbody>
+                  {patients.map((item, index) => (
+                    <tr
+                      key={item.id}
+                      className="border-b border-gray-300 hover:bg-gray-50 cursor-pointer"
+                      onClick={() => navigate(`/services/view/${item.id}`)}
+                    >
+                      {/* S No */}
+                      <td className="px-3 py-3 font-semibold">
+                        {index + 1}
+                      </td>
 
-            {/* CUSTOMER NAME + BOOKING ID */}
-            <td className="px-3 py-3">
-              <div className="font-medium">{item.name || "-"}</div>
-              <div className="text-xs text-gray-500">
-                {item.bookingId || "-"}
-              </div>
-            </td>
+                      {/* CUSTOMER NAME + BOOKING ID */}
+                      <td className="px-3 py-3">
+                        <div className="font-medium">{item.name || "-"}</div>
+                        <div className="text-xs text-gray-500">
+                          {item.bookingId || "-"}
+                        </div>
+                      </td>
 
-            {/* CONTACT */}
-            <td className="px-3 py-3">
-              {item.phone || "-"}
-              {item.altPhone && (
-                <div className="text-xs text-gray-400">
-                  Alt: {item.altPhone}
-                </div>
-              )}
-            </td>
+                      {/* CONTACT */}
+                      <td className="px-3 py-3">
+                        {item.phone || "-"}
+                        {item.altPhone && (
+                          <div className="text-xs text-gray-400">
+                            Alt: {item.altPhone}
+                          </div>
+                        )}
+                      </td>
 
-            {/* CAR */}
-            <td className="px-3 py-3">
-              {item.brand || "-"} {item.model || ""}
-            </td>
+                      {/* CAR */}
+                      <td className="px-3 py-3">
+                        {item.brand || "-"} {item.model || ""}
+                      </td>
 
-            {/* LAST VISIT */}
-            <td className="px-3 py-3">
-              {item.createdAt
-                ? formatDate(item.createdAt)
-                : "-"}
-            </td>
-          </tr>
-        ))}
+                      {/* LAST VISIT */}
+                      <td className="px-3 py-3">
+                        {item.createdAt
+                          ? formatDate(item.createdAt)
+                          : "-"}
+                      </td>
+                    </tr>
+                  ))}
 
-        {patients.length === 0 && (
-          <tr>
-            <td
-              colSpan="5"
-              className="text-center py-6 text-gray-400"
-            >
-              No services found
-            </td>
-          </tr>
-        )}
-      </tbody>
-    </table>
-  </div>
-</div>
+                  {patients.length === 0 && (
+                    <tr>
+                      <td
+                        colSpan="5"
+                        className="text-center py-6 text-gray-400"
+                      >
+                        No services found
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
 
         </div>
 
@@ -909,71 +921,66 @@ const Dashboard = () => {
         {/* TREATMENT STATS */}
         <div className="bg-white rounded-xl shadow p-6">
           <h3 className="font-semibold text-gray-800 mb-5">
-            Active Services
+            Car Products by Brand
           </h3>
 
-          <div className="flex flex-col sm:flex-row items-center gap-6">
-            {/* DONUT */}
-            <div className="relative">
-              <div
-                className="w-36 h-36 rounded-full shadow-inner"
-                style={{
-                  background: gradient,
-                  boxShadow: "0 0 0 8px #f8fafc inset",
-                }}
-              />
+          <div className="flex-1 w-full space-y-3 text-sm">
+            {Object.entries(stats1).map(([brand, stock], index) => {
+              const percent = total
+                ? Math.round((stock / total) * 100)
+                : 0;
 
-              {/* CENTER */}
-              <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <p className="text-3xl font-bold text-gray-800">
-                  {total}
-                </p>
-                <p className="text-xs text-gray-500">
-                  Active Services
-                </p>
-              </div>
-            </div>
-
-            {/* LEGEND */}
-            <div className="flex-1 w-full space-y-3 text-sm">
-              {Object.entries(stats1).map(([cat, count], index) => {
-                const percent = total
-                  ? Math.round((count / total) * 100)
-                  : 0;
-
-                return (
-                  <div
-                    key={cat}
-                    className="flex items-center justify-between"
-                  >
-                    <div className="flex items-center gap-2">
-                      <span
-                        className="w-3 h-3 rounded-full"
-                        style={{
-                          backgroundColor: getColor(cat, index),
-                        }}
-                      />
-                      <span className="font-medium text-gray-700">
-                        {cat}
-                      </span>
-                    </div>
-
-                    <span className="text-gray-600">
-                      {percent}%
+              return (
+                <div
+                  key={brand}
+                  className="flex items-center justify-between"
+                >
+                  <div className="flex items-center gap-2">
+                    <span
+                      className="w-3 h-3 rounded-full"
+                      style={{
+                        backgroundColor: getColor(brand, index),
+                      }}
+                    />
+                    <span className="font-medium text-gray-700">
+                      {brand}
                     </span>
                   </div>
-                );
-              })}
 
-              {total === 0 && (
-                <div className="text-center text-gray-400 py-6">
-                  No active services found
+                  {/* STOCK + % */}
+                  <span className="text-gray-600">
+                    {stock} • {percent}%
+                  </span>
                 </div>
-              )}
+              );
+            })}
+
+            {total === 0 && (
+              <div className="text-center text-gray-400 py-6">
+                No products found
+              </div>
+            )}
+          </div>
+
+          <div className="relative flex mt-10 items-center justify-center">
+            {/* OUTER DONUT */}
+            <div
+              className="w-40 h-40 rounded-full"
+              style={{ background: gradient }}
+            />
+
+            {/* INNER CIRCLE */}
+            <div className="absolute w-24 h-24 bg-slate-900 rounded-full flex flex-col items-center justify-center shadow-inner">
+              <p className="text-2xl font-bold text-white leading-none">
+                {total}
+              </p>
+              <p className="text-[10px] text-gray-300 leading-none">
+                Total Bookings
+              </p>
             </div>
           </div>
-        </div>
 
+        </div>
       </div>
 
       {/* FOLLOW UPS + EQUIPMENT */}
@@ -996,7 +1003,7 @@ const Dashboard = () => {
           <div className="bg-white rounded-2xl shadow border border-gray-200 overflow-hidden">
             <div className="overflow-x-auto">
               <table className="min-w-full text-sm text-gray-700">
-                 <thead className="bg-gradient-to-r from-black to-cyan-400 text-white">
+                <thead className="bg-gradient-to-r from-black to-cyan-400 text-white">
                   <tr>
                     <th className="px-3 py-4 text-left font-bold">S No</th>
                     <th className="px-3 py-4 text-left font-bold">Item</th>
@@ -1030,7 +1037,7 @@ const Dashboard = () => {
                       <td className="px-3 py-4">{index + 1}</td>
 
                       {/* PART NAME */}
-                      <td className="px-3 py-4 font-medium">
+                      <td className="px-3 py-4">
                         {r.partName}
                       </td>
 
@@ -1040,12 +1047,12 @@ const Dashboard = () => {
                       </td>
 
                       {/* STOCK QTY */}
-                      <td className="px-3 py-4 text-center font-semibold">
+                      <td className="px-3 py-4 ">
                         {r.stockQty}
                       </td>
 
                       {/* MIN STOCK */}
-                      <td className="px-3 py-4 text-center">
+                      <td className="px-3 py-4 ">
                         {r.minStock}
                       </td>
 
