@@ -245,9 +245,9 @@ const Header = ({ onMenuClick }) => {
                 />
 
                 <div
-                  className="absolute right-0 top-full mt-0 
+                  className="absolute right-0 top-[-5px] mt-0 
                   w-[90vw] max-w-[360px] sm:w-80 
-                  bg-white border border-slate-200 rounded-2xl shadow-xl 
+                  bg-white border border-slate-200 rounded-md shadow-xl 
                   flex flex-col z-50 animate-fadeIn overflow-hidden"
                 >
 
