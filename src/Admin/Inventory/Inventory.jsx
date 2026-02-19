@@ -1,287 +1,3 @@
-// import { useEffect, useState } from "react";
-// import {
-//   collection,
-//   getDocs,
-//   deleteDoc,
-//   doc,
-// } from "firebase/firestore";
-// import { db } from "../../firebase";
-// import { useNavigate } from "react-router-dom";
-// import toast from "react-hot-toast";
-// import {
-//   Plus,
-//   Filter,
-//   RotateCcw,
-//   Pencil,
-//   Trash2,
-//   Box,
-//   AlertTriangle,
-//   ShoppingCart,
-// } from "lucide-react";
-
-// /* =======================
-//    STAT CARD
-// ======================= */
-// const StatCard = ({ title, value, icon, color }) => (
-//   <div className="bg-white p-5 rounded-xl shadow flex justify-between items-center">
-//     <div>
-//       <p className="text-gray-500 text-sm">{title}</p>
-//       <h2 className={`text-2xl font-bold ${color}`}>{value}</h2>
-//     </div>
-//     <div className={`p-3 rounded-full ${color.replace("text", "bg")}/10`}>
-//       {icon}
-//     </div>
-//   </div>
-// );
-
-// const Inventory = () => {
-//   const navigate = useNavigate();
-
-//   const [items, setItems] = useState([]);
-//   const [filteredItems, setFilteredItems] = useState([]);
-
-//   const [categories, setCategories] = useState([]);
-//   const [suppliers, setSuppliers] = useState([]);
-
-//   const [filters, setFilters] = useState({
-//     category: "",
-//     supplier: "",
-//     search: "",
-//   });
-
-//   /* =======================
-//      LOAD INVENTORY
-//   ======================= */
-//   useEffect(() => {
-//     loadInventory();
-//   }, []);
-
-//   const loadInventory = async () => {
-//     try {
-//       const snap = await getDocs(collection(db, "inventory"));
-//       const data = snap.docs.map(d => ({
-//         id: d.id,
-//         ...d.data(),
-//       }));
-
-//       setItems(data);
-//       setFilteredItems(data);
-
-//       setCategories([...new Set(data.map(i => i.category))]);
-//       setSuppliers([...new Set(data.map(i => i.supplier))]);
-//     } catch {
-//       toast.error("Failed to load inventory");
-//     }
-//   };
-
-//   /* =======================
-//      STATS
-//   ======================= */
-//   const totalItems = items.length;
-//   const lowStock = items.filter(
-//     i => i.stockQty > 0 && i.stockQty <= i.minStock
-//   ).length;
-//   const outOfStock = items.filter(i => i.stockQty === 0).length;
-//   const receivedOrders = 18; // optional static / can be Firestore later
-
-//   /* =======================
-//      FILTER HANDLERS
-//   ======================= */
-//   const handleChange = (e) => {
-//     setFilters(prev => ({ ...prev, [e.target.name]: e.target.value }));
-//   };
-
-//   const applyFilter = () => {
-//     let data = [...items];
-
-//     if (filters.category)
-//       data = data.filter(i => i.category === filters.category);
-
-//     if (filters.supplier)
-//       data = data.filter(i => i.supplier === filters.supplier);
-
-//     if (filters.search)
-//       data = data.filter(i =>
-//         i.itemName.toLowerCase().includes(filters.search.toLowerCase()) ||
-//         i.supplier.toLowerCase().includes(filters.search.toLowerCase())
-//       );
-
-//     setFilteredItems(data);
-//   };
-
-//   const resetFilter = () => {
-//     setFilters({ category: "", supplier: "", search: "" });
-//     setFilteredItems(items);
-//   };
-
-//   /* =======================
-//      DELETE
-//   ======================= */
-//   const handleDelete = async (id) => {
-//     if (!window.confirm("Delete this item?")) return;
-//     await deleteDoc(doc(db, "inventory", id));
-//     toast.success("Item deleted");
-//     loadInventory();
-//   };
-
-//   /* =======================
-//      STATUS BADGE
-//   ======================= */
-//   const getStatus = (item) => {
-//     if (item.stockQty === 0)
-//       return <span className="bg-red-500 text-white px-3 py-1 rounded">Out of Stock</span>;
-//     if (item.stockQty <= item.minStock)
-//       return <span className="bg-yellow-400 text-black px-3 py-1 rounded">Low Stock</span>;
-//     return <span className="bg-green-500 text-white px-3 py-1 rounded">In Stock</span>;
-//   };
-
-//   return (
-//     <div className="space-y-6">
-
-//       {/* =======================
-//           DASHBOARD CARDS
-//       ======================= */}
-//       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-//         <StatCard
-//           title="Total Items"
-//           value={totalItems}
-//           icon={<Box />}
-//           color="text-blue-600"
-//         />
-//         <StatCard
-//           title="Low Stock Alerts"
-//           value={lowStock}
-//           icon={<AlertTriangle />}
-//           color="text-yellow-600"
-//         />
-//         <StatCard
-//           title="Out of Stock Items"
-//           value={outOfStock}
-//           icon={<ShoppingCart />}
-//           color="text-red-600"
-//         />
-//         <StatCard
-//           title="Received Orders This Month"
-//           value={receivedOrders}
-//           icon={<ShoppingCart />}
-//           color="text-green-600"
-//         />
-//       </div>
-
-//       {/* =======================
-//           FILTER + ADD BUTTON
-//       ======================= */}
-//       <div className="bg-white p-4 rounded-xl shadow flex flex-wrap justify-between gap-4">
-
-//         <div className="flex flex-wrap gap-3 items-center">
-
-//           <select
-//             name="category"
-//             value={filters.category}
-//             onChange={handleChange}
-//             className="border px-3 py-2 rounded"
-//           >
-//             <option value="">All Categories</option>
-//             {categories.map(c => <option key={c}>{c}</option>)}
-//           </select>
-
-//           <select
-//             name="supplier"
-//             value={filters.supplier}
-//             onChange={handleChange}
-//             className="border px-3 py-2 rounded"
-//           >
-//             <option value="">All Suppliers</option>
-//             {suppliers.map(s => <option key={s}>{s}</option>)}
-//           </select>
-
-//           <button
-//             onClick={applyFilter}
-//             className="bg-blue-100 text-blue-700 px-4 py-2 rounded flex gap-2"
-//           >
-//             <Filter size={16} /> Filter
-//           </button>
-
-//           <button
-//             onClick={resetFilter}
-//             className="bg-gray-100 px-4 py-2 rounded flex gap-2"
-//           >
-//             <RotateCcw size={16} /> Reset
-//           </button>
-
-//           <input
-//             type="text"
-//             name="search"
-//             value={filters.search}
-//             onChange={handleChange}
-//             placeholder="Search by item name or supplier"
-//             className="border px-3 py-2 rounded w-64"
-//           />
-//         </div>
-
-//         <button
-//           onClick={() => navigate("/admin/additemsinventory")}
-//           className="bg-green-500 text-white px-5 py-2 rounded flex items-center gap-2 shadow"
-//         >
-//           <Plus size={18} /> Add New Item
-//         </button>
-//       </div>
-
-//       {/* =======================
-//           INVENTORY TABLE
-//       ======================= */}
-//       <div className="bg-white rounded-xl shadow overflow-x-auto">
-//         <table className="w-full text-sm">
-//           <thead className="bg-gray-100">
-//             <tr>
-//               <th className="p-3 text-left">Item Name</th>
-//               <th>Category</th>
-//               <th>Supplier</th>
-//               <th>Stock Qty</th>
-//               <th>Status</th>
-//               <th className="text-center">Actions</th>
-//             </tr>
-//           </thead>
-
-//           <tbody>
-//             {filteredItems.map(item => (
-//               <tr key={item.id} className="border-t">
-//                 <td className="p-3">{item.itemName}</td>
-//                 <td>{item.category}</td>
-//                 <td>{item.supplier}</td>
-//                 <td>{item.stockQty}</td>
-//                 <td>{getStatus(item)}</td>
-//                 <td className="flex gap-2 justify-center p-2">
-//                   <button
-//                     onClick={() => navigate(`/admin/inventory/edit/${item.id}`)}
-//                     className="bg-blue-500 text-white px-3 py-1 rounded flex gap-1"
-//                   >
-//                     <Pencil size={14} /> Edit
-//                   </button>
-//                   <button
-//                     onClick={() => handleDelete(item.id)}
-//                     className="bg-red-500 text-white px-3 py-1 rounded flex gap-1"
-//                   >
-//                     <Trash2 size={14} /> Delete
-//                   </button>
-//                 </td>
-//               </tr>
-//             ))}
-//           </tbody>
-//         </table>
-
-//         {filteredItems.length === 0 && (
-//           <p className="text-center py-6 text-gray-500">No items found</p>
-//         )}
-//       </div>
-
-//     </div>
-//   );
-// };
-
-// export default Inventory;
-
-
 import { useEffect, useState } from "react";
 import {
   collection,
@@ -325,7 +41,7 @@ const inputStyle = `
    STAT CARD
 ======================= */
 const StatCard = ({ title, value, icon, color }) => (
-  <div className="bg-white p-5 rounded-xl shadow flex justify-between items-center">
+  <div className="bg-white p-5 rounded-md border border-gray-300 shadow flex justify-between items-center">
     <div>
       <p className="text-gray-500 text-sm">{title}</p>
       <h2 className={`text-2xl font-bold ${color}`}>{value}</h2>
@@ -466,7 +182,7 @@ const Inventory = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 p-2">
       <div className="flex justify-end">
         <button
           onClick={() => navigate("/admin/additemsinventory")}
@@ -485,7 +201,7 @@ const Inventory = () => {
       </div>
 
       {/* ===== FILTER + ADD ===== */}
-      <div className="bg-white rounded-xl shadow p-4 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
 
         {/* LEFT — SEARCH */}
         <div className="w-full lg:w-1/2">
@@ -533,7 +249,7 @@ const Inventory = () => {
       <div className="bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="min-w-full text-sm text-gray-700">
-            <thead className="bg-black text-white">
+            <thead className="bg-gradient-to-r from-black to-cyan-400 text-white">
               <tr>
                 <th className="px-4 py-4 text-left font-semibold">S No</th>
                 <th className="px-4 py-4 text-left font-semibold">Item Name</th>

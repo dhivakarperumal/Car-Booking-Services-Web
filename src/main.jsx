@@ -54,6 +54,8 @@ import About from "./Components/About.jsx";
 import ServiceDetails from "./Components/ServiceDetails.jsx";
 import PricingList from "./Admin/PricingAll/AllPricesList.jsx";
 import PricingForm from "./Admin/PricingAll/AddPrice.jsx";
+import ProductBilling from "./Admin/Products/ProductBill.jsx";
+import ShowAllBookings from "./Admin/Bookingservice/BookingShowAll.jsx";
 import Contact from "./Components/ContactUs.jsx";
 import BookService from "./Components/BookService.jsx";
 import Account from "./Components/Account.jsx";
@@ -93,7 +95,8 @@ const router = createBrowserRouter([
       { path: "services/:id", element: <ViewService/> },
       { path: "addservicestype", element: <AddServicesType /> },
       { path: "addserviceparts", element: <AddServiceParts /> },
-      { path: "bookings", element: <BookingService /> },
+      { path: "bookings", element: <ShowAllBookings/> },
+      { path: "addbooking", element: <BookingService /> },
       { path: "contact", element: <Contact /> },
 
       { path: "allProducts", element: <AllProducts /> },
@@ -103,11 +106,13 @@ const router = createBrowserRouter([
 
 
       { path: "addservices", element: <AddCarServices /> },
+      { path: "addservices/:id", element: <AddCarServices /> },
       { path: "serviceslist", element: <ServicesListAll /> },
 
 
       { path: "priceslist", element: <PricingList /> },
       { path: "addprice", element: <PricingForm /> },
+      { path: "addprice/:id", element: <PricingForm /> },
      
       
 
@@ -121,6 +126,9 @@ const router = createBrowserRouter([
       // { path: "addtreatments", element: <AddTreatment /> },
       // { path: "addtreatments/:id", element: <AddTreatment /> },
       // { path: "viewtreatment/:id", element: <ViewTreatment /> },
+
+      { path: "productbilling", element: <ProductBilling /> },
+
 
       { path: "billing", element: <Billings /> },
       { path: "addbillings", element: <AddBilling /> },

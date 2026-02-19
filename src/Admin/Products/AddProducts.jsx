@@ -1,301 +1,42 @@
-// import React, { useState } from "react";
-// import { db } from "../../firebase";
-// import {
-//   collection,
-//   addDoc,
-//   serverTimestamp,
-// } from "firebase/firestore";
-// import toast from "react-hot-toast";
-
-// const AddProduct = () => {
-//   const [product, setProduct] = useState({
-//     id: "",
-//     name: "",
-//     slug: "",
-//     category: "",
-//     subcategory: "",
-//     brand: "",
-//     description: "",
-//     shortDescription: "",
-//     mrp: "",
-//     salePrice: "",
-//     costPrice: "",
-//     discount: "",
-//     tax: "",
-//     weight: "",
-//     dimensions: "",
-//     warranty: "",
-//     returnPolicy: "",
-//     thumbnail: "",
-//     tags: "",
-//     isFeatured: false,
-//     isActive: true,
-//   });
-
-//   const [vehicles, setVehicles] = useState([
-//     { make: "", model: "", year: "", engine: "" },
-//   ]);
-
-//   const [variants, setVariants] = useState([
-//     { sku: "", position: "", material: "", stock: "" },
-//   ]);
-
-//   const [images, setImages] = useState([""]);
-
-//   const handleChange = (e) => {
-//     const { name, value, type, checked } = e.target;
-//     setProduct({
-//       ...product,
-//       [name]: type === "checkbox" ? checked : value,
-//     });
-//   };
-
-//   // Vehicle handlers
-//   const handleVehicleChange = (index, e) => {
-//     const newVehicles = [...vehicles];
-//     newVehicles[index][e.target.name] = e.target.value;
-//     setVehicles(newVehicles);
-//   };
-
-//   const addVehicle = () =>
-//     setVehicles([...vehicles, { make: "", model: "", year: "", engine: "" }]);
-
-//   // Variant handlers
-//   const handleVariantChange = (index, e) => {
-//     const newVariants = [...variants];
-//     newVariants[index][e.target.name] = e.target.value;
-//     setVariants(newVariants);
-//   };
-
-//   const addVariant = () =>
-//     setVariants([...variants, { sku: "", position: "", material: "", stock: "" }]);
-
-// const handleImageUpload = async (index, file) => {
-//   if (!file) return;
-
-//   try {
-//     const options = {
-//       maxSizeMB: 0.2, // 🔥 200KB max
-//       maxWidthOrHeight: 800,
-//       useWebWorker: true,
-//     };
-
-//     // compress image
-//     const compressedFile = await imageCompression(file, options);
-
-//     // convert to base64
-//     const reader = new FileReader();
-//     reader.readAsDataURL(compressedFile);
-
-//     reader.onloadend = () => {
-//       const newImages = [...images];
-//       newImages[index] = reader.result;
-//       setImages(newImages);
-//     };
-//   } catch (error) {
-//     console.error("Image compression error:", error);
-//   }
-// };
-
-// const addImage = () => setImages([...images, ""]);
-
-
-//   // 🔥 Submit to Firestore
-//   const handleSubmit = async (e) => {
-//     e.preventDefault();
-
-//     const totalStock = variants.reduce(
-//       (sum, v) => sum + Number(v.stock || 0),
-//       0
-//     );
-
-//     const productData = {
-//       ...product,
-//       mrp: Number(product.mrp),
-//       salePrice: Number(product.salePrice),
-//       costPrice: Number(product.costPrice),
-//       discount: Number(product.discount),
-//       tax: Number(product.tax),
-//       vehicleCompatibility: vehicles,
-//       variants: variants.map((v) => ({
-//         ...v,
-//         stock: Number(v.stock),
-//       })),
-//       images: images.filter((img) => img !== ""),
-//       tags: product.tags.split(","),
-//       totalStock,
-//       ratings: { average: 0, count: 0 },
-//       seo: {
-//         title: product.name,
-//         description: product.shortDescription,
-//         keywords: product.tags.split(","),
-//       },
-//       createdAt: serverTimestamp(),
-//       updatedAt: serverTimestamp(),
-//     };
-
-//     try {
-//       await addDoc(collection(db, "products"), productData);
-//       toast.success("✅ Product Added Successfully");
-//     } catch (error) {
-//       console.error(error);
-//       toast.error("❌ Error adding product");
-//     }
-//   };
-
-//   return (
-//     <form
-//       onSubmit={handleSubmit}
-//       className="p-6 max-w-6xl mx-auto space-y-6"
-//     >
-//       <h2 className="text-2xl font-bold">Add Car Spare Product</h2>
-
-//       {/* BASIC DETAILS */}
-//       <div className="grid grid-cols-2 gap-4">
-//         <input name="id" placeholder="Product ID" onChange={handleChange} className="input" />
-//         <input name="name" placeholder="Product Name" onChange={handleChange} className="input" />
-//         <input name="slug" placeholder="Slug" onChange={handleChange} className="input" />
-//         <input name="brand" placeholder="Brand" onChange={handleChange} className="input" />
-//         <input name="category" placeholder="Category" onChange={handleChange} className="input" />
-//         <input name="subcategory" placeholder="Subcategory" onChange={handleChange} className="input" />
-//       </div>
-
-//       <textarea name="description" placeholder="Description" onChange={handleChange} className="input" />
-//       <textarea name="shortDescription" placeholder="Short Description" onChange={handleChange} className="input" />
-
-//       {/* PRICE */}
-//       <div className="grid grid-cols-4 gap-4">
-//         <input name="mrp" placeholder="MRP" onChange={handleChange} className="input" />
-//         <input name="salePrice" placeholder="Sale Price" onChange={handleChange} className="input" />
-//         <input name="costPrice" placeholder="Cost Price" onChange={handleChange} className="input" />
-//         <input name="discount" placeholder="Discount %" onChange={handleChange} className="input" />
-//         <input name="tax" placeholder="Tax %" onChange={handleChange} className="input" />
-//       </div>
-
-//       {/* VEHICLE COMPATIBILITY */}
-//       <div>
-//         <h3 className="font-semibold">Vehicle Compatibility</h3>
-//         {vehicles.map((v, i) => (
-//           <div key={i} className="grid grid-cols-4 gap-2 mb-2">
-//             <input name="make" placeholder="Make" onChange={(e) => handleVehicleChange(i, e)} className="input" />
-//             <input name="model" placeholder="Model" onChange={(e) => handleVehicleChange(i, e)} className="input" />
-//             <input name="year" placeholder="Year" onChange={(e) => handleVehicleChange(i, e)} className="input" />
-//             <input name="engine" placeholder="Engine" onChange={(e) => handleVehicleChange(i, e)} className="input" />
-//           </div>
-//         ))}
-//         <button type="button" onClick={addVehicle} className="btn">+ Add Vehicle</button>
-//       </div>
-
-//       {/* VARIANTS */}
-//       <div>
-//         <h3 className="font-semibold">Variants</h3>
-//         {variants.map((v, i) => (
-//           <div key={i} className="grid grid-cols-4 gap-2 mb-2">
-//             <input name="sku" placeholder="SKU" onChange={(e) => handleVariantChange(i, e)} className="input" />
-//             <input name="position" placeholder="Position" onChange={(e) => handleVariantChange(i, e)} className="input" />
-//             <input name="material" placeholder="Material" onChange={(e) => handleVariantChange(i, e)} className="input" />
-//             <input name="stock" placeholder="Stock" onChange={(e) => handleVariantChange(i, e)} className="input" />
-//           </div>
-//         ))}
-//         <button type="button" onClick={addVariant} className="btn">+ Add Variant</button>
-//       </div>
-
-//       {/* IMAGES */}
-//      <div className="bg-white shadow rounded-xl p-6">
-//   <h3 className="text-xl font-semibold mb-4">Images</h3>
-
-//   {images.map((img, i) => (
-//     <div key={i} className="mb-4">
-//       <input
-//         type="file"
-//         accept="image/*"
-//         onChange={(e) => handleImageUpload(i, e.target.files[0])}
-//         className="block w-full text-sm text-gray-500
-//         file:mr-4 file:py-2 file:px-4
-//         file:rounded-lg file:border-0
-//         file:text-sm file:font-semibold
-//         file:bg-black file:text-white
-//         hover:file:bg-gray-800"
-//       />
-
-//       {img && (
-//         <img
-//           src={img}
-//           alt="preview"
-//           className="mt-3 w-32 h-32 object-cover rounded-lg border"
-//         />
-//       )}
-//     </div>
-//   ))}
-
-//   <button type="button" onClick={addImage} className="btn">
-//     + Add Image
-//   </button>
-// </div>
-
-//       {/* EXTRA */}
-//       <div className="grid grid-cols-2 gap-4">
-//         <input name="thumbnail" placeholder="Thumbnail URL" onChange={handleChange} className="input" />
-//         <input name="weight" placeholder="Weight" onChange={handleChange} className="input" />
-//         <input name="dimensions" placeholder="Dimensions" onChange={handleChange} className="input" />
-//         <input name="warranty" placeholder="Warranty" onChange={handleChange} className="input" />
-//         <input name="returnPolicy" placeholder="Return Policy" onChange={handleChange} className="input" />
-//         <input name="tags" placeholder="Tags (comma separated)" onChange={handleChange} className="input" />
-//       </div>
-
-//       {/* CHECKBOX */}
-//       <div className="flex gap-6">
-//         <label>
-//           <input type="checkbox" name="isFeatured" onChange={handleChange} /> Featured
-//         </label>
-//         <label>
-//           <input type="checkbox" name="isActive" defaultChecked onChange={handleChange} /> Active
-//         </label>
-//       </div>
-
-//       <button type="submit" className="bg-black text-white px-6 py-3 rounded-lg">
-//         Save Product
-//       </button>
-//     </form>
-//   );
-// };
-
-// export default AddProduct;
-
-
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { db } from "../../firebase";
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import {
+  collection,
+  addDoc,
+  serverTimestamp,
+  getDocs,
+  updateDoc,
+  doc,
+} from "firebase/firestore";
 import toast from "react-hot-toast";
 import imageCompression from "browser-image-compression";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const AddProduct = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const editData = location.state?.editData;
+
+  const [loading, setLoading] = useState(false);
+
   const [product, setProduct] = useState({
     id: "",
     name: "",
     slug: "",
-    category: "",
-    subcategory: "",
     brand: "",
     description: "",
-    shortDescription: "",
     mrp: "",
-    salePrice: "",
-    costPrice: "",
-    discount: "",
-    tax: "",
-    weight: "",
-    dimensions: "",
-    warranty: "",
-    returnPolicy: "",
+    offer: "",
+    offerPrice: "",
     tags: "",
+    warrantyAvailable: false,
+    warrantyMonths: "",
+    returnAvailable: false,
+    returnDays: "",
     isFeatured: false,
     isActive: true,
+    rating: "",
   });
-
-  const [vehicles, setVehicles] = useState([
-    { make: "", model: "", year: "", engine: "" },
-  ]);
 
   const [variants, setVariants] = useState([
     { sku: "", position: "", material: "", stock: "" },
@@ -304,23 +45,90 @@ const AddProduct = () => {
   const [images, setImages] = useState([]);
   const [thumbnail, setThumbnail] = useState("");
 
-  // 🔹 Input change
+  /* AUTO SLUG */
+  useEffect(() => {
+    if (product.name) {
+      setProduct((prev) => ({
+        ...prev,
+        slug: product.name
+          .toLowerCase()
+          .replace(/ /g, "-")
+          .replace(/[^\w-]+/g, ""),
+      }));
+    }
+  }, [product.name]);
+
+  /* AUTO OFFER PRICE */
+  useEffect(() => {
+    const mrp = Number(product.mrp || 0);
+    const offer = Number(product.offer || 0);
+
+    if (mrp && offer >= 0) {
+      const offerPrice = mrp - (mrp * offer) / 100;
+      setProduct((prev) => ({
+        ...prev,
+        offerPrice: offerPrice.toFixed(2),
+      }));
+    }
+  }, [product.mrp, product.offer]);
+
+  /* LOAD EDIT DATA */
+  useEffect(() => {
+    if (editData) {
+      setProduct({
+        ...editData,
+        tags: Array.isArray(editData.tags)
+          ? editData.tags.join(", ")
+          : editData.tags || "",
+        warrantyAvailable: editData?.warranty?.available || false,
+        warrantyMonths: editData?.warranty?.months || "",
+        returnAvailable: editData?.returnPolicy?.available || false,
+        returnDays: editData?.returnPolicy?.days || "",
+        rating: editData?.rating || "",
+      });
+
+      setVariants(editData.variants || []);
+      setImages(editData.images || []);
+      setThumbnail(editData.thumbnail || "");
+    }
+  }, [editData]);
+
+  /* GENERATE PRODUCT ID */
+  const generateProductId = async () => {
+    const snap = await getDocs(collection(db, "products"));
+    const count = snap.size + 1;
+    return `PR${String(count).padStart(3, "0")}`;
+  };
+
+  /* INPUT CHANGE */
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setProduct({ ...product, [name]: type === "checkbox" ? checked : value });
+
+    if (name === "warrantyAvailable") {
+      setProduct({
+        ...product,
+        warrantyAvailable: checked,
+        warrantyMonths: checked ? product.warrantyMonths : "",
+      });
+      return;
+    }
+
+    if (name === "returnAvailable") {
+      setProduct({
+        ...product,
+        returnAvailable: checked,
+        returnDays: checked ? product.returnDays : "",
+      });
+      return;
+    }
+
+    setProduct({
+      ...product,
+      [name]: type === "checkbox" ? checked : value,
+    });
   };
 
-  // 🔹 Vehicle handlers
-  const handleVehicleChange = (index, e) => {
-    const newVehicles = [...vehicles];
-    newVehicles[index][e.target.name] = e.target.value;
-    setVehicles(newVehicles);
-  };
-
-  const addVehicle = () =>
-    setVehicles([...vehicles, { make: "", model: "", year: "", engine: "" }]);
-
-  // 🔹 Variant handlers
+  /* VARIANT CHANGE */
   const handleVariantChange = (index, e) => {
     const newVariants = [...variants];
     newVariants[index][e.target.name] = e.target.value;
@@ -328,9 +136,12 @@ const AddProduct = () => {
   };
 
   const addVariant = () =>
-    setVariants([...variants, { sku: "", position: "", material: "", stock: "" }]);
+    setVariants([
+      ...variants,
+      { sku: "", position: "", material: "", stock: "" },
+    ]);
 
-  // 🔹 Convert to base64
+  /* IMAGE BASE64 */
   const convertToBase64 = (file) =>
     new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -339,26 +150,19 @@ const AddProduct = () => {
       reader.onerror = reject;
     });
 
-  // 🔹 Multiple image upload with compression
   const handleMultipleImages = async (files) => {
     const imageArray = [];
 
     for (let i = 0; i < files.length; i++) {
-      const file = files[i];
-
       const options = {
         maxSizeMB: 0.2,
         maxWidthOrHeight: 800,
         useWebWorker: true,
       };
 
-      try {
-        const compressedFile = await imageCompression(file, options);
-        const base64 = await convertToBase64(compressedFile);
-        imageArray.push(base64);
-      } catch (error) {
-        console.error("Compression error:", error);
-      }
+      const compressedFile = await imageCompression(files[i], options);
+      const base64 = await convertToBase64(compressedFile);
+      imageArray.push(base64);
     }
 
     const updatedImages = [...images, ...imageArray];
@@ -369,7 +173,6 @@ const AddProduct = () => {
     }
   };
 
-  // 🔹 Remove image
   const removeImage = (index) => {
     const updated = images.filter((_, i) => i !== index);
     setImages(updated);
@@ -379,167 +182,321 @@ const AddProduct = () => {
     }
   };
 
-  // 🔥 Submit to Firestore
+  /* SUBMIT */
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    const totalStock = variants.reduce(
-      (sum, v) => sum + Number(v.stock || 0),
-      0
-    );
-
-    const productData = {
-      ...product,
-      mrp: Number(product.mrp),
-      salePrice: Number(product.salePrice),
-      costPrice: Number(product.costPrice),
-      discount: Number(product.discount),
-      tax: Number(product.tax),
-      vehicleCompatibility: vehicles,
-      variants: variants.map((v) => ({
-        ...v,
-        stock: Number(v.stock),
-      })),
-      images,
-      thumbnail,
-      tags: product.tags.split(",").map((t) => t.trim()),
-      totalStock,
-      ratings: { average: 0, count: 0 },
-      seo: {
-        title: product.name,
-        description: product.shortDescription,
-        keywords: product.tags.split(","),
-      },
-      createdAt: serverTimestamp(),
-      updatedAt: serverTimestamp(),
-    };
+    setLoading(true);
 
     try {
-      await addDoc(collection(db, "products"), productData);
-      toast.success("✅ Product Added Successfully");
+      let productId = product.id;
+
+      if (!editData) {
+        productId = await generateProductId();
+      }
+
+      const totalStock = variants.reduce(
+        (sum, v) => sum + Number(v.stock || 0),
+        0
+      );
+
+      const productData = {
+        ...product,
+        id: productId,
+        mrp: Number(product.mrp),
+        offer: Number(product.offer),
+        offerPrice: Number(product.offerPrice),
+
+        warranty: {
+          available: product.warrantyAvailable,
+          months: product.warrantyAvailable
+            ? Number(product.warrantyMonths || 0)
+            : 0,
+        },
+
+        returnPolicy: {
+          available: product.returnAvailable,
+          days: product.returnAvailable
+            ? Number(product.returnDays || 0)
+            : 0,
+        },
+
+        rating: product.rating || "0",
+
+        variants: variants.map((v) => ({
+          ...v,
+          stock: Number(v.stock),
+        })),
+
+        images,
+        thumbnail,
+
+        /* ✅ SAFE TAG CONVERSION */
+        tags: Array.isArray(product.tags)
+          ? product.tags
+          : product.tags
+            ? product.tags.split(",").map((t) => t.trim())
+            : [],
+
+        totalStock,
+        updatedAt: serverTimestamp(),
+      };
+
+      if (!editData) {
+        const docRef = await addDoc(collection(db, "products"), {
+          ...productData,
+          createdAt: serverTimestamp(),
+        });
+
+        await updateDoc(docRef, { docId: docRef.id });
+
+        toast.success(`✅ Product ${productId} Added`);
+      } else {
+        await updateDoc(doc(db, "products", editData.docId), productData);
+        toast.success(`✏️ Product ${productId} Updated`);
+      }
+
+      navigate("/admin/allproducts");
     } catch (error) {
       console.error(error);
-      toast.error("❌ Error adding product");
+      toast.error("❌ Error saving product");
     }
+
+    setLoading(false);
   };
 
+
   return (
-    <form onSubmit={handleSubmit} className="p-6 max-w-6xl mx-auto space-y-6">
-      <h2 className="text-2xl font-bold">Add Car Spare Product</h2>
+    <div className="max-w-6xl mx-auto bg-white p-2 rounded-2xl shadow space-y-6">
+      <form onSubmit={handleSubmit} className="p-6 max-w-6xl mx-auto space-y-6">
+        <h2 className="text-2xl font-bold">
+          {editData ? "Update Product" : "Add Car Spare Product"}
+        </h2>
 
-      {/* BASIC DETAILS */}
-      <div className="grid grid-cols-2 gap-4">
-        <input name="id" placeholder="Product ID" onChange={handleChange} className="input" />
-        <input name="name" placeholder="Product Name" onChange={handleChange} className="input" />
-        <input name="slug" placeholder="Slug" onChange={handleChange} className="input" />
-        <input name="brand" placeholder="Brand" onChange={handleChange} className="input" />
-        <input name="category" placeholder="Category" onChange={handleChange} className="input" />
-        <input name="subcategory" placeholder="Subcategory" onChange={handleChange} className="input" />
-      </div>
-
-      <textarea name="description" placeholder="Description" onChange={handleChange} className="input" />
-      <textarea name="shortDescription" placeholder="Short Description" onChange={handleChange} className="input" />
-
-      {/* PRICE */}
-      <div className="grid grid-cols-5 gap-4">
-        <input name="mrp" placeholder="MRP" onChange={handleChange} className="input" />
-        <input name="salePrice" placeholder="Sale Price" onChange={handleChange} className="input" />
-        <input name="costPrice" placeholder="Cost Price" onChange={handleChange} className="input" />
-        <input name="discount" placeholder="Discount %" onChange={handleChange} className="input" />
-        <input name="tax" placeholder="Tax %" onChange={handleChange} className="input" />
-      </div>
-
-      {/* VEHICLES */}
-      <div>
-        <h3 className="font-semibold">Vehicle Compatibility</h3>
-        {vehicles.map((v, i) => (
-          <div key={i} className="grid grid-cols-4 gap-2 mb-2">
-            <input name="make" placeholder="Make" onChange={(e) => handleVehicleChange(i, e)} className="input" />
-            <input name="model" placeholder="Model" onChange={(e) => handleVehicleChange(i, e)} className="input" />
-            <input name="year" placeholder="Year" onChange={(e) => handleVehicleChange(i, e)} className="input" />
-            <input name="engine" placeholder="Engine" onChange={(e) => handleVehicleChange(i, e)} className="input" />
+        {/* BASIC */}
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium mb-1">Product Name</label>
+            <input
+              name="name"
+              value={product.name}
+              onChange={handleChange}
+              placeholder="E.g. Brake Pad Set"
+              className="w-full bg-white rounded-lg border border-gray-300 px-5 py-3 text-gray-900 shadow-sm  focus:ring-2 focus:ring-black outline-none transition transition"
+            />
           </div>
-        ))}
-        <button type="button" onClick={addVehicle} className="btn">+ Add Vehicle</button>
-      </div>
 
-      {/* VARIANTS */}
-      <div>
-        <h3 className="font-semibold">Variants</h3>
-        {variants.map((v, i) => (
-          <div key={i} className="grid grid-cols-4 gap-2 mb-2">
-            <input name="sku" placeholder="SKU" onChange={(e) => handleVariantChange(i, e)} className="input" />
-            <input name="position" placeholder="Position" onChange={(e) => handleVariantChange(i, e)} className="input" />
-            <input name="material" placeholder="Material" onChange={(e) => handleVariantChange(i, e)} className="input" />
-            <input name="stock" placeholder="Stock" onChange={(e) => handleVariantChange(i, e)} className="input" />
+          <div>
+            <label className="block text-sm font-medium mb-1">Brand</label>
+            <input
+              name="brand"
+              value={product.brand}
+              placeholder="E.g. Bosch"
+              onChange={handleChange}
+              className="w-full bg-white rounded-lg border border-gray-300 px-5 py-3 text-gray-900 shadow-sm  focus:ring-2 focus:ring-black outline-none transition transition"
+            />
           </div>
-        ))}
-        <button type="button" onClick={addVariant} className="btn">+ Add Variant</button>
-      </div>
+        </div>
 
-      {/* MULTIPLE IMAGE UPLOAD */}
-      <div className="bg-white shadow rounded-xl p-6">
-        <h3 className="text-xl font-semibold mb-4">Product Images</h3>
+        {/* DESCRIPTION */}
+        <div>
+          <label className="block text-sm font-medium mb-1">Description</label>
+          <textarea
+            name="description"
+            placeholder="Enter product description"
+            value={product.description}
+            onChange={handleChange}
+            className="w-full bg-white rounded-lg border border-gray-300 px-5 py-3 text-gray-900 shadow-sm  focus:ring-2 focus:ring-black outline-none transition transition"
+          />
+        </div>
 
-        <input
-          type="file"
-          multiple
-          accept="image/*"
-          onChange={(e) => handleMultipleImages(e.target.files)}
-          className="block w-full text-sm text-gray-500
-          file:mr-4 file:py-2 file:px-4
-          file:rounded-lg file:border-0
-          file:text-sm file:font-semibold
-          file:bg-black file:text-white
-          hover:file:bg-gray-800"
-        />
+        {/* PRICE */}
+        <div className="grid grid-cols-4 gap-4">
+          <div>
+            <label className="block text-sm font-medium mb-1">MRP</label>
+            <input name="mrp" value={product.mrp} onChange={handleChange} placeholder="Enter Mrp" className="w-full bg-white rounded-lg border border-gray-300 px-5 py-3 text-gray-900 shadow-sm  focus:ring-2 focus:ring-black outline-none transition transition" />
+          </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
+          <div>
+            <label className="block text-sm font-medium mb-1">Offer %</label>
+            <input name="offer" value={product.offer} onChange={handleChange} placeholder="Enter Offer" className="w-full bg-white rounded-lg border border-gray-300 px-5 py-3 text-gray-900 shadow-sm  focus:ring-2 focus:ring-black outline-none transition transition" />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-1">Offer Price</label>
+            <input name="offerPrice" value={product.offerPrice} readOnly className="w-full bg-white rounded-lg border border-gray-300 px-5 py-3 text-gray-900 shadow-sm  focus:ring-2 focus:ring-black outline-none transition transition" />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">Rating (1–5)</label>
+            <input
+              type="number"
+              min="1"
+              max="5"
+              step="0.1"
+              placeholder="Enter Rating "
+              value={product.rating}
+              onChange={(e) => setProduct({ ...product, rating: e.target.value })}
+              className="w-full bg-white rounded-lg border border-gray-300 px-5 py-3 text-gray-900 shadow-sm  focus:ring-2 focus:ring-black outline-none transition transition"
+            />
+
+          </div>
+        </div>
+
+
+
+        {/* VARIANTS */}
+        <div>
+          <h3 className="font-semibold mb-2">Variants</h3>
+
+          {variants.map((v, i) => (
+            <div key={i} className="grid grid-cols-4 gap-2 mb-2">
+              <div>
+                <label className="block text-xs mb-1">SKU</label>
+                <input name="sku" value={v.sku} onChange={(e) => handleVariantChange(i, e)} placeholder="" className="w-full bg-white rounded-lg border border-gray-300 px-5 py-3 text-gray-900 shadow-sm  focus:ring-2 focus:ring-black outline-none transition transition" />
+              </div>
+
+              <div>
+                <label className="block text-xs mb-1">Position</label>
+                <input name="position" value={v.position} onChange={(e) => handleVariantChange(i, e)} className="w-full bg-white rounded-lg border border-gray-300 px-5 py-3 text-gray-900 shadow-sm  focus:ring-2 focus:ring-black outline-none transition transition" />
+              </div>
+
+              <div>
+                <label className="block text-xs mb-1">Material</label>
+                <input name="material" value={v.material} onChange={(e) => handleVariantChange(i, e)} className="w-full bg-white rounded-lg border border-gray-300 px-5 py-3 text-gray-900 shadow-sm  focus:ring-2 focus:ring-black outline-none transition transition" />
+              </div>
+
+              <div>
+                <label className="block text-xs mb-1">Stock</label>
+                <input name="stock" value={v.stock} onChange={(e) => handleVariantChange(i, e)} className="w-full bg-white rounded-lg border border-gray-300 px-5 py-3 text-gray-900 shadow-sm  focus:ring-2 focus:ring-black outline-none transition transition" />
+              </div>
+            </div>
+          ))}
+
+          <button type="button" onClick={addVariant} className="
+bg-gradient-to-r from-black to-cyan-400
+text-white px-6 py-3 rounded
+hover:from-cyan-400 hover:to-black
+transition-all duration-500 ease-in-out
+hover:scale-105 hover:shadow-lg
+">
+            + Add Variant
+          </button>
+        </div>
+
+        {/* IMAGES */}
+        <div>
+          <label className="block text-sm font-medium mb-1">Product Images</label>
+          <input type="file" className="w-full bg-white rounded-lg border border-gray-300 px-5 py-3 text-gray-900 shadow-sm  focus:ring-2 focus:ring-black outline-none transition transition" multiple accept="image/*" onChange={(e) => handleMultipleImages(e.target.files)} />
+        </div>
+
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {images.map((img, i) => (
             <div key={i} className="relative">
-              <img
-                src={img}
-                alt="product"
-                className="w-full h-32 object-cover rounded-lg border"
-              />
-
+              <img src={img} className="w-full h-32 object-cover rounded border" />
               <button
                 type="button"
                 onClick={() => removeImage(i)}
-                className="absolute top-1 right-1 bg-black text-white rounded-full w-6 h-6 text-xs"
+                className="absolute top-1 right-1 bg-black text-white w-6 h-6 text-xs rounded-full"
               >
                 ✕
               </button>
-
-              {i === 0 && (
-                <span className="absolute bottom-1 left-1 bg-green-600 text-white text-xs px-2 py-1 rounded">
-                  Thumbnail
-                </span>
-              )}
             </div>
           ))}
         </div>
-      </div>
 
-      {/* EXTRA */}
-      <div className="grid grid-cols-2 gap-4">
-        <input name="weight" placeholder="Weight" onChange={handleChange} className="input" />
-        <input name="dimensions" placeholder="Dimensions" onChange={handleChange} className="input" />
-        <input name="warranty" placeholder="Warranty" onChange={handleChange} className="input" />
-        <input name="returnPolicy" placeholder="Return Policy" onChange={handleChange} className="input" />
-        <input name="tags" placeholder="Tags (comma separated)" onChange={handleChange} className="input" />
-      </div>
+        <div className="grid md:grid-cols-2 gap-6">
 
-      {/* CHECKBOX */}
-      <div className="flex gap-6">
-        <label><input type="checkbox" name="isFeatured" onChange={handleChange} /> Featured</label>
-        <label><input type="checkbox" name="isActive" defaultChecked onChange={handleChange} /> Active</label>
-      </div>
+          {/* 🔹 WARRANTY */}
+          <div className="space-y-3">
+            <label className="flex items-center gap-2 font-medium">
+              <input
+                type="checkbox"
+                name="warrantyAvailable"
+                checked={product.warrantyAvailable}
+                onChange={handleChange}
+              />
+              Warranty Available
+            </label>
 
-      <button type="submit" className="bg-black text-white px-6 py-3 rounded-lg">
-        Save Product
-      </button>
-    </form>
+            {product.warrantyAvailable && (
+              <div>
+                <label className="block text-sm font-medium mb-1">
+                  Warranty Months
+                </label>
+                <input
+                  name="warrantyMonths"
+                  placeholder="Enter Warranty Months"
+                  value={product.warrantyMonths}
+                  onChange={handleChange}
+                  className="w-full bg-white rounded-lg border border-gray-300 px-5 py-3 text-gray-900 shadow-sm  focus:ring-2 focus:ring-black outline-none transition transition"
+                />
+              </div>
+            )}
+          </div>
+
+          {/* 🔹 RETURN */}
+          <div className="space-y-3">
+            <label className="flex items-center gap-2 font-medium">
+              <input
+                type="checkbox"
+                name="returnAvailable"
+                checked={product.returnAvailable}
+                onChange={handleChange}
+              />
+              Return Available
+            </label>
+
+            {product.returnAvailable && (
+              <div>
+                <label className="block text-sm font-medium mb-1">
+                  Return Days
+                </label>
+                <input
+                  name="returnDays"
+                  value={product.returnDays}
+                  placeholder="Enter Return Days"
+                  onChange={handleChange}
+                  className="w-full bg-white rounded-lg border border-gray-300 px-5 py-3 text-gray-900 shadow-sm  focus:ring-2 focus:ring-black outline-none transition transition"
+                />
+              </div>
+            )}
+          </div>
+
+        </div>
+
+
+        {/* TAGS */}
+        <div>
+          <label className="block text-sm font-medium mb-1">Tags</label>
+          <input name="tags" value={product.tags} onChange={handleChange} placeholder="Enter Your Tags" className="w-full bg-white rounded-lg border border-gray-300 px-5 py-3 text-gray-900 shadow-sm  focus:ring-2 focus:ring-black outline-none transition transition" />
+        </div>
+
+        {/* FLAGS */}
+        <div className="flex gap-6">
+          <label className="flex items-center gap-2">
+            <input type="checkbox" name="isFeatured" checked={product.isFeatured} onChange={handleChange} />
+            Featured
+          </label>
+
+          <label className="flex items-center gap-2">
+            <input type="checkbox" name="isActive" checked={product.isActive} onChange={handleChange} />
+            Active
+          </label>
+        </div>
+
+        <div className="flex justify-end">
+          <button disabled={loading} className="
+bg-gradient-to-r from-black to-cyan-400
+text-white px-6 py-3 rounded
+hover:from-cyan-400 hover:to-black
+transition-all duration-500 ease-in-out
+hover:scale-105 hover:shadow-lg
+">
+            {loading ? "Saving..." : editData ? "Update Product" : "Save Product"}
+          </button>
+        </div>
+      </form>
+
+    </div>
   );
 };
 

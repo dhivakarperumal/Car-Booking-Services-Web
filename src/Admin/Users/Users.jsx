@@ -130,7 +130,7 @@ const Users = () => {
 
       {/* ===================== STATS CARDS ===================== */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-        <div className="bg-white rounded-xl shadow p-5 flex justify-between items-center">
+        <div className="bg-white rounded-md border border-gray-300 shadow p-5 flex justify-between items-center">
           <div>
             <p className="text-gray-500 text-sm">Total Users</p>
             <h2 className="text-2xl font-bold">{totalUsers}</h2>
@@ -140,7 +140,7 @@ const Users = () => {
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow p-5 flex justify-between items-center">
+        <div className="bg-white rounded-md border border-gray-300 shadow p-5 flex justify-between items-center">
           <div>
             <p className="text-gray-500 text-sm">Active Users</p>
             <h2 className="text-2xl font-bold">{activeUsers}</h2>
@@ -150,7 +150,7 @@ const Users = () => {
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow p-5 flex justify-between items-center">
+        <div className="bg-white rounded-md border border-gray-300 shadow p-5 flex justify-between items-center">
           <div>
             <p className="text-gray-500 text-sm">Admin Users</p>
             <h2 className="text-2xl font-bold">{adminUsers}</h2>
@@ -162,7 +162,7 @@ const Users = () => {
       </div>
 
       {/* ===================== FILTER BAR ===================== */}
-      <div className="bg-white rounded-xl shadow p-4 flex flex-col lg:flex-row lg:items-center gap-4 justify-between">
+      <div className=" p-4 flex flex-col lg:flex-row lg:items-center gap-4 justify-between">
         {/* Left: Search */}
         <div className="relative w-full lg:w-1/3">
           <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm" />
@@ -206,7 +206,7 @@ const Users = () => {
       <div className="bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="min-w-full text-sm text-gray-700">
-            <thead className="bg-black text-white">
+            <thead className="bg-gradient-to-r from-black to-cyan-400 text-white">
               <tr>
                 <th className="px-4 py-4 text-left font-semibold">S No</th>
                 <th className="px-4 py-4 text-left font-semibold">Name</th>

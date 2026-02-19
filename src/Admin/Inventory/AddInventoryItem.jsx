@@ -201,7 +201,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import toast from "react-hot-toast";
 
 const labelClass = "text-sm font-semibold text-gray-800 mb-1";
-const inputClass ="w-full bg-white rounded-lg border border-gray-300 px-5 py-3 text-gray-900 shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500/40 focus:border-orange-500 transition";
+const inputClass ="w-full bg-white rounded-lg border border-gray-300 px-5 py-3 text-gray-900 shadow-sm  focus:ring-2 focus:ring-black outline-none transition transition";
 
 const AddInventoryItem = () => {
   const navigate = useNavigate();
