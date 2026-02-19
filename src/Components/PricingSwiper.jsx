@@ -25,7 +25,7 @@ export default function PricingSwiper() {
   }, []);
 
   return (
-    <section className="py-20 bg-black text-white">
+    <section className="py-15 bg-black text-white">
       <div className="container mx-auto px-6">
         {/* Heading */}
         <div className="text-center mb-14">
