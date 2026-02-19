@@ -31,7 +31,7 @@ export default function Reviews() {
   if (!reviews.length) return null;
 
   return (
-    <section className="bg-black py-24">
+    <section className="bg-black py-15">
       <PageContainer>
         <h2 className="text-center text-4xl font-extrabold text-white mb-16">
           Customer Reviews

@@ -15,7 +15,7 @@ const brands = [
 
 export default function BrandSwiper() {
   return (
-    <section className="bg-black py-10">
+    <section className="bg-black py-15">
       <PageContainer>
       <div className="container mx-auto px-6">
         <h3 className="text-center text-gray-400 uppercase tracking-[0.3em] mb-10">

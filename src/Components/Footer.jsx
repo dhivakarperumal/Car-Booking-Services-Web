@@ -3,18 +3,20 @@ import PageContainer from "./PageContainer";
 import { useEffect, useState } from "react";
 import { collection, getDocs, query, where, limit } from "firebase/firestore";
 import { db } from "../firebase";
+import { useNavigate } from "react-router-dom";
 
 const links = [
-  "Home",
-  "About",
-  "Pricing",
-  "Services",
-  "Products",
-  "Contact Us",
+  { label: "Home", path: "/" },
+  { label: "About", path: "/about" },
+  { label: "Pricing", path: "/pricing" },
+  { label: "Services", path: "/services" },
+  { label: "Products", path: "/products" },
+  { label: "Contact Us", path: "/contact" },
 ];
 
 export default function Footer() {
   const [services, setServices] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchServices = async () => {
@@ -78,8 +80,9 @@ export default function Footer() {
                 {services.map((item) => (
                   <li
                     key={item.id}
+                    onClick={() => navigate("/services")}
                     className="group flex items-center gap-3 cursor-pointer
-    hover:text-blue-400 transition-all duration-300 hover:-translate-y-1"
+      hover:text-blue-400 transition-all duration-300 hover:-translate-y-1"
                   >
                     <span className="text-blue-500 font-bold tracking-[-3px] group-hover:translate-x-1 transition duration-300">
                       &gt;&gt;
@@ -102,15 +105,15 @@ export default function Footer() {
                 {links.map((item, i) => (
                   <li
                     key={i}
+                    onClick={() => navigate(item.path)}
                     className="group flex items-center gap-3 cursor-pointer
-                  hover:text-blue-400 transition-all duration-300 hover:-translate-y-1"
+      hover:text-blue-400 transition-all duration-300 hover:-translate-y-1"
                   >
-                    {/* Attached Double Arrow */}
                     <span className="text-blue-500 font-bold tracking-[-3px] group-hover:translate-x-1 transition duration-300">
                       &gt;&gt;
                     </span>
 
-                    <span>{item}</span>
+                    <span>{item.label}</span>
                   </li>
                 ))}
               </ul>

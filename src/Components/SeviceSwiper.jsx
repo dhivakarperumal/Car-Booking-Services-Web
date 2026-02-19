@@ -46,7 +46,7 @@ export default function ServiceSwiper() {
   }
 
   return (
-    <section className="bg-black py-24">
+    <section className="bg-black py-15">
       <PageContainer>
         <div className="">
           {/* TITLE */}
