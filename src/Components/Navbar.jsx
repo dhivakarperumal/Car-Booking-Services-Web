@@ -125,7 +125,7 @@ const Navbar = () => {
     <header className="sticky top-0 z-50">
       <div className="bg-black backdrop-blur-md border-b border-sky-400/20">
         <PageContainer>
-          <div className="flex items-center justify-between h-16">
+          <div className="flex items-center justify-between h-18">
             {/* LOGO */}
             <div
               onClick={() => navigate("/")}
@@ -173,19 +173,7 @@ const Navbar = () => {
             <div className="flex items-center gap-4">
               {/* RIGHT SIDE (DESKTOP + MOBILE) */}
               <div className="flex items-center gap-4">
-                {/* BOOK SERVICE (DESKTOP ONLY) */}
-                <button
-                  onClick={() => navigate("/bookservice")}
-                  className="hidden md:flex relative px-6 py-2.5 rounded-md
-             font-bold text-xs tracking-[0.2em]
-             text-sky-400 border border-sky-400/60
-             transition-all duration-300
-             hover:text-black hover:bg-sky-400
-             hover:shadow-[0_0_25px_rgba(56,189,248,0.7)]
-             active:scale-95 cursor-pointer"
-                >
-                  BOOK SERVICE
-                </button>
+               
 
                 {/* CART ICON */}
                 <button
@@ -216,8 +204,8 @@ const Navbar = () => {
                           setShowMenu((prev) => !prev);
                         }}
                         className="h-9 w-9 cursor-pointer rounded-full flex items-center justify-center
-                     bg-gradient-to-br from-sky-500 to-cyan-400
-                     text-black font-bold shadow-[0_0_15px_rgba(56,189,248,0.6)]"
+                     bg-gradient-to-r from-blue-600 to-cyan-400
+                     text-white hover:text-black font-bold shadow-[0_0_15px_rgba(56,189,248,0.6)]"
                       >
                         {(
                           userData.username ||
@@ -259,6 +247,21 @@ const Navbar = () => {
                             Account
                           </button>
 
+                          {/* ADMIN PANEL (ONLY FOR ADMIN) */}
+{userData?.role === "admin" && (
+  <button
+    onClick={() => {
+      navigate("/admin");
+      setShowMenu(false);
+    }}
+    className="w-full cursor-pointer px-4 py-3 text-left
+               text-white hover:text-yellow-300
+               hover:bg-yellow-400/10 transition font-semibold"
+  >
+    Admin Panel
+  </button>
+)}
+
                           {/* LOGOUT */}
                           <button
                             onClick={handleLogout}
@@ -279,19 +282,33 @@ const Navbar = () => {
                     </button>
                   ))}
 
+                   {/* BOOK NOW (DESKTOP ONLY) */}
+                <button
+                  onClick={() => navigate("/bookservice")}
+                  className="hidden md:flex relative px-4 py-2 rounded-full
+             font-bold text-sm  
+             border border-sky-400/60
+             transition-all duration-300
+             text-white bg-gradient-to-r from-blue-600 to-cyan-400 hover:text-black 
+             hover:shadow-[0_0_25px_rgba(56,189,248,0.7)]
+             active:scale-95 cursor-pointer"
+                >
+                  Book Now
+                </button>
+
                 {/* HAMBURGER (MOBILE ONLY) */}
                 <button
                   onClick={() => setIsOpen(!isOpen)}
                   className="md:hidden flex flex-col gap-1"
                 >
                   <span
-                    className={`w-6 h-[2px] bg-white transition ${isOpen && "rotate-45 translate-y-2"}`}
+                    className={`w-6 h-[2px] bg-sky-500 transition ${isOpen && "rotate-45 translate-y-2"}`}
                   />
                   <span
-                    className={`w-6 h-[2px] bg-white transition ${isOpen && "opacity-0"}`}
+                    className={`w-6 h-[2px] bg-sky-500 transition ${isOpen && "opacity-0"}`}
                   />
                   <span
-                    className={`w-6 h-[2px] bg-white transition ${isOpen && "-rotate-45 -translate-y-2"}`}
+                    className={`w-6 h-[2px] bg-sky-500 transition ${isOpen && "-rotate-45 -translate-y-2"}`}
                   />
                 </button>
               </div>
@@ -336,7 +353,7 @@ const Navbar = () => {
                        text-black bg-sky-400
                        shadow-[0_0_25px_rgba(56,189,248,0.6)]"
           >
-            BOOK SERVICE
+            BOOK NOW
           </button>
         </nav>
       </div>
