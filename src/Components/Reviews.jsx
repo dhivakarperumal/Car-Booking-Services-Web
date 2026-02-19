@@ -147,7 +147,7 @@ export default function Reviews() {
   hover:shadow-[0_35px_120px_rgba(56,189,248,0.45)]
 
   transition-all duration-700 ease-out
-  flex flex-col"
+  flex flex-col mr-0.5"
                   >
                     {/* Glow sweep */}
                     <div
