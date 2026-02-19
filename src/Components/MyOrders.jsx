@@ -92,17 +92,17 @@ const MyOrders = () => {
       {orders.length === 0 ? (
         <p className="text-slate-400">No orders found.</p>
       ) : (
-       <div className="space-y-4">
-  {orders.map((order) => {
-    const statusKey = order.status || "orderplaced";
-    const statusLabel =
-      STATUS_CONFIG[statusKey]?.label || "Order Placed";
+        <div className="space-y-4">
+          {orders.map((order) => {
+            const statusKey = order.status || "orderplaced";
+            const statusLabel =
+              STATUS_CONFIG[statusKey]?.label || "Order Placed";
 
-    return (
-      <div
-        key={order.id}
-        onClick={() => setSelectedOrder(order)}
-        className="
+            return (
+              <div
+                key={order.id}
+                onClick={() => setSelectedOrder(order)}
+                className="
           cursor-pointer
           bg-black
           border border-slate-700
@@ -111,52 +111,51 @@ const MyOrders = () => {
           hover:border-sky-400
           transition
         "
-      >
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+              >
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
 
-          {/* ===== LEFT ===== */}
-          <div>
-            <p className="text-white font-semibold">
-              Order ID: {order.orderId}
-            </p>
+                  {/* ===== LEFT ===== */}
+                  <div>
+                    <p className="text-white font-semibold">
+                      Order ID: {order.orderId}
+                    </p>
 
-            <p className="text-slate-400 text-sm mt-1">
-              Placed on:{" "}
-              {order.createdAt?.toDate().toLocaleString()}
-            </p>
-          </div>
+                    <p className="text-slate-400 text-sm mt-1">
+                      Placed on:{" "}
+                      {order.createdAt?.toDate().toLocaleString()}
+                    </p>
+                  </div>
 
-          {/* ===== RIGHT (ONE COLUMN) ===== */}
-          <div className="flex flex-col items-start md:items-end gap-2">
+                  {/* ===== RIGHT (ONE COLUMN) ===== */}
+                  <div className="flex flex-col items-start md:items-end gap-2">
 
-            {/* STATUS */}
-            <span
-              className={`text-xs px-3 py-1 rounded-full font-semibold
-                ${
-                  statusKey === "cancelled"
-                    ? "bg-red-900 text-red-400"
-                    : statusKey === "delivered"
-                    ? "bg-green-900 text-green-400"
-                    : statusKey === "outfordelivery"
-                    ? "bg-yellow-900 text-yellow-400"
-                    : "bg-sky-900 text-sky-400"
-                }
+                    {/* STATUS */}
+                    <span
+                      className={`text-xs px-3 py-1 rounded-full font-semibold
+                ${statusKey === "cancelled"
+                          ? "bg-red-900 text-red-400"
+                          : statusKey === "delivered"
+                            ? "bg-green-900 text-green-400"
+                            : statusKey === "outfordelivery"
+                              ? "bg-yellow-900 text-yellow-400"
+                              : "bg-sky-900 text-sky-400"
+                        }
               `}
-            >
-              {statusLabel}
-            </span>
+                    >
+                      {statusLabel}
+                    </span>
 
-            {/* TOTAL */}
-            <p className="text-sky-400 font-bold whitespace-nowrap">
-              Total: ₹{order.total}
-            </p>
+                    {/* TOTAL */}
+                    <p className="text-sky-400 font-bold whitespace-nowrap">
+                      Total: ₹{order.total}
+                    </p>
 
-          </div>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
         </div>
-      </div>
-    );
-  })}
-</div>
       )}
 
       {/* ===== MODAL ===== */}
@@ -304,8 +303,8 @@ const OrderModal = ({ order, onClose }) => {
                   {/* Label */}
                   <p
                     className={`text-xs mt-2 text-center ${index <= currentStepIndex
-                        ? "text-sky-400"
-                        : "text-slate-500"
+                      ? "text-sky-400"
+                      : "text-slate-500"
                       }`}
                   >
                     {step}
@@ -315,8 +314,8 @@ const OrderModal = ({ order, onClose }) => {
                   {index !== STATUS_STEPS.length - 1 && (
                     <div
                       className={`h-1 w-full mt-2 ${index < currentStepIndex
-                          ? "bg-sky-500"
-                          : "bg-slate-700"
+                        ? "bg-sky-500"
+                        : "bg-slate-700"
                         }`}
                     />
                   )}
