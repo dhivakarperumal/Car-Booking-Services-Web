@@ -373,12 +373,6 @@ const BOOKING_STATUS = [
   "Booked",
   "Call Verified",
   "Approved",
-  "Processing",
-  "Waiting for Spare",
-  "Service Going on",
-  "Bill Pending",
-  "Bill Completed",
-  "Service Completed",
   "Cancelled",
 ];
 
@@ -605,23 +599,30 @@ const ShowAllBookings = () => {
       ))}
     </select>
 
-    <button
-      onClick={() => setView("card")}
-      className={`px-4 py-2 rounded ${
-        view === "card" ? "bg-black text-white" : "bg-gray-200"
-      }`}
-    >
-      <FaThLarge />
-    </button>
+  <button
+  onClick={() => setView("card")}
+  className={`h-[42px] px-4 rounded flex items-center gap-2 text-sm font-medium transition
+    ${view === "card"
+      ? "bg-black text-white"
+      : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+    }`}
+>
+  <FaThLarge className="text-base" />
+  Card
+</button>
 
-    <button
-      onClick={() => setView("table")}
-      className={`px-4 py-2 rounded ${
-        view === "table" ? "bg-black text-white" : "bg-gray-200"
-      }`}
-    >
-      <FaTable />
-    </button>
+<button
+  onClick={() => setView("table")}
+  className={`h-[42px] px-4 rounded flex items-center gap-2 text-sm font-medium transition
+    ${view === "table"
+      ? "bg-black text-white"
+      : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+    }`}
+>
+  <FaTable classNameName="text-base" />
+  Table
+</button>
+
 
     <button
       onClick={() => navigate("/admin/addbooking")}
