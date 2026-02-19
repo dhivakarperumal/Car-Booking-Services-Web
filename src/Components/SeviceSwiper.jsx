@@ -35,57 +35,52 @@ export default function ServiceSwiper() {
 
   if (loading) {
     return (
-      <p className="text-center text-gray-400 py-24">
-        Loading services...
-      </p>
+      <p className="text-center text-gray-400 py-24">Loading services...</p>
     );
   }
 
   if (!services.length) {
     return (
-      <p className="text-center text-gray-400 py-24">
-        No services available.
-      </p>
+      <p className="text-center text-gray-400 py-24">No services available.</p>
     );
   }
 
   return (
     <section className="bg-black py-24">
       <PageContainer>
-      <div className="container mx-auto px-6">
+        <div className="">
+          {/* TITLE */}
+          <div className="text-center mb-16">
+            <span className="text-sky-400 uppercase tracking-widest text-sm">
+              Our Services
+            </span>
 
-        {/* TITLE */}
-        <div className="text-center mb-16">
-          <span className="text-sky-400 uppercase tracking-widest text-sm">
-            Our Services
-          </span>
+            <h2 className="text-white text-4xl md:text-5xl font-extrabold mt-4">
+              What We Offer
+            </h2>
+          </div>
 
-          <h2 className="text-white text-4xl md:text-5xl font-extrabold mt-4">
-            What We Offer
-          </h2>
+          {/* SWIPER */}
+          <Swiper
+            className="service-swiper !overflow-hidden"
+            modules={[Autoplay]}
+            autoplay={{ delay: 3000 }}
+            loop
+            grabCursor
+            spaceBetween={30}
+            breakpoints={{
+              0: { slidesPerView: 1 },
+              640: { slidesPerView: 2 },
+              1024: { slidesPerView: 3 },
+            }}
+          >
+            {services.map((service) => (
+              <SwiperSlide key={service.id} className="mt-5 mb-8">
+                <ServiceCard service={service} />
+              </SwiperSlide>
+            ))}
+          </Swiper>
         </div>
-
-        {/* SWIPER */}
-        <Swiper
-          modules={[Autoplay]}
-          autoplay={{ delay: 3000 }}
-          loop
-          grabCursor
-          spaceBetween={30}
-          breakpoints={{
-            0: { slidesPerView: 1 },
-            640: { slidesPerView: 2 },
-            1024: { slidesPerView: 3 },
-          }}
-        >
-          {services.map((service) => (
-            <SwiperSlide key={service.id} className="mt-5 mb-8 h-auto">
-              <ServiceCard service={service} />
-            </SwiperSlide>
-          ))}
-        </Swiper>
-
-      </div>
       </PageContainer>
     </section>
   );

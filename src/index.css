@@ -204,4 +204,43 @@ body {
   }
 }
 
+html,
+body {
+  overflow-x: hidden;
+}
+
+/* Only Pricing swiper */
+.pricing-swiper {
+  overflow: hidden !important;
+}
+
+/* Force equal slide height */
+.pricing-swiper .swiper-slide,
+.service-swiper .swiper-slide {
+  height: 100% !important;
+  display: flex;
+}
+
+/* ===== SERVICE SWIPER FIX ===== */
+
+/* Only Service swiper */
+.service-swiper {
+  overflow: hidden !important;
+}
+
+.service-swiper .swiper-wrapper {
+  display: flex;
+  align-items: stretch;
+}
+
+.service-swiper .swiper-slide {
+  height: auto !important;
+  display: flex;
+}
+
+.service-swiper .swiper-slide > * {
+  height: 100%;
+  width: 100%;
+}
+
 

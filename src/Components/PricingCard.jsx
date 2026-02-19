@@ -2,14 +2,17 @@ import React from "react";
 
 export default function PricingCard({ pkg }) {
   return (
-    <div className="relative rounded-3xl p-[1px] bg-gradient-to-b from-sky-500/40 to-transparent hover:from-sky-400 transition-all duration-300">
+    <div className="relative flex h-full rounded-3xl p-[1px] bg-gradient-to-b from-sky-500/40 to-transparent hover:from-sky-400 transition-all duration-300">
 
       {/* Inner Card */}
       <div
-        className="relative h-full rounded-3xl bg-black/70 backdrop-blur-xl p-10
-        border border-white/10 hover:border-sky-400/40
-        transition-all duration-300"
-      >
+  className="relative flex flex-col flex-1 rounded-3xl bg-black/70 backdrop-blur-xl p-10
+  border border-white/10 hover:border-sky-400/40
+  transition-all duration-300"
+>
+
+
+
         {/* Plan Title */}
         <h3 className="text-sm uppercase tracking-widest text-sky-400 mb-3">
           {pkg.title}
@@ -43,11 +46,12 @@ export default function PricingCard({ pkg }) {
 
         {/* CTA */}
         <button
-          className="w-full py-4 rounded-xl font-semibold text-black
-          bg-gradient-to-r from-sky-400 to-cyan-300
-          hover:from-sky-300 hover:to-cyan-200
-          transition-all duration-300 shadow-lg shadow-sky-500/30"
-        >
+  className="mt-auto w-full py-4 rounded-xl font-semibold text-black
+  bg-gradient-to-r from-sky-400 to-cyan-300
+  hover:from-sky-300 hover:to-cyan-200
+  transition-all duration-300 shadow-lg shadow-sky-500/30"
+>
+
           Book Now →
         </button>
       </div>

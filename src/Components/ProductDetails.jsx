@@ -15,6 +15,7 @@ import { auth, db } from "../firebase";
 import { useEffect, useState } from "react";
 import PageHeader from "./PageHeader";
 import PageContainer from "./PageContainer";
+import toast from "react-hot-toast";
 
 export default function ProductDetails() {
   const { slug } = useParams();
@@ -106,6 +107,7 @@ export default function ProductDetails() {
         createdAt: serverTimestamp(),
       });
     }
+    toast.success("Added to cart 🛒");
 
     navigate("/cart");
   };
