@@ -190,12 +190,13 @@ transition-all duration-300 cursor-pointer"
               </div>
 
               <button
-                className="w-full mt-8 py-4 rounded-xl font-semibold text-black
-                bg-gradient-to-r from-sky-400 to-cyan-300
-                hover:scale-105 transition-all duration-300"
-              >
-                Proceed To Checkout
-              </button>
+  onClick={() => navigate("/checkout")}
+  className="w-full mt-8 py-4 rounded-xl font-semibold text-black
+  bg-gradient-to-r from-sky-400 to-cyan-300
+  hover:scale-105 transition-all duration-300"
+>
+  Proceed To Checkout
+</button>
             </div>
           </div>
         )}

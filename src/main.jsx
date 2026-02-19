@@ -12,10 +12,7 @@ import Home from "./Components/Home.jsx";
 import Pricing from "./Components/Pricing.jsx";
 import Products from "./Components/Products.jsx";
 import ContactUs from "./Components/ContactUs.jsx";
-
-// Auth
-import Register from "./Auth/Register.jsx";
-
+import Checkout from "./Components/Checkout.jsx";
 
 // // Admin
 import AdminPanel from "./Admin/AdminPanel.jsx";
@@ -68,9 +65,9 @@ const router = createBrowserRouter([
     element: <App />,
     children: [
       { index: true, element: <Home /> },
-      { path: "/register", element: <Register /> },
       { path: "/services", element: <Services /> },
       { path: "/pricing", element: <Pricing /> },
+      { path: "/checkout", element: <Checkout/> },
       { path: "/products", element: <Products /> },
       { path: "/products/:slug", element: <ProductDetails /> },
       { path: "/services/:id", element: <ServiceDetails /> },

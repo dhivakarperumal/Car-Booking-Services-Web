@@ -9,6 +9,7 @@ import {
   getDocs,
   query,
   where,
+  serverTimestamp 
 } from "firebase/firestore";
 import { auth, db } from "../firebase";
 import { useEffect, useState } from "react";
@@ -33,34 +34,47 @@ export default function ProductDetails() {
     fetchProduct();
   }, [slug]);
 
-  const handleAddToCart = async () => {
-    const user = auth.currentUser;
+const handleAddToCart = async () => {
+  const user = auth.currentUser;
 
-    if (!user) {
-      alert("Please login first");
-      return;
-    }
+  if (!user) {
+    alert("Please login first");
+    return;
+  }
 
-    const cartRef = doc(db, "users", user.uid, "cart", product.docId);
-    const existing = await getDoc(cartRef);
+  // ✅ pick first variant (you have only one now)
+  const variant = product.variants?.[0];
 
-    if (existing.exists()) {
-      await updateDoc(cartRef, {
-        quantity: existing.data().quantity + 1,
-      });
-    } else {
-      await setDoc(cartRef, {
-        productId: product.docId,
-        name: product.name,
-        price: product.offerPrice,
-        image: product.images?.[0],
-        quantity: 1,
-        addedAt: new Date(),
-      });
-    }
+  if (!variant?.sku) {
+    alert("Product variant not available");
+    return;
+  }
 
-    navigate("/cart");
-  };
+  const cartRef = doc(db, "users", user.uid, "cart", product.docId);
+  const existing = await getDoc(cartRef);
+
+  if (existing.exists()) {
+    await updateDoc(cartRef, {
+      quantity: existing.data().quantity + 1,
+    });
+  } else {
+    await setDoc(cartRef, {
+      // 🔥 REQUIRED FOR CHECKOUT + STOCK
+      docId: product.docId,      // product document id
+      sku: variant.sku,          // variant sku (OF-BOSCH-001)
+
+      // UI fields
+      name: product.name,
+      price: product.offerPrice,
+      image: product.images?.[0],
+      quantity: 1,
+
+      createdAt: serverTimestamp(),
+    });
+  }
+
+  navigate("/cart");
+};
 
   if (!product)
     return <div className="text-white text-center py-40">Loading...</div>;

@@ -8,6 +8,7 @@ import {
   getDocs,
   query,
   where,
+  serverTimestamp 
 } from "firebase/firestore";
 import { auth, db } from "../firebase";
 import PageContainer from "./PageContainer";
@@ -40,36 +41,49 @@ export default function Products() {
     fetchProducts();
   }, []);
 
-  const handleAddToCart = async (product, e) => {
-    e.stopPropagation(); // prevents card click
+const handleAddToCart = async (product, e) => {
+  e.stopPropagation();
 
-    const user = auth.currentUser;
+  const user = auth.currentUser;
+  if (!user) {
+    alert("Please login first");
+    return;
+  }
 
-    if (!user) {
-      alert("Please login first");
-      return;
-    }
+  // 🚫 Out of stock protection
+  if (!product.totalStock || product.totalStock <= 0) {
+    alert("Product is out of stock");
+    return;
+  }
 
-    const cartRef = doc(db, "users", user.uid, "cart", product.docId);
-    const existing = await getDoc(cartRef);
+  // 🔑 assume first variant (same as ProductDetails)
+  const variant = product.variants?.[0];
+  if (!variant?.sku) {
+    alert("Invalid product variant");
+    return;
+  }
 
-    if (existing.exists()) {
-      await updateDoc(cartRef, {
-        quantity: existing.data().quantity + 1,
-      });
-    } else {
-      await setDoc(cartRef, {
-        productId: product.docId,
-        name: product.name,
-        price: product.offerPrice,
-        image: product.thumbnail,
-        quantity: 1,
-        addedAt: new Date(),
-      });
-    }
+  const cartRef = doc(db, "users", user.uid, "cart", product.docId);
+  const existing = await getDoc(cartRef);
 
-    alert("Added to cart!");
-  };
+  if (existing.exists()) {
+    await updateDoc(cartRef, {
+      quantity: existing.data().quantity + 1,
+    });
+  } else {
+    await setDoc(cartRef, {
+      docId: product.docId,          
+      sku: variant.sku,              
+      name: product.name,
+      price: product.offerPrice,
+      image: product.thumbnail,
+      quantity: 1,
+      createdAt: serverTimestamp(),  // ✅ SAFE
+    });
+  }
+
+  alert("Added to cart!");
+};
 
   return (
     <>
