@@ -14,6 +14,7 @@ import {
 import { auth, db } from "../firebase";
 import { useEffect, useState } from "react";
 import PageHeader from "./PageHeader";
+import PageContainer from "./PageContainer";
 
 export default function ProductDetails() {
   const { slug } = useParams();
@@ -154,6 +155,7 @@ export default function ProductDetails() {
     <>
     <PageHeader title={product?.name || "Product Details"} />
     <section className="bg-black text-white py-20">
+      <PageContainer>
       <div className="container mx-auto px-6">
         <div className="grid lg:grid-cols-2 gap-16 items-start">
           {/* LEFT — IMAGE GALLERY */}
@@ -365,6 +367,7 @@ shadow-xl shadow-blue-500/40 cursor-pointer"
           </div>
         </div>
       </div>
+      </PageContainer>
     </section>
     </>
   );
