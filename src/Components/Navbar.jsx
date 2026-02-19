@@ -125,7 +125,7 @@ const Navbar = () => {
     <header className="sticky top-0 z-50">
       <div className="bg-black backdrop-blur-md border-b border-sky-400/20">
         <PageContainer>
-          <div className="flex items-center justify-between h-18">
+          <div className="relative flex items-center justify-between h-18">
             {/* LOGO */}
             <div
               onClick={() => navigate("/")}
@@ -141,26 +141,29 @@ const Navbar = () => {
             </div>
 
             {/* DESKTOP MENU */}
-            <nav className="hidden md:flex items-center gap-6">
+            <nav
+              className="hidden md:flex items-center gap-6
+             absolute left-1/2 -translate-x-1/2"
+            >
               {links.map((item) => (
                 <button
                   key={item.label}
                   onClick={() => navigate(item.path)}
-                  className={`relative cursor-pointer text-[14px] font-bold tracking-[0.1em]
-    transition-all duration-300
-    ${location.pathname === item.path
+                  className={`relative cursor-pointer text-[14px] font-bold
+        transition-all duration-300
+        ${location.pathname === item.path
                       ? "text-sky-400 drop-shadow-[0_0_10px_rgba(56,189,248,0.8)]"
                       : "text-gray-300 hover:text-sky-400 hover:drop-shadow-[0_0_8px_rgba(56,189,248,0.6)]"
                     }
-    after:absolute after:left-1/2 after:-bottom-2
-    after:h-[2px] after:-translate-x-1/2
-    after:bg-gradient-to-r after:from-sky-400 after:to-cyan-300
-    after:transition-all after:duration-300
-    ${location.pathname === item.path
+        after:absolute after:left-1/2 after:-bottom-2
+        after:h-[2px] after:-translate-x-1/2
+        after:bg-gradient-to-r after:from-sky-400 after:to-cyan-300
+        after:transition-all after:duration-300
+        ${location.pathname === item.path
                       ? "after:w-full"
                       : "after:w-0 hover:after:w-full"
                     }
-  `}
+      `}
                 >
                   {item.label}
                 </button>
