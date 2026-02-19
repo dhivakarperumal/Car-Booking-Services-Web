@@ -2,8 +2,8 @@ import StatusTracker from "./StatusTracker";
 
 const BookingModal = ({ booking, onClose }) => {
   return (
-    <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
-      <div className="bg-[#020617] border border-sky-500/30
+    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+      <div className="bg-[#020617] border border-sky-500
                       rounded-2xl max-w-3xl w-full p-6 relative border border-sky-400">
 
         {/* CLOSE */}
