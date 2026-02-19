@@ -6,6 +6,7 @@ import "swiper/css";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../firebase";
 import ServiceCard from "./ServiceCard";
+import PageContainer from "./PageContainer";
 
 export default function ServiceSwiper() {
   const [services, setServices] = useState([]);
@@ -50,7 +51,7 @@ export default function ServiceSwiper() {
 
   return (
     <section className="bg-black py-24">
-
+      <PageContainer>
       <div className="container mx-auto px-6">
 
         {/* TITLE */}
@@ -85,7 +86,7 @@ export default function ServiceSwiper() {
         </Swiper>
 
       </div>
-
+      </PageContainer>
     </section>
   );
 }
