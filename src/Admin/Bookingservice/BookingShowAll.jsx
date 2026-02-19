@@ -6,10 +6,19 @@
 //   orderBy,
 //   updateDoc,
 //   doc,
+//   addDoc,
 // } from "firebase/firestore";
 // import { db } from "../../firebase";
 // import { useNavigate } from "react-router-dom";
 // import toast from "react-hot-toast";
+// import { FaThLarge, FaTable } from "react-icons/fa";
+// import {
+//   FaCar,
+//   FaUser,
+//   FaPhone,
+//   FaMapMarkerAlt,
+//   FaClock,
+// } from "react-icons/fa";
 
 // /* 🔹 STATUS LIST */
 // const BOOKING_STATUS = [
@@ -38,9 +47,9 @@
 
 //     const unsub = onSnapshot(q, (snap) => {
 //       setBookings(
-//         snap.docs.map((doc) => ({
-//           id: doc.id,
-//           ...doc.data(),
+//         snap.docs.map((d) => ({
+//           id: d.id,
+//           ...d.data(),
 //         }))
 //       );
 //     });
@@ -55,8 +64,7 @@
 //       b.name?.toLowerCase().includes(search.toLowerCase()) ||
 //       b.phone?.includes(search);
 
-//     const matchStatus =
-//       statusFilter === "All" || b.status === statusFilter;
+//     const matchStatus = statusFilter === "All" || b.status === statusFilter;
 
 //     return matchSearch && matchStatus;
 //   });
@@ -65,25 +73,25 @@
 //   const statusColor = (status) => {
 //     switch (status) {
 //       case "Booked":
-//         return "bg-blue-500/20 text-blue-400";
+//         return "bg-blue-100 text-blue-700";
 //       case "Processing":
-//         return "bg-yellow-500/20 text-yellow-400";
+//         return "bg-yellow-100 text-yellow-700";
 //       case "Service Completed":
-//         return "bg-green-500/20 text-green-400";
+//         return "bg-green-100 text-green-700";
 //       case "Bill Pending":
-//         return "bg-orange-500/20 text-orange-400";
+//         return "bg-orange-100 text-orange-700";
 //       default:
-//         return "bg-gray-500/20 text-gray-300";
+//         return "bg-gray-100 text-gray-700";
 //     }
 //   };
 
-//   /* 🔄 STATUS UPDATE (Optimistic) */
+//   /* 🔄 STATUS UPDATE + COPY TO SERVICES */
 //   const updateStatus = async (booking, newStatus) => {
 //     if (booking.status === "Service Completed") return;
 
 //     const previousStatus = booking.status;
 
-//     /* 🟢 Instant UI update */
+//     /* 🟢 Optimistic UI */
 //     setBookings((prev) =>
 //       prev.map((b) =>
 //         b.id === booking.id ? { ...b, status: newStatus } : b
@@ -91,26 +99,50 @@
 //     );
 
 //     try {
-//       /* 🟡 Update global */
 //       await updateDoc(doc(db, "bookings", booking.id), {
 //         status: newStatus,
 //       });
 
-//       /* 🟡 Update user subcollection */
 //       if (booking.uid) {
 //         await updateDoc(
 //           doc(db, "users", booking.uid, "bookings", booking.id),
-//           {
-//             status: newStatus,
-//           }
+//           { status: newStatus }
 //         );
+//       }
+
+//       /* 🚀 COPY TO allServices WHEN APPROVED */
+//       if (newStatus === "Approved" && !booking.serviceCreated) {
+//         const serviceData = {
+//           bookingId: booking.bookingId,
+//           bookingDocId: booking.id,
+//           uid: booking.uid,
+//           name: booking.name,
+//           phone: booking.phone,
+//           email: booking.email,
+//           brand: booking.brand,
+//           model: booking.model,
+//           issue: booking.issue,
+//           otherIssue: booking.otherIssue || "",
+//           location: booking.location,
+//           address: booking.address,
+//           serviceStatus: "Pending",
+//           createdAt: booking.createdAt || new Date(),
+//         };
+
+//         await addDoc(collection(db, "allServices"), serviceData);
+
+//         await updateDoc(doc(db, "bookings", booking.id), {
+//           serviceCreated: true,
+//         });
+
+//         toast.success("Moved to Services");
 //       }
 
 //       toast.success("Status updated");
 //     } catch (err) {
-//       console.error("Status update failed", err);
+//       console.error(err);
 
-//       /* 🔴 Revert UI if error */
+//       /* 🔴 Revert UI */
 //       setBookings((prev) =>
 //         prev.map((b) =>
 //           b.id === booking.id ? { ...b, status: previousStatus } : b
@@ -121,155 +153,177 @@
 //     }
 //   };
 
+//   /* 📅 FORMAT DATE SAFE */
+//   const formatDate = (ts) => {
+//     try {
+//       return ts?.toDate?.().toLocaleString() || "-";
+//     } catch {
+//       return "-";
+//     }
+//   };
+
 //   return (
-//     <div className="p-8  max-w-7xl mx-auto">
-
+//     <div className="p-8 max-w-7xl mx-auto">
 //       {/* 🔝 TOP BAR */}
-//       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
-//         <h2 className="text-3xl font-bold">All Bookings</h2>
+// <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
+//   {/* 🔎 SEARCH */}
+//   <div className="w-full max-w-sm">
+//     <input
+//       type="text"
+//       placeholder="Search booking, name, phone..."
+//       value={search}
+//       onChange={(e) => setSearch(e.target.value)}
+//       className="w-full border border-gray-300 bg-white px-4 py-2.5 rounded-lg text-sm shadow-sm focus:border-black focus:ring-2 focus:ring-black/20 outline-none"
+//     />
+//   </div>
 
-//         <div className="flex flex-wrap gap-3">
+//   <div className="flex flex-wrap gap-3">
+//     {/* 🎯 STATUS FILTER */}
+//     <select
+//       value={statusFilter}
+//       onChange={(e) => setStatusFilter(e.target.value)}
+//       className="h-[42px] min-w-[140px] border border-gray-300 bg-white px-4 rounded-md text-sm shadow-sm focus:ring-2 focus:ring-black outline-none"
+//     >
+//       <option>All</option>
+//       {BOOKING_STATUS.map((s) => (
+//         <option key={s}>{s}</option>
+//       ))}
+//     </select>
 
-//           {/* 🔍 SEARCH */}
-//           <input
-//             type="text"
-//             placeholder="Search booking, name, phone..."
-//             value={search}
-//             onChange={(e) => setSearch(e.target.value)}
-//             className="px-4 py-2 rounded-xl bg-black/50 border border-white/10"
-//           />
+//     {/* 🔄 VIEW TOGGLE */}
+//     <div className="flex gap-2">
+//       <button
+//         onClick={() => setView("card")}
+//         className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm transition ${
+//           view === "card"
+//             ? "bg-black text-white"
+//             : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+//         }`}
+//       >
+//         <FaThLarge /> Card
+//       </button>
 
-//           {/* 🎯 STATUS FILTER */}
-//           <select
-//             value={statusFilter}
-//             onChange={(e) => setStatusFilter(e.target.value)}
-//             className="px-4 py-2 rounded-xl bg-black/50 border border-white/10"
+//       <button
+//         onClick={() => setView("table")}
+//         className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm transition ${
+//           view === "table"
+//             ? "bg-black text-white"
+//             : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+//         }`}
+//       >
+//         <FaTable /> Table
+//       </button>
+//     </div>
+
+//     {/* ➕ ADD BOOKING */}
+//     <button
+//       onClick={() => navigate("/admin/addbooking")}
+//       className="h-[42px] bg-black text-white px-5 rounded-md font-bold shadow hover:bg-gray-900 transition"
+//     >
+//       + Add Booking
+//     </button>
+//   </div>
+// </div>
+
+// {/* 🟦 CARD VIEW */}
+// {view === "card" && (
+//   <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+//     {filtered.map((b) => (
+//       <div
+//         key={b.id}
+//         className="p-5 rounded-2xl bg-white border border-gray-300 shadow-sm hover:shadow-md transition"
+//       >
+//         <div className="flex justify-between items-start">
+//           <h3 className="text-lg font-semibold">{b.bookingId}</h3>
+
+//           <span
+//             className={`text-xs px-3 py-1 rounded-full font-medium ${statusColor(
+//               b.status
+//             )}`}
 //           >
-//             <option>All</option>
-//             {BOOKING_STATUS.map((s) => (
-//               <option key={s}>{s}</option>
-//             ))}
-//           </select>
-
-//           {/* 🔄 VIEW TOGGLE */}
-//           <button
-//             onClick={() => setView(view === "card" ? "table" : "card")}
-//             className="px-4 py-2 rounded-xl bg-gray-800"
-//           >
-//             {view === "card" ? "Table View" : "Card View"}
-//           </button>
-
-//           {/* ➕ ADD BOOKING */}
-//           <button
-//             onClick={() => navigate("/admin/addbooking")}
-//             className="px-6 py-2 rounded-xl font-semibold
-//             bg-gradient-to-r from-sky-500 to-cyan-400 text-black"
-//           >
-//             + Add Booking
-//           </button>
+//             {b.status}
+//           </span>
 //         </div>
-//       </div>
 
-//       {/* 🟦 CARD VIEW */}
-//       {view === "card" && (
-//         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-//           {filtered.map((b) => (
-//             <div
-//               key={b.id}
-//               className="p-6 rounded-2xl bg-white/5 border border-white/10"
-//             >
-//               <div className="flex justify-between items-center">
-//                 <h3 className="text-xl font-semibold">{b.bookingId}</h3>
+//         <p className="mt-2 flex items-center gap-2 text-sm">
+//           <FaCar /> {b.brand} • {b.model}
+//         </p>
 
-//                 <span
-//                   className={`text-xs px-3 py-1 rounded-full ${statusColor(
-//                     b.status
-//                   )}`}
-//                 >
-//                   {b.status}
-//                 </span>
-//               </div>
+//         <p className="text-sm flex items-center gap-2 mt-2">
+//           <FaUser /> {b.name}
+//         </p>
 
-//               <p className="text-gray-300 mt-2">
-//                 {b.brand} • {b.model}
-//               </p>
+//         <p className="text-sm flex items-center gap-2 mt-2">
+//           <FaPhone /> {b.phone}
+//         </p>
 
-//               <p className="text-gray-400 text-sm">👤 {b.name}</p>
-//               <p className="text-gray-400 text-sm">📞 {b.phone}</p>
+//         <p className="text-sm flex items-start gap-2 mt-2 line-clamp-2">
+//           <FaMapMarkerAlt className="mt-0.5" />
+//           {b.location}
+//         </p>
 
-//               <p className="text-gray-400 text-sm mt-2 line-clamp-2">
-//                 📍 {b.location}
-//               </p>
-
-//               {/* 🔄 STATUS DROPDOWN */}
-//               <select
-//                 value={b.status}
-//                 disabled={b.status === "Service Completed"}
-//                 onChange={(e) =>
-//                   updateStatus(b, e.target.value)
-//                 }
-//                 className="mt-3 w-full px-3 py-2 rounded-lg bg-black/60 border border-white/10 text-sm disabled:opacity-50"
-//               >
-//                 {BOOKING_STATUS.map((s) => (
-//                   <option key={s} value={s}>
-//                     {s}
-//                   </option>
-//                 ))}
-//               </select>
-
-//               <p className="text-black text-xs mt-3">
-//                 {b.createdAt?.toDate?.().toLocaleString()}
-//               </p>
-//             </div>
+//         <select
+//           value={b.status}
+//           disabled={b.status === "Service Completed"}
+//           onChange={(e) => updateStatus(b, e.target.value)}
+//           className="mt-4 w-full px-3 py-2 rounded-lg border border-gray-300 text-sm bg-white"
+//         >
+//           {BOOKING_STATUS.map((s) => (
+//             <option key={s} value={s}>
+//               {s}
+//             </option>
 //           ))}
-//         </div>
-//       )}
+//         </select>
+
+//         <p className="text-xs mt-3 flex items-center gap-2 text-gray-500">
+//           <FaClock /> {formatDate(b.createdAt)}
+//         </p>
+//       </div>
+//     ))}
+//   </div>
+// )}
 
 //       {/* 🟨 TABLE VIEW */}
 //       {view === "table" && (
-//         <div className="overflow-auto rounded-xl border border-white/10">
+//         <div className="overflow-x-auto bg-white rounded-2xl shadow-sm ">
 //           <table className="w-full text-sm">
-//             <thead className="bg-black/40 text-gray-300">
+//             <thead className="bg-gradient-to-r from-black to-cyan-400 text-white text-left">
 //               <tr>
-//                 <th className="p-3 text-left">Booking ID</th>
-//                 <th className="p-3 text-left">Customer</th>
-//                 <th className="p-3 text-left">Car</th>
-//                 <th className="p-3 text-left">Phone</th>
-//                 <th className="p-3 text-left">Status</th>
-//                 <th className="p-3 text-left">Date</th>
+//                 <th className="px-4 py-4 text-left">S No</th>
+//                 <th className="px-4 py-4 text-left">Booking ID</th>
+//                 <th className="px-4 py-4 text-left">Customer</th>
+//                 <th className="px-4 py-4 text-left">Car</th>
+//                 <th className="px-4 py-4 text-left">Phone</th>
+//                 <th className="px-4 py-4 text-left">Status</th>
+//                 <th className="px-4 py-4 text-left">Date</th>
 //               </tr>
 //             </thead>
 
 //             <tbody>
-//               {filtered.map((b) => (
-//                 <tr key={b.id} className="border-t border-white/10">
-//                   <td className="p-3">{b.bookingId}</td>
-//                   <td className="p-3">{b.name}</td>
-//                   <td className="p-3">
+//               {filtered.map((b, i) => (
+//                 <tr key={b.id} className="border-t border-gray-300">
+//                   <td className="px-4 py-4">{i + 1}</td>
+//                   <td className="px-4 py-4">{b.bookingId}</td>
+//                   <td className="px-4 py-4">{b.name}</td>
+//                   <td className="px-4 py-4">
 //                     {b.brand} • {b.model}
 //                   </td>
-//                   <td className="p-3">{b.phone}</td>
+//                   <td className="px-4 py-4">{b.phone}</td>
 
-//                   <td className="p-3">
+//                   <td className="px-4 py-4">
 //                     <select
 //                       value={b.status}
 //                       disabled={b.status === "Service Completed"}
-//                       onChange={(e) =>
-//                         updateStatus(b, e.target.value)
-//                       }
-//                       className="px-3 py-1 rounded-lg bg-black/60 border border-white/10 text-xs disabled:opacity-50"
+//                       onChange={(e) => updateStatus(b, e.target.value)}
+//                       className="px-3 py-1 rounded-lg border border-gray-300 text-xs bg-white"
 //                     >
 //                       {BOOKING_STATUS.map((s) => (
-//                         <option key={s} value={s}>
-//                           {s}
-//                         </option>
+//                         <option key={s}>{s}</option>
 //                       ))}
 //                     </select>
 //                   </td>
 
-//                   <td className="p-3">
-//                     {b.createdAt?.toDate?.().toLocaleDateString()}
-//                   </td>
+//                   <td className="px-4 py-4">{formatDate(b.createdAt)}</td>
 //                 </tr>
 //               ))}
 //             </tbody>
@@ -298,18 +352,13 @@ import {
   updateDoc,
   doc,
   addDoc,
+  getDocs,
+  where,
 } from "firebase/firestore";
 import { db } from "../../firebase";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
-import { FaThLarge, FaTable } from "react-icons/fa";
-import {
-  FaCar,
-  FaUser,
-  FaPhone,
-  FaMapMarkerAlt,
-  FaClock,
-} from "react-icons/fa";
+import { FaThLarge, FaTable, FaCar, FaUser, FaPhone, FaMapMarkerAlt, FaClock } from "react-icons/fa";
 
 /* 🔹 STATUS LIST */
 const BOOKING_STATUS = [
@@ -322,7 +371,23 @@ const BOOKING_STATUS = [
   "Bill Pending",
   "Bill Completed",
   "Service Completed",
+  "Cancelled",
 ];
+
+/* 🎨 CARD BG COLOR */
+const cardBgColor = (status) => {
+  switch (status) {
+    case "Approved":
+      return "bg-indigo-50 border-indigo-200";
+    case "Service Completed":
+      return "bg-green-50 border-green-200";
+    case "Cancelled":
+      return "bg-red-50 border-red-200";
+    default:
+      return "bg-white border-gray-300";
+  }
+};
+
 
 const ShowAllBookings = () => {
   const navigate = useNavigate();
@@ -331,6 +396,11 @@ const ShowAllBookings = () => {
   const [view, setView] = useState("card");
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
+
+  /* 🔴 POPUP STATE */
+  const [popup, setPopup] = useState(null);
+  const [trackNumber, setTrackNumber] = useState("");
+  const [cancelReason, setCancelReason] = useState("");
 
   /* 🔥 FETCH BOOKINGS */
   useEffect(() => {
@@ -361,90 +431,162 @@ const ShowAllBookings = () => {
   });
 
   /* 🎨 STATUS COLOR */
-  const statusColor = (status) => {
-    switch (status) {
-      case "Booked":
-        return "bg-blue-100 text-blue-700";
-      case "Processing":
-        return "bg-yellow-100 text-yellow-700";
-      case "Service Completed":
-        return "bg-green-100 text-green-700";
-      case "Bill Pending":
-        return "bg-orange-100 text-orange-700";
-      default:
-        return "bg-gray-100 text-gray-700";
-    }
-  };
+ const statusColor = (status) => {
+  switch (status) {
+    case "Booked":
+      return "bg-green-100 text-blue-700 ring-1 ring-blue-200";
 
-  /* 🔄 STATUS UPDATE + COPY TO SERVICES */
-  const updateStatus = async (booking, newStatus) => {
+    case "Call Verified":
+      return "bg-cyan-100 text-cyan-700 ring-1 ring-cyan-200";
+
+    case "Approved":
+      return "bg-gradient-to-r from-indigo-500 to-purple-500 text-white shadow-sm";
+
+    case "Processing":
+      return "bg-yellow-100 text-yellow-800 ring-1 ring-yellow-200";
+
+    case "Waiting for Spare":
+      return "bg-orange-100 text-orange-700 ring-1 ring-orange-200";
+
+    case "Service Going on":
+      return "bg-sky-100 text-sky-700 ring-1 ring-sky-200";
+
+    case "Bill Pending":
+      return "bg-amber-100 text-amber-800 ring-1 ring-amber-200";
+
+    case "Bill Completed":
+      return "bg-emerald-100 text-emerald-700 ring-1 ring-emerald-200";
+
+    case "Service Completed":
+      return "bg-green-500 text-white shadow";
+
+    case "Cancelled":
+      return "bg-red-500 text-white shadow";
+
+    default:
+      return "bg-gray-100 text-gray-700";
+  }
+};
+
+
+  /* 🔄 STATUS CHANGE HANDLER */
+  const handleStatusChange = (booking, newStatus) => {
     if (booking.status === "Service Completed") return;
 
-    const previousStatus = booking.status;
+    if (newStatus === "Approved") {
+      setPopup({ type: "approved", booking });
+      return;
+    }
 
-    /* 🟢 Optimistic UI */
-    setBookings((prev) =>
-      prev.map((b) =>
-        b.id === booking.id ? { ...b, status: newStatus } : b
-      )
-    );
+    if (newStatus === "Cancelled") {
+      setPopup({ type: "cancel", booking });
+      return;
+    }
 
+    updateStatus(booking, newStatus);
+  };
+
+  /* 🔥 UPDATE STATUS CORE */
+  const updateStatus = async (booking, newStatus, extraData = {}) => {
     try {
-      await updateDoc(doc(db, "bookings", booking.id), {
+      const bookingRef = doc(db, "bookings", booking.id);
+
+      const updateData = {
         status: newStatus,
-      });
+        ...extraData,
+      };
+
+      await updateDoc(bookingRef, updateData);
 
       if (booking.uid) {
         await updateDoc(
           doc(db, "users", booking.uid, "bookings", booking.id),
-          { status: newStatus }
+          updateData
         );
       }
 
-      /* 🚀 COPY TO allServices WHEN APPROVED */
-      if (newStatus === "Approved" && !booking.serviceCreated) {
-        const serviceData = {
-          bookingId: booking.bookingId,
-          bookingDocId: booking.id,
-          uid: booking.uid,
-          name: booking.name,
-          phone: booking.phone,
-          email: booking.email,
-          brand: booking.brand,
-          model: booking.model,
-          issue: booking.issue,
-          otherIssue: booking.otherIssue || "",
-          location: booking.location,
-          address: booking.address,
-          serviceStatus: "Pending",
-          createdAt: booking.createdAt || new Date(),
-        };
+      /* 🚀 MOVE TO allServices WHEN APPROVED */
+      if (newStatus === "Approved") {
+        const q = query(
+          collection(db, "allServices"),
+          where("bookingDocId", "==", booking.id)
+        );
 
-        await addDoc(collection(db, "allServices"), serviceData);
+        const snap = await getDocs(q);
 
-        await updateDoc(doc(db, "bookings", booking.id), {
-          serviceCreated: true,
-        });
+        if (snap.empty) {
+          const serviceData = {
+            bookingId: booking.bookingId,
+            bookingDocId: booking.id,
+            uid: booking.uid || null,
 
-        toast.success("Moved to Services");
+            name: booking.name || "",
+            phone: booking.phone || "",
+            email: booking.email || "",
+
+            brand: booking.brand || "",
+            model: booking.model || "",
+            issue: booking.issue || "",
+            otherIssue: booking.otherIssue || "",
+
+            location: booking.location || "",
+            address: booking.address || "",
+
+            trackNumber: extraData.trackNumber || "",
+
+            serviceStatus: "Pending",
+
+            createdAt:
+              booking.createdAt && booking.createdAt.toDate
+                ? booking.createdAt
+                : new Date(),
+          };
+
+          await addDoc(collection(db, "allServices"), serviceData);
+        }
+
+        await updateDoc(bookingRef, { serviceCreated: true });
       }
 
       toast.success("Status updated");
     } catch (err) {
       console.error(err);
-
-      /* 🔴 Revert UI */
-      setBookings((prev) =>
-        prev.map((b) =>
-          b.id === booking.id ? { ...b, status: previousStatus } : b
-        )
-      );
-
       toast.error("Failed to update status");
     }
   };
 
-  /* 📅 FORMAT DATE SAFE */
+  /* ✅ APPROVED SUBMIT */
+  const submitApproved = async () => {
+    if (!trackNumber.trim()) {
+      toast.error("Track number required");
+      return;
+    }
+
+    await updateStatus(popup.booking, "Approved", {
+      trackNumber: trackNumber.trim(),
+      approvedAt: new Date(),
+    });
+
+    setPopup(null);
+    setTrackNumber("");
+  };
+
+  /* ❌ CANCEL SUBMIT */
+  const submitCancel = async () => {
+    if (!cancelReason.trim()) {
+      toast.error("Cancel reason required");
+      return;
+    }
+
+    await updateStatus(popup.booking, "Cancelled", {
+      cancelReason: cancelReason.trim(),
+    });
+
+    setPopup(null);
+    setCancelReason("");
+  };
+
+  /* 📅 FORMAT DATE */
   const formatDate = (ts) => {
     try {
       return ts?.toDate?.().toLocaleString() || "-";
@@ -485,22 +627,20 @@ const ShowAllBookings = () => {
           <div className="flex gap-2">
             <button
               onClick={() => setView("card")}
-              className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm transition ${
-                view === "card"
+              className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm transition ${view === "card"
                   ? "bg-black text-white"
                   : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-              }`}
+                }`}
             >
               <FaThLarge /> Card
             </button>
 
             <button
               onClick={() => setView("table")}
-              className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm transition ${
-                view === "table"
+              className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm transition ${view === "table"
                   ? "bg-black text-white"
                   : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-              }`}
+                }`}
             >
               <FaTable /> Table
             </button>
@@ -518,12 +658,15 @@ const ShowAllBookings = () => {
 
       {/* 🟦 CARD VIEW */}
       {view === "card" && (
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid md:grid-cols-2 mt-15 lg:grid-cols-3 gap-6">
           {filtered.map((b) => (
             <div
               key={b.id}
-              className="p-5 rounded-2xl bg-white border border-gray-300 shadow-sm hover:shadow-md transition"
+              className={`p-5 rounded-2xl border shadow-sm hover:shadow-md transition ${cardBgColor(
+                b.status
+              )}`}
             >
+
               <div className="flex justify-between items-start">
                 <h3 className="text-lg font-semibold">{b.bookingId}</h3>
 
@@ -576,44 +719,39 @@ const ShowAllBookings = () => {
 
       {/* 🟨 TABLE VIEW */}
       {view === "table" && (
-        <div className="overflow-x-auto bg-white rounded-2xl shadow-sm ">
+        <div className="overflow-x-auto bg-white mt-15 rounded-2xl shadow-sm">
           <table className="w-full text-sm">
             <thead className="bg-gradient-to-r from-black to-cyan-400 text-white text-left">
               <tr>
-                <th className="px-4 py-4 text-left">S No</th>
-                <th className="px-4 py-4 text-left">Booking ID</th>
-                <th className="px-4 py-4 text-left">Customer</th>
-                <th className="px-4 py-4 text-left">Car</th>
-                <th className="px-4 py-4 text-left">Phone</th>
-                <th className="px-4 py-4 text-left">Status</th>
-                <th className="px-4 py-4 text-left">Date</th>
+                <th className="px-4 py-4">S No</th>
+                <th className="px-4 py-4">Booking ID</th>
+                <th className="px-4 py-4">Customer</th>
+                <th className="px-4 py-4">Car</th>
+                <th className="px-4 py-4">Phone</th>
+                <th className="px-4 py-4">Status</th>
+                <th className="px-4 py-4">Date</th>
               </tr>
             </thead>
-
             <tbody>
               {filtered.map((b, i) => (
                 <tr key={b.id} className="border-t border-gray-300">
                   <td className="px-4 py-4">{i + 1}</td>
                   <td className="px-4 py-4">{b.bookingId}</td>
                   <td className="px-4 py-4">{b.name}</td>
-                  <td className="px-4 py-4">
-                    {b.brand} • {b.model}
-                  </td>
+                  <td className="px-4 py-4">{b.brand} • {b.model}</td>
                   <td className="px-4 py-4">{b.phone}</td>
-
                   <td className="px-4 py-4">
                     <select
                       value={b.status}
                       disabled={b.status === "Service Completed"}
-                      onChange={(e) => updateStatus(b, e.target.value)}
-                      className="px-3 py-1 rounded-lg border border-gray-300 text-xs bg-white"
+                      onChange={(e) => handleStatusChange(b, e.target.value)}
+                      className="px-3 py-1 rounded-lg border text-xs"
                     >
                       {BOOKING_STATUS.map((s) => (
                         <option key={s}>{s}</option>
                       ))}
                     </select>
                   </td>
-
                   <td className="px-4 py-4">{formatDate(b.createdAt)}</td>
                 </tr>
               ))}
@@ -623,9 +761,56 @@ const ShowAllBookings = () => {
       )}
 
       {filtered.length === 0 && (
-        <p className="text-center text-gray-400 mt-10">
-          No bookings found
-        </p>
+        <p className="text-center text-gray-400 mt-10">No bookings found</p>
+      )}
+
+      {/* 🔴 POPUP MODAL */}
+      {popup && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-xl w-[350px]">
+            {popup.type === "approved" && (
+              <>
+                <h2 className="font-bold mb-3">Enter Track Number</h2>
+                <input
+                  value={trackNumber}
+                  onChange={(e) => setTrackNumber(e.target.value)}
+                  className="w-full border px-3 py-2 rounded mb-4"
+                  placeholder="Track Number"
+                />
+                <button
+                  onClick={submitApproved}
+                  className="bg-green-600 text-white px-4 py-2 rounded w-full"
+                >
+                  Submit
+                </button>
+              </>
+            )}
+
+            {popup.type === "cancel" && (
+              <>
+                <h2 className="font-bold mb-3">Cancel Reason</h2>
+                <textarea
+                  value={cancelReason}
+                  onChange={(e) => setCancelReason(e.target.value)}
+                  className="w-full border px-3 py-2 rounded mb-4"
+                />
+                <button
+                  onClick={submitCancel}
+                  className="bg-red-600 text-white px-4 py-2 rounded w-full"
+                >
+                  Submit
+                </button>
+              </>
+            )}
+
+            <button
+              onClick={() => setPopup(null)}
+              className="mt-3 text-sm text-gray-500 w-full"
+            >
+              Close
+            </button>
+          </div>
+        </div>
       )}
     </div>
   );

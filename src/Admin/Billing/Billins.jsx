@@ -323,13 +323,13 @@ const Billings = () => {
         <table className="min-w-full text-sm">
           <thead className="bg-gradient-to-r from-black to-cyan-400 text-white">
             <tr>
-              <th className="px-4 py-4">S No</th>
-              <th className="px-4 py-4">Invoice</th>
-              <th className="px-4 py-4">Customer</th>
-              <th className="px-4 py-4">Car No</th>
-              <th className="px-4 py-4">Total</th>
-              <th className="px-4 py-4">Status</th>
-              <th className="px-4 py-4">Actions</th>
+              <th className="px-4 py-4 text-left">S No</th>
+              <th className="px-4 py-4 text-left">Invoice</th>
+              <th className="px-4 py-4 text-left">Customer</th>
+              <th className="px-4 py-4 text-left">Car No</th>
+              <th className="px-4 py-4 text-left">Total</th>
+              <th className="px-4 py-4 text-left">Status</th>
+              <th className="px-4 py-4 text-left">Actions</th>
             </tr>
           </thead>
 
@@ -339,7 +339,7 @@ const Billings = () => {
                 <td className="px-4 py-4">{i + 1}</td>
                 <td className="px-4 py-4">{b.invoiceNo}</td>
                 <td className="px-4 py-4">{b.customerName}</td>
-                <td className="px-4 py-4">{b.carNumber}</td>
+                <td className="px-4 py-4">{b.bookingId}</td>
                 <td className="px-4 py-4">₹{b.grandTotal}</td>
                 <td className="px-4 py-4">
                   <StatusBadge status={b.paymentStatus} />
@@ -348,9 +348,9 @@ const Billings = () => {
                   <button onClick={() => printInvoice(b)} className="bg-gray-700 text-white px-2 py-1 rounded">
                     <Printer size={14} />
                   </button>
-                  <button onClick={() => navigate(`/admin/addbillings/${b.id}`)} className="bg-yellow-500 text-white px-2 py-1 rounded">
+                  {/* <button onClick={() => navigate(`/admin/addbillings/${b.id}`)} className="bg-yellow-500 text-white px-2 py-1 rounded">
                     <Pencil size={14} />
-                  </button>
+                  </button> */}
                   <button onClick={() => deleteInvoice(b.id)} className="bg-red-500 text-white px-2 py-1 rounded">
                     <Trash2 size={14} />
                   </button>

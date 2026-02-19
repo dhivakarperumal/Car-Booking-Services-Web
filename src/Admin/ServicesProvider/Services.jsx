@@ -12,6 +12,16 @@ import toast from "react-hot-toast";
 import { FaEdit, FaTrash, FaSearch, FaEye } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
+const BOOKING_STATUS = [
+  "Approved",
+  "Processing",
+  "Waiting for Spare",
+  "Service Going on",
+  "Bill Pending",
+  "Bill Completed",
+  "Service Completed",
+];
+
 const Services = () => {
   const navigate = useNavigate();
 
@@ -49,25 +59,59 @@ const Services = () => {
   /* =======================
      STATUS CHANGE
   ======================= */
-  const handleStatusChange = async (s, newStatus) => {
-    if (!s?.id) return toast.error("Invalid service ID");
+ const handleStatusChange = async (s, newStatus) => {
+  if (!s?.id) return toast.error("Invalid service ID");
 
-    try {
-      setRowLoading(s.id);
+  try {
+    setRowLoading(s.id);
 
-      await updateDoc(doc(db, "allServices", s.id), {
-        serviceStatus: newStatus,
+    /* 🔥 1. UPDATE SERVICE STATUS */
+    await updateDoc(doc(db, "allServices", s.id), {
+      serviceStatus: newStatus,
+      updatedAt: serverTimestamp(),
+    });
+
+    /* 🔥 2. MAP SERVICE STATUS → BOOKING STATUS */
+    let bookingStatus = newStatus;
+
+    if (newStatus === "Completed") {
+      bookingStatus = "Service Completed";
+    } else if (newStatus === "Cancelled") {
+      bookingStatus = "Cancelled";
+    } else {
+      bookingStatus = newStatus;
+    }
+
+    /* 🔥 3. UPDATE BOOKING STATUS */
+    if (s.bookingDocId) {
+      const bookingRef = doc(db, "bookings", s.bookingDocId);
+
+      await updateDoc(bookingRef, {
+        status: bookingStatus,
         updatedAt: serverTimestamp(),
       });
 
-      toast.success("Status updated");
-    } catch (error) {
-      console.error(error);
-      toast.error("Status update failed");
-    } finally {
-      setRowLoading(null);
+      /* 🔥 4. UPDATE USER SUBCOLLECTION BOOKING */
+      if (s.uid) {
+        await updateDoc(
+          doc(db, "users", s.uid, "bookings", s.bookingDocId),
+          {
+            status: bookingStatus,
+            updatedAt: serverTimestamp(),
+          }
+        );
+      }
     }
-  };
+
+    toast.success("Service & Booking status updated");
+  } catch (error) {
+    console.error(error);
+    toast.error("Status update failed");
+  } finally {
+    setRowLoading(null);
+  }
+};
+
 
   /* =======================
      DELETE
@@ -115,16 +159,37 @@ const Services = () => {
   );
 
   /* =======================
-     STATUS COLOR BADGE
+     STATUS COLOR
   ======================= */
   const getStatusColor = (status) => {
     switch (status) {
-      case "Completed":
-        return "bg-green-100 text-green-700";
-      case "In Progress":
+      case "Booked":
+        return "bg-gray-100 text-gray-700";
+
+      case "Call Verified":
         return "bg-blue-100 text-blue-700";
-      case "Waiting for Parts":
-        return "bg-yellow-100 text-yellow-700";
+
+      case "Approved":
+        return "bg-indigo-100 text-indigo-700";
+
+      case "Processing":
+        return "bg-purple-100 text-purple-700";
+
+      case "Waiting for Spare":
+        return "bg-yellow-100 text-yellow-800";
+
+      case "Service Going on":
+        return "bg-orange-100 text-orange-700";
+
+      case "Bill Pending":
+        return "bg-pink-100 text-pink-700";
+
+      case "Bill Completed":
+        return "bg-cyan-100 text-cyan-700";
+
+      case "Service Completed":
+        return "bg-green-100 text-green-700";
+
       default:
         return "bg-red-100 text-red-700";
     }
@@ -132,15 +197,9 @@ const Services = () => {
 
   return (
     <div className="p-4 min-h-screen space-y-6">
-      {/* HEADER */}
-      <div className="flex justify-between items-center">
-        
-
-       
-      </div>
-
       {/* SEARCH & FILTER */}
-      <div className=" p-4 flex flex-wrap gap-3 justify-between items-center">
+      <div className="p-4 flex flex-wrap gap-3 justify-between items-center">
+        {/* SEARCH */}
         <div className="relative w-full md:w-1/3">
           <FaSearch className="absolute left-3 top-4 text-gray-400" />
           <input
@@ -156,29 +215,32 @@ const Services = () => {
           />
         </div>
 
-       <div className="flex gap-2">
-         <select
-          value={statusFilter}
-          onChange={(e) => {
-            setStatusFilter(e.target.value);
-            setCurrentPage(1);
-          }}
-          className="rounded-lg border border-gray-200 px-4 py-2.5 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-900/40"
-        >
-          <option value="all">All Status</option>
-          <option value="Pending">Pending</option>
-          <option value="In Progress">In Progress</option>
-          <option value="Waiting for Parts">Waiting for Parts</option>
-          <option value="Completed">Completed</option>
-        </select>
-         <button
-          onClick={() => navigate("/admin/addserviceparts")}
-          className="h-[42px] w-full sm:w-auto bg-black text-white px-5 rounded-md font-bold shadow
+        {/* FILTER + BUTTON */}
+        <div className="flex gap-2 flex-wrap">
+          <select
+            value={statusFilter}
+            onChange={(e) => {
+              setStatusFilter(e.target.value);
+              setCurrentPage(1);
+            }}
+            className="rounded-lg border border-gray-200 px-4 py-2.5 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-900/40"
+          >
+            <option value="all">All Status</option>
+            {BOOKING_STATUS.map((status) => (
+              <option key={status} value={status}>
+                {status}
+              </option>
+            ))}
+          </select>
+
+          <button
+            onClick={() => navigate("/admin/addserviceparts")}
+            className="h-[42px] bg-black text-white px-5 rounded-md font-bold shadow
              hover:bg-gray-900 transition"
-        >
-          + Add Service Parts
-        </button>
-       </div>
+          >
+            + Add Service Parts
+          </button>
+        </div>
       </div>
 
       {/* TABLE */}
@@ -220,21 +282,20 @@ const Services = () => {
                   {/* STATUS */}
                   <td className="px-3 py-3">
                     <select
-                      value={s.serviceStatus || "Pending"}
+                      value={s.serviceStatus || "Booked"}
                       disabled={rowLoading === s.id}
                       onChange={(e) =>
                         handleStatusChange(s, e.target.value)
                       }
-                      className={`border rounded px-2 py-1 text-xs ${getStatusColor(
-                        s.serviceStatus
+                      className={`border rounded px-2 py-1 text-xs font-semibold ${getStatusColor(
+                        s.serviceStatus || "Booked"
                       )}`}
                     >
-                      <option value="Pending">Pending</option>
-                      <option value="In Progress">In Progress</option>
-                      <option value="Waiting for Parts">
-                        Waiting for Parts
-                      </option>
-                      <option value="Completed">Completed</option>
+                      {BOOKING_STATUS.map((status) => (
+                        <option key={status} value={status}>
+                          {status}
+                        </option>
+                      ))}
                     </select>
                   </td>
 
@@ -248,7 +309,7 @@ const Services = () => {
                       onClick={() =>
                         navigate(`/admin/services/${s.id}`)
                       }
-                      className="bg-blue-600 text-white p-2 rounded-lg"
+                      className="p-3 rounded-full border border-gray-300 hover:bg-gray-100 transition"
                       title="View Service"
                     >
                       <FaEye />
@@ -258,7 +319,7 @@ const Services = () => {
                       onClick={() =>
                         navigate(`/admin/addservices/${s.id}`)
                       }
-                      className="bg-green-600 text-white p-2 rounded-lg"
+                      className="p-3 rounded-full border border-gray-300 hover:bg-gray-100 transition"
                       title="Edit Service"
                     >
                       <FaEdit />
@@ -267,7 +328,7 @@ const Services = () => {
                     <button
                       onClick={() => handleDelete(s.id)}
                       disabled={rowLoading === s.id}
-                      className="bg-red-600 text-white p-2 rounded-lg"
+                      className="p-3 rounded-full border border-gray-300 hover:bg-red-100 transition"
                       title="Delete Service"
                     >
                       <FaTrash />

@@ -195,41 +195,41 @@ const Reports = () => {
       </div>
 
       {/* FILTER */}
-     <div className="bg-white p-4 rounded-xl shadow mb-6">
-  <div className="flex items-center justify-between gap-4 flex-wrap">
+      <div className=" mb-6">
+        <div className="flex items-center justify-between gap-4 flex-wrap">
 
-    {/* LEFT SIDE – TYPE FILTER */}
-    <select
-      value={typeFilter}
-      onChange={e => setTypeFilter(e.target.value)}
-      className="border px-4 py-3 rounded-md shadow-sm w-full sm:w-40"
-    >
-      <option value="All">All Types</option>
-      <option value="Appointments">Appointments</option>
-      <option value="Inventory">Inventory</option>
-      <option value="Billing">Billing</option>
-    </select>
+          {/* LEFT SIDE – TYPE FILTER */}
+          <select
+            value={typeFilter}
+            onChange={e => setTypeFilter(e.target.value)}
+            className="border border-gray-300 px-4 py-3 rounded-md shadow-sm w-full sm:w-40"
+          >
+            <option value="All">All Types</option>
+            <option value="Appointments">Appointments</option>
+            <option value="Inventory">Inventory</option>
+            <option value="Billing">Billing</option>
+          </select>
 
-    {/* RIGHT SIDE – MONTH FILTER */}
-    <select
-      value={monthFilter}
-      onChange={e => setMonthFilter(e.target.value)}
-      className="border px-4 py-3 rounded-md shadow-sm w-full sm:w-40"
-    >
-      <option value="All">All Months</option>
-      {availableMonths.map(m => (
-        <option key={m} value={m}>
-          {dayjs(m).format("MMM YYYY")}
-        </option>
-      ))}
-    </select>
+          {/* RIGHT SIDE – MONTH FILTER */}
+          <select
+            value={monthFilter}
+            onChange={e => setMonthFilter(e.target.value)}
+            className="border border-gray-300 px-4 py-3 rounded-md shadow-sm w-full sm:w-40"
+          >
+            <option value="All">All Months</option>
+            {availableMonths.map(m => (
+              <option key={m} value={m}>
+                {dayjs(m).format("MMM YYYY")}
+              </option>
+            ))}
+          </select>
 
-  </div>
-</div>
+        </div>
+      </div>
 
 
       {/* TABLE */}
-      <div className="bg-white rounded-2xl shadow overflow-hidden">
+      <div className="bg-white rounded-2xl mt-15 shadow overflow-hidden">
         <table className="min-w-full text-sm">
           <thead className="bg-gradient-to-r from-black to-cyan-400 text-white">
             <tr>
@@ -326,7 +326,7 @@ const Reports = () => {
    STAT CARD
 ======================== */
 const Stat = ({ title, value, icon }) => (
-  <div className="bg-white rounded-xl shadow p-5 flex justify-between items-center">
+  <div className="bg-white rounded-md border border-gray-300 shadow p-5 flex justify-between items-center">
     <div>
       <p className="text-sm text-gray-500">{title}</p>
       <h2 className="text-2xl font-bold">{value}</h2>

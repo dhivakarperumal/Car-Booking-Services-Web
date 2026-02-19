@@ -268,10 +268,10 @@ const Users = () => {
                       </button>
                       <button
                         onClick={() => deleteUser(u.id)}
-                        className="px-3 py-1 bg-red-500 text-white rounded text-xs font-medium hover:bg-red-600 transition"
+                        className="p-3 rounded-full  border border-gray-300  transition"
                       >
-                        <FaTrash className="inline mr-1" />
-                        Delete
+                        <FaTrash />
+                        
                       </button>
                     </td>
                   </tr>

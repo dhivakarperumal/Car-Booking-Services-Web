@@ -227,14 +227,14 @@ const ServicesListAll = () => {
                   onClick={() =>
                     navigate(`/admin/addservices/${srv.docId}`)
                   }
-                  className="border border-gray-300 p-2 rounded-full text-blue-600 hover:scale-110 transition"
+                  className="p-3 rounded-full  border border-gray-300  transition"
                 >
                   <Pencil size={16} />
                 </button>
 
                 <button
                   onClick={() => handleDelete(srv.docId)}
-                  className="border border-gray-300 p-2 rounded-full text-red-500 hover:scale-110 transition"
+                  className="p-3 rounded-full  border border-gray-300  transition"
                 >
                   <Trash2 size={16} />
                 </button>
@@ -300,17 +300,16 @@ const ServicesListAll = () => {
                         onClick={() =>
                           navigate(`/admin/addservices/${srv.docId}`)
                         }
-                        className="flex items-center gap-1 border border-gray-300 px-3 py-1.5 rounded-lg text-xs
-                 hover:bg-gray-100 transition"
+                        className="p-3 rounded-full  border border-gray-300  transition"
                       >
-                        <Pencil size={16} /> Edit
+                        <Pencil size={16} /> 
                       </button>
 
                       <button
                         onClick={() => handleDelete(srv.docId)}
-                        className="flex items-center gap-1 border border-gray-300 px-3 py-1.5 rounded-lg text-xs text-red-500 hover:bg-red-50 transition"
+                        className="p-3 rounded-full  border border-gray-300  transition"
                       >
-                        <Trash2 size={16} /> Delete
+                        <Trash2 size={16} />
                       </button>
                     </div>
                   </td>
