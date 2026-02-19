@@ -25,12 +25,24 @@ const Navbar = () => {
   const [showRegister, setShowRegister] = useState(false);
   const [cartCount, setCartCount] = useState(0);
 
-  const handleLogout = async () => {
+ const handleLogout = async () => {
+  try {
     await signOut(auth);
+
+    // clear local states immediately
     setUserData(null);
     setShowMenu(false);
+    setCartCount(0);
+
+    // 🔴 IMPORTANT: force navigation to home
+    navigate("/", { replace: true });
+
+    // optional: open login modal
     setShowLogin(true);
-  };
+  } catch (error) {
+    console.error("Logout error:", error);
+  }
+};
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
