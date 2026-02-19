@@ -12,46 +12,46 @@ import { auth, db } from "../firebase";
 const MyOrders = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
-useEffect(() => {
-  let unsubscribe;
+  useEffect(() => {
+    let unsubscribe;
 
-const fetchMyOrders = async (user) => {
-  try {
-    const q = query(
-      collection(db, "orders"),
-      where("uid", "==", user.uid),
-      orderBy("createdAt", "desc")
-    );
+    const fetchMyOrders = async (user) => {
+      try {
+        const q = query(
+          collection(db, "orders"),
+          where("uid", "==", user.uid),
+          orderBy("createdAt", "desc")
+        );
 
-    const snapshot = await getDocs(q);
+        const snapshot = await getDocs(q);
 
-    const ordersData = snapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-    }));
+        const ordersData = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
 
-    // ✅ NOW it's safe to use
-    console.log("Orders fetched:", ordersData);
+        // ✅ NOW it's safe to use
+        console.log("Orders fetched:", ordersData);
 
-    setOrders(ordersData);
-  } catch (error) {
-    console.error("Error fetching orders:", error);
-  } finally {
-    setLoading(false);
-  }
-};
+        setOrders(ordersData);
+      } catch (error) {
+        console.error("Error fetching orders:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  unsubscribe = onAuthStateChanged(auth, (user) => {
-    if (user) {
-      fetchMyOrders(user);
-    } else {
-      setOrders([]);
-      setLoading(false);
-    }
-  });
+    unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        fetchMyOrders(user);
+      } else {
+        setOrders([]);
+        setLoading(false);
+      }
+    });
 
-  return () => unsubscribe();
-}, []);
+    return () => unsubscribe();
+  }, []);
   if (loading) {
     return (
       <p className="text-slate-400">Loading orders...</p>
