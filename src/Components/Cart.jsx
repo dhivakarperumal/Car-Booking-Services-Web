@@ -10,6 +10,7 @@ import {
 import PageContainer from "./PageContainer";
 import { useNavigate } from "react-router-dom";
 import { FiTrash2 } from "react-icons/fi";
+import PageHeader from "./PageHeader";
 
 export default function Cart() {
   const [items, setItems] = useState([]);
@@ -61,16 +62,16 @@ export default function Cart() {
   const subtotal = items.reduce((t, i) => t + i.price * i.quantity, 0);
 
   return (
+    <>
+    <PageHeader title="Cart" />
     <section className="bg-black text-white py-24">
       <PageContainer>
-        <h2 className="text-4xl font-extrabold mb-12">Your Cart</h2>
-
         {items.length === 0 ? (
-          <div className="text-center py-32">
+          <div className="text-center py-10">
             <p className="text-gray-400 mb-6">Your cart is empty</p>
             <button
               onClick={() => navigate("/products")}
-              className="px-10 py-4 rounded-full bg-sky-400 text-black font-semibold"
+              className="px-10 py-4 rounded-full bg-sky-400 text-black font-semibold cursor-pointer"
             >
               Continue Shopping
             </button>
@@ -202,5 +203,6 @@ transition-all duration-300 cursor-pointer"
         )}
       </PageContainer>
     </section>
+    </>
   );
 }

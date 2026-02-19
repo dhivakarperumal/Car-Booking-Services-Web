@@ -16,6 +16,7 @@ import {
 } from "firebase/firestore";
 
 import { forwardRef } from "react";
+import PageHeader from "./PageHeader";
 
 const BOOKING_STATUS = {
     BOOKED: "Booked",
@@ -453,6 +454,8 @@ const BookService = () => {
     };
 
     return (
+        <>
+        <PageHeader title="Book Your Service" />
         <section className="relative py-24 bg-black text-white overflow-hidden">
 
             {/* Background */}
@@ -467,16 +470,6 @@ const BookService = () => {
 
             <PageContainer>
                 <div className="relative max-w-3xl mx-auto">
-
-                    {/* Header */}
-                    <div className="text-center mb-14">
-                        <h2 className="text-4xl md:text-5xl font-extrabold">
-                            Book Your Service
-                        </h2>
-                        <p className="text-gray-400 mt-4">
-                            Quick & hassle-free car service booking in Chennai
-                        </p>
-                    </div>
 
                     {/* Form Card */}
                     <form className="rounded-3xl border border-white/10 bg-white/5 backdrop-blur-xl p-10 space-y-2 shadow-2xl">
@@ -652,6 +645,7 @@ const BookService = () => {
                 </div>
             </PageContainer>
         </section>
+        </>
     );
 };
 

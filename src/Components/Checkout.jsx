@@ -9,6 +9,7 @@ import {
   Timestamp,
   runTransaction,
 } from "firebase/firestore";
+import { useLocation } from "react-router-dom";
 import { onAuthStateChanged } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import PageHeader from "../Components/PageHeader";
@@ -30,12 +31,26 @@ const generateOrderNumber = async () => {
 };
 
 const indianStates = [
-  "Tamil Nadu","Kerala","Karnataka","Andhra Pradesh","Telangana",
-  "Delhi","Maharashtra","Gujarat","Punjab","Rajasthan","West Bengal",
+  "Tamil Nadu",
+  "Kerala",
+  "Karnataka",
+  "Andhra Pradesh",
+  "Telangana",
+  "Delhi",
+  "Maharashtra",
+  "Gujarat",
+  "Punjab",
+  "Rajasthan",
+  "West Bengal",
 ];
 
 export default function Checkout() {
   const navigate = useNavigate();
+
+  const location = useLocation();
+
+  const buyNowProduct = location.state?.product;
+  const isBuyNow = location.state?.isBuyNow;
 
   /* ================= AUTH ================= */
   const [uid, setUid] = useState(null);
@@ -52,6 +67,14 @@ export default function Checkout() {
 
   useEffect(() => {
     if (!uid) return;
+
+    // BUY NOW FLOW
+    if (isBuyNow && buyNowProduct) {
+      setItems([{ id: "buynow", ...buyNowProduct }]);
+      return;
+    }
+
+    // NORMAL CART FLOW
     getDocs(collection(db, "users", uid, "cart")).then((snap) => {
       setItems(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
     });
@@ -106,9 +129,7 @@ export default function Checkout() {
   const clearCart = async () => {
     const snap = await getDocs(collection(db, "users", uid, "cart"));
     await Promise.all(
-      snap.docs.map((d) =>
-        deleteDoc(doc(db, "users", uid, "cart", d.id))
-      )
+      snap.docs.map((d) => deleteDoc(doc(db, "users", uid, "cart", d.id))),
     );
   };
 
@@ -169,7 +190,10 @@ export default function Checkout() {
       setDoc(userOrderRef, orderData),
     ]);
 
-    await clearCart();
+    if (!isBuyNow) {
+      await clearCart();
+    }
+
     toast.success(`Order ${orderNumber} placed 🎉`);
     navigate("/account", { state: { tab: "orders" } });
   };
@@ -178,7 +202,12 @@ export default function Checkout() {
   const placeOrder = async () => {
     if (!items.length) return toast.error("Cart is empty");
 
-    if (!shipping.name || !shipping.phone || !shipping.address || !shipping.state) {
+    if (
+      !shipping.name ||
+      !shipping.phone ||
+      !shipping.address ||
+      !shipping.state
+    ) {
       return toast.error("Fill all delivery details");
     }
 
@@ -257,7 +286,7 @@ export default function Checkout() {
               SHIPPING
             </h2>
 
-            {["name","email","phone","city","zip"].map((k) => (
+            {["name", "email", "phone", "city", "zip"].map((k) => (
               <input
                 key={k}
                 value={shipping[k]}
@@ -300,7 +329,9 @@ export default function Checkout() {
 
             {items.map((i) => (
               <div key={i.id} className="flex justify-between mb-3">
-                <span>{i.name} × {i.quantity}</span>
+                <span>
+                  {i.name} × {i.quantity}
+                </span>
                 <span>₹{i.price * i.quantity}</span>
               </div>
             ))}
