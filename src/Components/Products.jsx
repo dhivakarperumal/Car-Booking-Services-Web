@@ -126,28 +126,6 @@ flex flex-col"
                   </span>
                 )}
 
-                {/* CART ICON (TOP RIGHT ON HOVER) */}
-                <div
-                  onClick={(e) => handleAddToCart(product, e)}
-                  className="
-absolute top-5 right-5 z-20 cursor-pointer
-
-opacity-100 translate-x-0
-
-md:translate-x-10 md:opacity-0
-md:group-hover:translate-x-0
-md:group-hover:opacity-100
-
-transition-all duration-500 ease-out
-bg-black backdrop-blur p-3 rounded-full
-border border-sky-400 text-sky-400
-shadow-lg shadow-sky-400/40
-hover:shadow-sky-400/70
-"
-                >
-                  <FiShoppingCart size={18} />
-                </div>
-
                 {/* IMAGE */}
                 <div className="relative h-[260px] overflow-hidden">
                   <img
