@@ -83,6 +83,37 @@ export default function ProductDetails() {
     navigate("/cart");
   };
 
+  const handleBuyNow = () => {
+    const user = auth.currentUser;
+
+    if (!user) {
+      alert("Please login first");
+      return;
+    }
+
+    const variant = product.variants?.[selectedVariantIndex];
+
+    if (!variant?.sku) {
+      alert("Product variant not available");
+      return;
+    }
+
+    // 🔥 Pass product directly to checkout page
+    navigate("/checkout", {
+      state: {
+        isBuyNow: true,
+        product: {
+          docId: product.docId,
+          sku: variant.sku,
+          name: product.name,
+          price: product.offerPrice,
+          image: product.images?.[0],
+          quantity: 1,
+        },
+      },
+    });
+  };
+
   if (!product)
     return <div className="text-white text-center py-40">Loading...</div>;
 
@@ -165,7 +196,6 @@ export default function ProductDetails() {
 
             {/* PRODUCT DETAILS */}
             <div className="mt-6 grid grid-cols-2 gap-y-3 text-xl">
-
               {product.variants?.[selectedVariantIndex]?.stock !==
                 undefined && (
                 <>
@@ -184,7 +214,7 @@ export default function ProductDetails() {
                   </span>
                 </>
               )}
-              
+
               {/* SKU DROPDOWN */}
               {product.variants?.length > 0 && (
                 <>
@@ -258,10 +288,11 @@ shadow-xl shadow-blue-500/40 cursor-pointer"
               </button>
 
               <button
+                onClick={handleBuyNow}
                 className="flex-1 px-10 py-4 rounded-full font-semibold
-    border border-sky-400 text-sky-400
-    hover:bg-sky-400 hover:text-black
-    transition-all duration-300 cursor-pointer"
+  border border-sky-400 text-sky-400
+  hover:bg-sky-400 hover:text-black
+  transition-all duration-300 cursor-pointer"
               >
                 Buy Now
               </button>
