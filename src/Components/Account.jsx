@@ -11,6 +11,7 @@ const Account = () => {
   personal: "Personal Information",
   orders: "My Orders",
   address: "Manage Address",
+  servicestatus: "Service Status",
 };
 
   const renderComponent = () => {
