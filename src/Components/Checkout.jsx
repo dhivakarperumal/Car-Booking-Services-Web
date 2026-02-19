@@ -80,7 +80,6 @@ export default function Checkout() {
     country: "India",
   });
 
-  /* ✅ FIXED: map Firestore fields correctly */
   const selectAddress = (addr) => {
     setShipping({
       name: addr.fullName,
@@ -98,7 +97,7 @@ export default function Checkout() {
   /* ================= ORDER STATE ================= */
   const [placing, setPlacing] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState("CASH");
-  const [orderType, setOrderType] = useState("DELIVERY");
+  const [orderType] = useState("DELIVERY");
 
   const subtotal = items.reduce((a, c) => a + c.price * c.quantity, 0);
   const total = subtotal;
@@ -128,7 +127,6 @@ export default function Checkout() {
   const saveOrder = async (paymentId = null) => {
     if (!uid) throw new Error("User not logged in");
 
-    // 🔒 Reduce stock first
     await reduceStockAfterPurchase(items);
 
     const orderNumber = await generateOrderNumber();
@@ -141,7 +139,7 @@ export default function Checkout() {
       uid,
       items,
       orderType,
-      shipping: orderType === "DELIVERY" ? shipping : null,
+      shipping,
       subtotal,
       total,
       paymentMethod,
@@ -151,7 +149,6 @@ export default function Checkout() {
       createdAt: Timestamp.now(),
     };
 
-    // 🏠 Save address (duplicate-safe)
     try {
       await saveUserAddress(uid, {
         fullName: shipping.name,
@@ -181,10 +178,7 @@ export default function Checkout() {
   const placeOrder = async () => {
     if (!items.length) return toast.error("Cart is empty");
 
-    if (
-      orderType === "DELIVERY" &&
-      (!shipping.name || !shipping.phone || !shipping.address || !shipping.state)
-    ) {
+    if (!shipping.name || !shipping.phone || !shipping.address || !shipping.state) {
       return toast.error("Fill all delivery details");
     }
 
@@ -200,7 +194,7 @@ export default function Checkout() {
       if (!loaded) throw new Error("Razorpay failed");
 
       new window.Razorpay({
-        key: import.meta.env.VITE_RAZORPAY_KEY,
+        key: "rzp_test_SGj8n5SyKSE10b",
         amount: total * 100,
         currency: "INR",
         name: "Your Store",
@@ -212,7 +206,7 @@ export default function Checkout() {
           email: shipping.email,
           contact: shipping.phone,
         },
-        theme: { color: "#ef4444" },
+        theme: { color: "#38bdf8" },
       }).open();
     } catch (err) {
       toast.error(err.message || "Payment failed");
@@ -221,7 +215,6 @@ export default function Checkout() {
     }
   };
 
-  /* ================= UI ================= */
   return (
     <div className="bg-black text-white min-h-screen">
       <PageHeader title="Checkout" />
@@ -229,10 +222,10 @@ export default function Checkout() {
       <PageContainer>
         <div className="grid lg:grid-cols-2 gap-12 py-16">
           {/* LEFT */}
-          <div className="border border-red-500/60 p-8 rounded-3xl">
+          <div className="border border-sky-400/40 bg-black/80 p-8 rounded-3xl backdrop-blur-xl shadow-[0_0_40px_rgba(56,189,248,0.25)]">
             {savedAddresses.length > 0 && (
               <div className="mb-6 space-y-3">
-                <h3 className="text-red-500 text-sm tracking-widest">
+                <h3 className="text-sky-400 text-sm tracking-widest">
                   SAVED ADDRESSES
                 </h3>
 
@@ -243,8 +236,8 @@ export default function Checkout() {
                     className={`p-4 rounded-xl border cursor-pointer
                       ${
                         selectedAddressId === addr.id
-                          ? "border-red-500 bg-red-500/10"
-                          : "border-red-500/30"
+                          ? "border-sky-400 bg-sky-400/10"
+                          : "border-sky-400/30"
                       }`}
                   >
                     <p className="font-semibold text-sm">{addr.fullName}</p>
@@ -260,7 +253,7 @@ export default function Checkout() {
               </div>
             )}
 
-            <h2 className="text-red-500 text-xl mb-4 tracking-widest">
+            <h2 className="text-sky-400 text-xl mb-4 tracking-widest">
               SHIPPING
             </h2>
 
@@ -272,7 +265,7 @@ export default function Checkout() {
                   setShipping({ ...shipping, [k]: e.target.value })
                 }
                 placeholder={k.toUpperCase()}
-                className="w-full mb-4 bg-black border border-red-500/40 px-4 py-3 rounded-xl"
+                className="w-full mb-4 bg-black border border-sky-400/40 px-4 py-3 rounded-xl"
               />
             ))}
 
@@ -282,7 +275,7 @@ export default function Checkout() {
                 setShipping({ ...shipping, address: e.target.value })
               }
               placeholder="ADDRESS"
-              className="w-full mb-4 bg-black border border-red-500/40 px-4 py-3 rounded-xl"
+              className="w-full mb-4 bg-black border border-sky-400/40 px-4 py-3 rounded-xl"
             />
 
             <select
@@ -290,7 +283,7 @@ export default function Checkout() {
               onChange={(e) =>
                 setShipping({ ...shipping, state: e.target.value })
               }
-              className="w-full bg-black border border-red-500/40 px-4 py-3 rounded-xl"
+              className="w-full bg-black border border-sky-400/40 px-4 py-3 rounded-xl"
             >
               <option value="">Select State</option>
               {indianStates.map((s) => (
@@ -300,8 +293,8 @@ export default function Checkout() {
           </div>
 
           {/* RIGHT */}
-          <div className="border border-red-500/60 p-8 rounded-3xl">
-            <h2 className="text-red-500 text-xl mb-6 tracking-widest">
+          <div className="border border-sky-400/40 bg-black/80 p-8 rounded-3xl backdrop-blur-xl shadow-[0_0_40px_rgba(56,189,248,0.25)]">
+            <h2 className="text-sky-400 text-xl mb-6 tracking-widest">
               SUMMARY
             </h2>
 
@@ -312,19 +305,48 @@ export default function Checkout() {
               </div>
             ))}
 
-            <div className="border-t border-red-500/40 mt-6 pt-4">
+            <div className="border-t border-sky-400/40 mt-6 pt-4">
               <div className="flex justify-between font-bold text-lg">
                 <span>Total</span>
-                <span className="text-red-500">₹{total}</span>
+                <span className="text-sky-400">₹{total}</span>
               </div>
+            </div>
+
+            {/* PAYMENT */}
+            <div className="mt-6 space-y-4">
+              <h3 className="text-sky-400 text-sm tracking-widest">
+                PAYMENT METHOD
+              </h3>
+
+              <label className="flex items-center gap-3">
+                <input
+                  type="radio"
+                  checked={paymentMethod === "CASH"}
+                  onChange={() => setPaymentMethod("CASH")}
+                  className="accent-sky-400"
+                />
+                Cash on Delivery
+              </label>
+
+              <label className="flex items-center gap-3">
+                <input
+                  type="radio"
+                  checked={paymentMethod === "ONLINE"}
+                  onChange={() => setPaymentMethod("ONLINE")}
+                  className="accent-sky-400"
+                />
+                Online Payment (Razorpay)
+              </label>
             </div>
 
             <button
               onClick={placeOrder}
               disabled={placing}
               className="w-full mt-6 py-3 rounded-full
-              bg-gradient-to-r from-[#eb613e] to-red-700
-              tracking-widest hover:scale-105 transition"
+              bg-gradient-to-r from-sky-500 to-cyan-400
+              text-black font-semibold tracking-widest
+              hover:scale-105 transition
+              shadow-[0_0_30px_rgba(56,189,248,0.6)]"
             >
               {placing ? "Processing..." : "PLACE ORDER"}
             </button>
