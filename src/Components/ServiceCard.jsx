@@ -9,7 +9,7 @@ const ServiceCard = ({ service }) => {
       className="group relative bg-[#0b0f14]
       border border-white/10
       transition-all duration-500
-      hover:scale-[1.02]
+      hover:scale-[1]
       hover:border-sky-400
       hover:shadow-[0_25px_70px_rgba(56,189,248,0.35)]
       flex flex-col h-full"

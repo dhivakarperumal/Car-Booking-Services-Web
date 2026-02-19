@@ -27,18 +27,16 @@ export default function PricingSwiper() {
   return (
     <section className="py-20 bg-black text-white">
       <div className="container mx-auto px-6">
-
         {/* Heading */}
         <div className="text-center mb-14">
-          <h2 className="text-4xl font-extrabold">
-            Our Pricing Plans
-          </h2>
+          <h2 className="text-4xl font-extrabold">Our Pricing Plans</h2>
         </div>
 
         <Swiper
+          className="pricing-swiper !overflow-hidden "
           modules={[Autoplay]}
-          autoplay={{ delay: 3500 }}
-          loop={true}
+          autoplay={{ delay: 2500 }}
+          loop
           spaceBetween={30}
           breakpoints={{
             0: { slidesPerView: 1 },
@@ -47,12 +45,13 @@ export default function PricingSwiper() {
           }}
         >
           {packages.map((pkg) => (
-            <SwiperSlide key={pkg.id}>
-              <PricingCard pkg={pkg} />
+            <SwiperSlide key={pkg.id} className="!flex !h-auto">
+              <div className="flex flex-col w-full h-full">
+                <PricingCard pkg={pkg} />
+              </div>
             </SwiperSlide>
           ))}
         </Swiper>
-
       </div>
     </section>
   );
