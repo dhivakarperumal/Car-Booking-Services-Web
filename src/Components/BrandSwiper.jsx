@@ -16,6 +16,7 @@ const brands = [
 export default function BrandSwiper() {
   return (
     <section className="bg-black py-10">
+      <PageContainer>
       <div className="container mx-auto px-6">
         <h3 className="text-center text-gray-400 uppercase tracking-[0.3em] mb-10">
           Trusted Brands
@@ -75,6 +76,7 @@ transition-all duration-500"
           ))}
         </Swiper>
       </div>
+      </PageContainer>
     </section>
   );
 }
