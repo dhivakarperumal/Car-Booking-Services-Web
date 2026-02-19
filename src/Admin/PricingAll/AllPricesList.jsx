@@ -396,7 +396,7 @@ const PricingList = () => {
                 key={pkg.id}
                 className="border border-gray-300 rounded-xl p-4 shadow-sm hover:shadow-md transition bg-white"
               >
-                <h3 className="font-semibold text-sm">{pkg.title}</h3>
+                <h3 className="font-semibold text-md">{pkg.title}</h3>
 
                 <p className="text-sm font-medium mt-1">
                   ₹{Number(pkg.price || 0).toLocaleString()}
@@ -418,14 +418,14 @@ const PricingList = () => {
                     onClick={() =>
                       navigate(`/admin/addprice/${pkg.id}`, { state: pkg })
                     }
-                    className="text-blue-600 hover:scale-110 transition"
+                    className="p-3 rounded-full  border border-gray-300  transition"
                   >
                     <Pencil size={16} />
                   </button>
 
                   <button
                     onClick={() => handleDelete(pkg.id)}
-                    className="text-red-500 hover:scale-110 transition"
+                    className="p-3 rounded-full  border border-gray-300  transition"
                   >
                     <Trash2 size={16} />
                   </button>
@@ -475,23 +475,19 @@ const PricingList = () => {
                           onClick={() =>
                             navigate(`/admin/addprice/${pkg.id}`, { state: pkg })
                           }
-                          className="flex items-center gap-1 px-3 py-1.5 rounded-lg
-      text-blue-600 hover:bg-blue-50 hover:text-blue-700
-      transition active:scale-95"
+                          className="p-3 rounded-full  border border-gray-300  transition"
                         >
                           <Pencil size={14} />
-                          <span className="hidden sm:inline">Edit</span>
+                          
                         </button>
 
                         {/* 🗑 DELETE */}
                         <button
                           onClick={() => handleDelete(pkg.id)}
-                          className="flex items-center gap-1 px-3 py-1.5 rounded-lg
-      text-red-500 hover:bg-red-50 hover:text-red-600
-      transition active:scale-95"
+                          className="p-3 rounded-full  border border-gray-300  transition"
                         >
                           <Trash2 size={14} />
-                          <span className="hidden sm:inline">Delete</span>
+                          
                         </button>
 
                       </div>

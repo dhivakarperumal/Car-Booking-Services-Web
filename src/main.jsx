@@ -60,6 +60,8 @@ import Contact from "./Components/ContactUs.jsx";
 import BookService from "./Components/BookService.jsx";
 import Account from "./Components/Account.jsx";
 import Cart from "./Components/Cart.jsx";
+import AllOrders from "./Admin/Orders/All Orders.jsx";
+import OrderDetails from "./Admin/Orders/OrderDetails.jsx";
 
 
 const router = createBrowserRouter([
@@ -97,7 +99,13 @@ const router = createBrowserRouter([
       { path: "addserviceparts", element: <AddServiceParts /> },
       { path: "bookings", element: <ShowAllBookings/> },
       { path: "addbooking", element: <BookingService /> },
-      { path: "contact", element: <Contact /> },
+      // { path: "contact", element: <Contact /> },
+
+      { path: "orders", element: <AllOrders /> },
+      { path: "orders/:id", element: <OrderDetails /> },
+
+
+
 
       { path: "allProducts", element: <AllProducts /> },
       { path: "addproducts", element: <AddProducts /> },

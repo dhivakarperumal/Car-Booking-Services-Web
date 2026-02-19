@@ -316,16 +316,16 @@ const AllProducts = () => {
               <div className="flex justify-between mt-auto gap-2">
                 <button
                   onClick={() => handleEdit(p)}
-                  className="flex-1 border border-gray-300 py-1 rounded-lg text-xs hover:bg-gray-100 transition"
+                  className="p-3 rounded-full   border border-gray-300  transition"
                 >
-                  Edit
+                  <FaEdit  />
                 </button>
 
                 <button
                   onClick={() => handleDelete(p.docId)}
-                  className="flex-1 bg-black text-white py-1 rounded-lg text-xs hover:bg-gray-900 transition"
+                  className="p-3 rounded-full  border border-gray-300  transition"
                 >
-                  Delete
+                  <FaTrash  />
                 </button>
               </div>
             </div>

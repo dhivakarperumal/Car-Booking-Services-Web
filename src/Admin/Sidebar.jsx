@@ -35,6 +35,8 @@ const navItems = [
     ],
   },
 
+  { path: "/admin/orders", label: "Orders", icon: CalendarCheck },
+
   { path: "/admin/serviceslist", label: "Services List", icon: CalendarCheck },
   { path: "/admin/priceslist", label: "Pricing List", icon: BarChart3 },
 

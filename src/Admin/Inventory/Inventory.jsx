@@ -276,13 +276,13 @@ const Inventory = () => {
                   <td className="px-3 py-4 flex gap-2 justify-center">
                     <button
                       onClick={() => navigate(`/admin/additemsinventory/${item.id}`)}
-                      className="p-2 rounded-lg bg-green-700 text-white  transition"
+                      className="p-3 rounded-full  border border-gray-300  transition"
                     >
                       <Pencil size={14} />
                     </button>
                     <button
                       onClick={() => handleDelete(item.id)}
-                      className="p-2 rounded-lg bg-red-700 text-white  transition"
+                      className="p-3 rounded-full  border border-gray-300  transition"
                     >
                       <Trash2 size={14} />
                     </button>
