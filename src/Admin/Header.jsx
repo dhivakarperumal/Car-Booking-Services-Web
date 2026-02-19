@@ -36,11 +36,14 @@ const pageTitles = {
   "/admin/users": "Users",
 };
 
+
+
+
 const Header = ({ onMenuClick }) => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
+
   const searchInputRef = useRef(null);
 
   const [todayBookings, setTodayBookings] = useState([]);
@@ -51,21 +54,94 @@ const Header = ({ onMenuClick }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
+
+  const [searchTerm, setSearchTerm] = useState("");
+  const [bookings, setBookings] = useState([]);
+  const [orders, setOrders] = useState([]);
+  const [customers, setCustomers] = useState([]);
+
+  const sidebarMenus = [
+    { title: "Dashboard", path: "/admin" },
+    { title: "Bookings Service", path: "/admin/bookings" },
+    { title: "Customers", path: "/admin/customers" },
+    { title: "Billing", path: "/admin/billing" },
+    { title: "Inventory", path: "/admin/inventory" },
+    { title: "Reports", path: "/admin/reports" },
+    { title: "Settings", path: "/admin/settings" },
+  ];
+
+  const searchResults = searchTerm
+    ? [
+      // Menus
+      ...sidebarMenus
+        .filter((m) =>
+          m.title.toLowerCase().includes(searchTerm.toLowerCase())
+        )
+        .map((m) => ({ type: "menu", ...m })),
+
+      // Bookings
+      ...bookings
+        .filter(
+          (b) =>
+            b.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            b.phone?.includes(searchTerm) ||
+            b.bookingId?.toLowerCase().includes(searchTerm.toLowerCase())
+        )
+        .map((b) => ({ type: "booking", ...b })),
+
+      // Customers
+      ...customers
+        .filter(
+          (c) =>
+            c.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            c.phone?.includes(searchTerm)
+        )
+        .map((c) => ({ type: "customer", ...c })),
+
+      // Orders
+      ...orders
+        .filter(
+          (o) =>
+            o.orderId?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            o.shipping?.phone?.includes(searchTerm) ||
+            o.shipping?.name
+              ?.toLowerCase()
+              .includes(searchTerm.toLowerCase())
+        )
+        .map((o) => ({ type: "order", ...o })),
+    ]
+    : [];
+
   useEffect(() => {
-    if (showSearch && searchInputRef.current) {
-      searchInputRef.current.focus();
-    }
-  }, [showSearch]);
+    const unsubBookings = onSnapshot(collection(db, "bookings"), (snap) => {
+      setBookings(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
+    });
+
+    const unsubOrders = onSnapshot(collection(db, "orders"), (snap) => {
+      setOrders(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
+    });
+
+    const unsubCustomers = onSnapshot(collection(db, "customers"), (snap) => {
+      setCustomers(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
+    });
+
+    return () => {
+      unsubBookings();
+      unsubOrders();
+      unsubCustomers();
+    };
+  }, []);
+
 
 
 
 
   const getGreeting = () => {
-  const hour = new Date().getHours();
-  if (hour < 12) return "Good morning";
-  if (hour < 18) return "Good afternoon";
-  return "Good evening";
-};
+    const hour = new Date().getHours();
+    if (hour < 12) return "Good morning";
+    if (hour < 18) return "Good afternoon";
+    return "Good evening";
+  };
 
 
   const [greeting, setGreeting] = useState(getGreeting());
@@ -168,31 +244,83 @@ const Header = ({ onMenuClick }) => {
                   className="fixed inset-0 z-40"
                 />
 
-                <div className="fixed sm:absolute left-4 right-4 sm:left-auto sm:right-10 top-[4.5rem] sm:top-1/2 sm:-translate-y-1/2 
-                      bg-white border border-slate-200 rounded-2xl shadow-xl 
-                      flex items-center z-50 w-auto sm:w-80 animate-fadeIn">
-                  {/* Input */}
-                  <input
-                    ref={searchInputRef}
-                    type="text"
-                    placeholder="Search patients, doctors, bills..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    onKeyDown={(e) => e.key === "Escape" && setShowSearch(false)}
-                    autoFocus
-                    className="flex-1 px-4 py-3 text-sm outline-none placeholder-slate-400"
-                  />
+                <div
+                  className="absolute right-0 top-full mt-0 
+                  w-[90vw] max-w-[360px] sm:w-80 
+                  bg-white border border-slate-200 rounded-2xl shadow-xl 
+                  flex flex-col z-50 animate-fadeIn overflow-hidden"
+                >
 
-                  {/* Close */}
-                  <button
-                    onClick={() => {
-                      setShowSearch(false);
-                      setSearchTerm("");
-                    }}
-                    className="p-3 text-slate-400 hover:text-slate-600 transition"
-                  >
-                    <X className="w-5 h-5" />
-                  </button>
+                  {/* Input Row */}
+                  <div className="flex items-center border-b border-slate-100">
+                    <input
+                      ref={searchInputRef}
+                      type="text"
+                      placeholder="Search menus, customers, bookings..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      onKeyDown={(e) => e.key === "Escape" && setShowSearch(false)}
+                      autoFocus
+                      className="flex-1 px-4 py-3 text-sm outline-none placeholder-slate-400"
+                    />
+
+                    <button
+                      onClick={() => {
+                        setShowSearch(false);
+                        setSearchTerm("");
+                      }}
+                      className="p-3 text-slate-400 hover:text-slate-600 transition"
+                    >
+                      <X className="w-5 h-5" />
+                    </button>
+                  </div>
+
+                  {/* RESULTS */}
+                  {searchTerm && (
+                    <div className="max-h-72 overflow-y-auto">
+                      {searchResults.length > 0 ? (
+                        searchResults.map((item, i) => (
+                          <div
+                            key={i}
+                            onClick={() => {
+                              setShowSearch(false);
+                              setSearchTerm("");
+
+                              if (item.type === "menu") navigate(item.path);
+                              if (item.type === "booking")
+                                navigate(`/admin/bookings/${item.id}`);
+                              if (item.type === "customer")
+                                navigate(`/admin/customers/${item.id}`);
+                              if (item.type === "order")
+                                navigate(`/admin/orders/${item.id}`);
+                            }}
+                            className="px-4 py-3 border-b border-slate-100 hover:bg-slate-50 cursor-pointer"
+                          >
+                            <p className="text-sm font-semibold text-slate-800">
+                              {item.title ||
+                                item.name ||
+                                item.shipping?.name ||
+                                "Result"}
+                            </p>
+
+                            <p className="text-xs text-slate-500">
+                              {item.type === "menu" && "Menu"}
+                              {item.type === "booking" &&
+                                `Booking ID: ${item.bookingId}`}
+                              {item.type === "customer" &&
+                                `Phone: ${item.phone}`}
+                              {item.type === "order" &&
+                                `Order ID: ${item.orderId}`}
+                            </p>
+                          </div>
+                        ))
+                      ) : (
+                        <p className="px-4 py-3 text-sm text-slate-400 text-center">
+                          No results found
+                        </p>
+                      )}
+                    </div>
+                  )}
                 </div>
               </>
             )}
@@ -209,6 +337,7 @@ const Header = ({ onMenuClick }) => {
               <Search className="w-5 h-5" />
             </button>
           </div>
+
 
 
           {/* Notifications */}
