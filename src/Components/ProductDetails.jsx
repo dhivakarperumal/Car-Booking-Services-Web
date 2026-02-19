@@ -13,6 +13,7 @@ import {
 } from "firebase/firestore";
 import { auth, db } from "../firebase";
 import { useEffect, useState } from "react";
+import PageHeader from "./PageHeader";
 
 export default function ProductDetails() {
   const { slug } = useParams();
@@ -150,6 +151,8 @@ export default function ProductDetails() {
     return <div className="text-white text-center py-40">Loading...</div>;
 
   return (
+    <>
+    <PageHeader title={product?.name || "Product Details"} />
     <section className="bg-black text-white py-20">
       <div className="container mx-auto px-6">
         <div className="grid lg:grid-cols-2 gap-16 items-start">
@@ -363,5 +366,6 @@ shadow-xl shadow-blue-500/40 cursor-pointer"
         </div>
       </div>
     </section>
+    </>
   );
 }

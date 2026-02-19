@@ -15,7 +15,7 @@ const brands = [
 
 export default function BrandSwiper() {
   return (
-    <section className="bg-black py-20">
+    <section className="bg-black py-10">
       <div className="container mx-auto px-6">
         <h3 className="text-center text-gray-400 uppercase tracking-[0.3em] mb-10">
           Trusted Brands
@@ -23,24 +23,22 @@ export default function BrandSwiper() {
 
         <Swiper
           modules={[Autoplay]}
-          loop
-          centeredSlides={false}
           autoplay={{ delay: 2500, disableOnInteraction: false }}
-          spaceBetween={40}
-          slidesOffsetBefore={20}
-          slidesOffsetAfter={20}
+          loop
+          grabCursor
+          spaceBetween={30}
           breakpoints={{
-            0: { slidesPerView: 1, spaceBetween: 20 },
-            640: { slidesPerView: 3, spaceBetween: 25 },
-            1024: { slidesPerView: 4, spaceBetween: 40 },
+            0: { slidesPerView: 1 },
+            640: { slidesPerView: 3 },
+            1024: { slidesPerView: 4 },
           }}
         >
           {brands.map((logo, i) => (
             <SwiperSlide key={i}>
               <div
-                className="group relative mt-5 mb-5 h-32 flex items-center justify-center
+                className="group relative mt-5 mb-10 h-32 flex items-center justify-center
 bg-[#050b14]/80 backdrop-blur-xl rounded-2xl
-border border-sky-400
+border border-sky-400/20
 overflow-hidden
 
 shadow-[0_25px_80px_rgba(56,189,248,0.35)]
