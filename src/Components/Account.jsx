@@ -1,13 +1,26 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import PersonalInfo from "./PersonalInfo";
 import PageHeader from "./PageHeader";
 import MyOrders from "./MyOrders";
 import ManageAddress from "./ManageAddress";
 import ServiceStatus from "./ServiceStatus";
 import PageContainer from "./PageContainer";
+import { useLocation } from "react-router-dom";
 
 const Account = () => {
-  const [activeTab, setActiveTab] = useState("servicestatus");
+  const location = useLocation();
+
+  const [activeTab, setActiveTab] = useState(
+    location.state?.tab || "servicestatus"
+  );
+
+  useEffect(() => {
+  if (location.state?.tab) {
+    setActiveTab(location.state.tab);
+  }
+}, [location.state]);
+
+  const defaultTab = location.state?.tab || "profile";
 
   const titleMap = {
     personal: "Personal Information",

@@ -165,7 +165,7 @@ export default function Checkout() {
       total,
       paymentMethod,
       paymentStatus: paymentMethod === "CASH" ? "Pending" : "Paid",
-      status: "OrderPlaced",
+      status: "orderplaced",
       paymentId,
       createdAt: Timestamp.now(),
     };
@@ -377,7 +377,7 @@ export default function Checkout() {
               bg-gradient-to-r from-sky-500 to-cyan-400
               text-black font-semibold tracking-widest
               hover:scale-105 transition
-              shadow-[0_0_30px_rgba(56,189,248,0.6)]"
+              shadow-[0_0_30px_rgba(56,189,248,0.6)] cursor-pointer"
             >
               {placing ? "Processing..." : "PLACE ORDER"}
             </button>

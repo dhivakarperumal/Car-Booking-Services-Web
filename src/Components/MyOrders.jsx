@@ -8,6 +8,7 @@ import {
 } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth, db } from "../firebase";
+import { useLocation } from "react-router-dom";
 
 const STATUS_CONFIG = {
   orderplaced: {
@@ -48,6 +49,17 @@ const MyOrders = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedOrder, setSelectedOrder] = useState(null);
+
+  const location = useLocation();
+
+useEffect(() => {
+  if (location.state?.highlightOrderId && orders.length) {
+    const found = orders.find(
+      (o) => o.id === location.state.highlightOrderId
+    );
+    if (found) setSelectedOrder(found);
+  }
+}, [orders]);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
