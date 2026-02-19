@@ -165,6 +165,26 @@ export default function ProductDetails() {
 
             {/* PRODUCT DETAILS */}
             <div className="mt-6 grid grid-cols-2 gap-y-3 text-xl">
+
+              {product.variants?.[selectedVariantIndex]?.stock !==
+                undefined && (
+                <>
+                  <span className="text-gray-400">Stock</span>
+
+                  <span
+                    className={`font-medium ${
+                      product.variants[selectedVariantIndex].stock > 0
+                        ? "text-green-400"
+                        : "text-red-400"
+                    }`}
+                  >
+                    {product.variants[selectedVariantIndex].stock > 0
+                      ? `${product.variants[selectedVariantIndex].stock} Available`
+                      : "Out of Stock"}
+                  </span>
+                </>
+              )}
+              
               {/* SKU DROPDOWN */}
               {product.variants?.length > 0 && (
                 <>
@@ -223,24 +243,6 @@ export default function ProductDetails() {
                     </span>
                   </>
                 )}
-              {product.variants?.[selectedVariantIndex]?.stock !==
-                undefined && (
-                <>
-                  <span className="text-gray-400">Stock</span>
-
-                  <span
-                    className={`font-medium ${
-                      product.variants[selectedVariantIndex].stock > 0
-                        ? "text-green-400"
-                        : "text-red-400"
-                    }`}
-                  >
-                    {product.variants[selectedVariantIndex].stock > 0
-                      ? `${product.variants[selectedVariantIndex].stock} Available`
-                      : "Out of Stock"}
-                  </span>
-                </>
-              )}
             </div>
 
             {/* CTA BUTTONS */}
