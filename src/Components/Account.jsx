@@ -3,17 +3,21 @@ import PersonalInfo from "./PersonalInfo";
 import PageHeader from "./PageHeader";
 import MyOrders from "./MyOrders";
 import ManageAddress from "./ManageAddress";
+import ServiceStatus from "./ServiceStatus";
 
 const Account = () => {
-  const [activeTab, setActiveTab] = useState("personal");
+  const [activeTab, setActiveTab] = useState("servicestatus");
   const titleMap = {
   personal: "Personal Information",
   orders: "My Orders",
   address: "Manage Address",
+  servicestatus: "Service Status",
 };
 
   const renderComponent = () => {
     switch (activeTab) {
+      case "servicestatus":
+        return <ServiceStatus />;
       case "personal":
         return <PersonalInfo />;
       case "orders":
@@ -21,7 +25,7 @@ const Account = () => {
       case "address":
         return <ManageAddress />;
       default:
-        return <PersonalInfo />;
+        return <ServiceStatus />;
     }
   };
 
@@ -33,6 +37,15 @@ const Account = () => {
 
         {/* ===== LEFT SIDEBAR ===== */}
         <div className="bg-slate-900 rounded-2xl p-4 space-y-3 border border-sky-400">
+           <button
+            onClick={() => setActiveTab("servicestatus")}
+            className={`w-full text-left px-4 py-3 rounded-lg font-semibold transition
+              ${activeTab === "servicestatus"
+                ? "bg-sky-500 text-black"
+                : "bg-slate-800 hover:bg-slate-700"}`}
+          >
+            Service Status
+          </button>
           <button
             onClick={() => setActiveTab("personal")}
             className={`w-full text-left px-4 py-3 rounded-lg font-semibold transition
