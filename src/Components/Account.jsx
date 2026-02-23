@@ -6,6 +6,7 @@ import ManageAddress from "./ManageAddress";
 import ServiceStatus from "./ServiceStatus";
 import PageContainer from "./PageContainer";
 import { useLocation } from "react-router-dom";
+import ChangePassword from "./ChangePassword";
 
 const Account = () => {
   const location = useLocation();
@@ -25,6 +26,7 @@ const Account = () => {
     orders: "My Orders",
     address: "Manage Address",
     servicestatus: "Service Status",
+    changepassword: "Change Password",
   };
 
   const renderComponent = () => {
@@ -37,6 +39,8 @@ const Account = () => {
         return <MyOrders />;
       case "address":
         return <ManageAddress />;
+         case "changepassword":  
+      return <ChangePassword />;
       default:
         return <ServiceStatus />;
     }
@@ -56,6 +60,7 @@ const Account = () => {
               ["personal", "Profile"],
               ["orders", "Orders"],
               ["address", "Address"],
+              ["changepassword", "Password"],
             ].map(([key, label]) => (
               <button
                 key={key}
@@ -96,6 +101,11 @@ const Account = () => {
                   onClick={() => setActiveTab("personal")}
                   label="Personal Info"
                 />
+                <SidebarButton
+  active={activeTab === "changepassword"}
+  onClick={() => setActiveTab("changepassword")}
+  label="Change Password"
+/>
                 <SidebarButton
                   active={activeTab === "orders"}
                   onClick={() => setActiveTab("orders")}
