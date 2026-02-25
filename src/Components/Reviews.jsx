@@ -139,7 +139,7 @@ export default function Reviews() {
               {reviews.map((r) => (
                 <SwiperSlide key={r.id}>
                   <div
-                    className="group relative min-h-[260px] rounded-3xl p-8
+                    className="group relative min-h-[300px] rounded-3xl p-8
                       bg-[#050b14]/80 backdrop-blur-xl
                       border border-sky-400 overflow-hidden mt-5 mb-5
                       hover:-translate-y-2
@@ -187,7 +187,7 @@ export default function Reviews() {
                     </div>
 
                     {/* MESSAGE */}
-                    <p className="text-gray-300 italic leading-relaxed flex-1 overflow-hidden">
+                    <p className="text-gray-300 italic leading-relaxed flex-1 overflow-hidden line-clamp-4">
                       “{r.message}”
                     </p>
                   </div>
