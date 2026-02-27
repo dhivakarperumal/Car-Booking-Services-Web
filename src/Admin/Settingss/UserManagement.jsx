@@ -37,15 +37,24 @@ const UserManagement = () => {
     loadUsers();
   };
 
-  const toggleStatus = async (id, active) => {
-    await updateDoc(doc(db, "users", id), { active: !active });
-    toast.success("User status updated");
-    loadUsers();
-  };
+const toggleStatus = async (id, currentStatus) => {
+  const newStatus =
+    currentStatus === "active" ? "inactive" : "active";
+
+  await updateDoc(doc(db, "users", id), {
+    status: newStatus,
+    updatedAt: new Date(),
+  });
+
+  toast.success("User status updated");
+  loadUsers();
+};
 
   /* 📊 Stats */
   const totalUsers = users.length;
-  const activeUsers = users.filter((u) => u.active).length;
+  const activeUsers = users.filter(
+  (u) => u.status === "active"
+).length;
 
   /* 🔍 Filters */
   const filteredUsers = users.filter((u) => {
@@ -209,18 +218,18 @@ const UserManagement = () => {
                   </td>
                   <td>
                     <span
-                      className={`px-2 py-1 text-xs rounded-full font-medium ${u.active
-                          ? "bg-green-100 text-green-700"
-                          : "bg-red-100 text-red-700"
+                      className={`px-2 py-1 text-xs rounded-full font-medium ${u.status === "active"
+  ? "bg-green-100 text-green-700"
+  : "bg-red-100 text-red-700"
                         }`}
                     >
-                      {u.active ? "Active" : "Disabled"}
+                     {u.status === "active" ? "Active" : "Disabled"}
                     </span>
                   </td>
 
                   <td className="px-4 py-3">
                     <button
-                      onClick={() => toggleStatus(u.id, u.active)}
+                      onClick={() => toggleStatus(u.id, u.status)}
                       className="bg-blue-600 text-white px-3 py-1 rounded text-xs hover:bg-blue-700"
                     >
                       Toggle

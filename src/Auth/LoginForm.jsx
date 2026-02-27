@@ -61,7 +61,21 @@ const LoginForm = ({ onSuccess, onOpenRegister }) => {
             );
 
             const snap = await getDoc(doc(db, "users", res.user.uid));
-            onSuccess?.(snap.exists() ? snap.data().role : "user");
+
+            if (!snap.exists()) {
+                await auth.signOut();
+                toast.error("User record not found");
+                return;
+            }
+
+            if (snap.data().status !== "active") {
+                await auth.signOut();
+                toast.error("Your account has been disabled. Contact admin.");
+                return;
+            }
+
+            onSuccess?.(snap.data().role);
+
         } catch (err) {
             toast.error(err.message || "Login failed");
         } finally {
@@ -89,6 +103,12 @@ const LoginForm = ({ onSuccess, onOpenRegister }) => {
                     createdAt: serverTimestamp(),
                 });
             } else {
+                if (snap.data().status !== "active") {
+                    await auth.signOut();
+                    toast.error("Your account has been disabled. Contact admin.");
+                    return;
+                }
+
                 role = snap.data().role;
             }
 
