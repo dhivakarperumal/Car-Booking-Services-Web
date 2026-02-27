@@ -47,6 +47,7 @@ const RegisterForm = ({ onSuccess, onSwitchToLogin }) => {
                 mobile,
                 role,
                 active: true,
+                status: "active",
                 createdAt: serverTimestamp(),
             });
 
