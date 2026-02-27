@@ -84,6 +84,7 @@ const LoginForm = ({ onSuccess, onOpenRegister }) => {
                     email: res.user.email || "",
                     username: res.user.displayName || "",
                     role: "user",
+                    status: "active",
                     photoURL: res.user.photoURL || "",
                     createdAt: serverTimestamp(),
                 });

@@ -196,6 +196,7 @@ const RegisterForm = ({ onSuccess, onSwitchToLogin }) => {
 
                 <button
                     disabled={loading}
+                    onClick={handleRegister}
                     className="w-full py-2.5 rounded-lg font-semibold
                    bg-gradient-to-r from-sky-500 to-cyan-400
                    text-black hover:shadow-[0_0_20px_rgba(56,189,248,0.7)]
