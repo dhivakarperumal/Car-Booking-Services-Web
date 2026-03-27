@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
     "dev:server": "npm run dev --prefix Backend",
-    "dev:client": "npm run dev --prefix Car-Booking-Services-Web",
+    "dev:client": "npm run dev --prefix Frontend",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview"
